@@ -1,97 +1,402 @@
-const IPL_PLAYERS = [
-  // BATTERS (role: BAT)
-  { id:'b1', name:'Virat Kohli', nation:'🇮🇳', role:'BAT', battingStyle:'RHB', bowlingStyle:'RM', stats:{ avg:53.5, sr:131.2, runs2024:741, fifties:6, hundreds:1, catches:8 }, form:92, basePrice:20 },
-  { id:'b2', name:'Rohit Sharma', nation:'🇮🇳', role:'BAT', battingStyle:'RHB', bowlingStyle:'OB', stats:{ avg:42.1, sr:138.9, runs2024:502, fifties:3, hundreds:1, catches:5 }, form:82, basePrice:16 },
-  { id:'b3', name:'Shubman Gill', nation:'🇮🇳', role:'BAT', battingStyle:'RHB', bowlingStyle:'OB', stats:{ avg:46.3, sr:142.7, runs2024:890, fifties:7, hundreds:3, catches:10 }, form:90, basePrice:18 },
-  { id:'b4', name:'KL Rahul', nation:'🇮🇳', role:'BAT', battingStyle:'RHB', bowlingStyle:'-', stats:{ avg:47.2, sr:136.8, runs2024:520, fifties:4, hundreds:1, catches:18 }, form:84, basePrice:14 },
-  { id:'b5', name:'Faf du Plessis', nation:'🇿🇦', role:'BAT', battingStyle:'RHB', bowlingStyle:'OB', stats:{ avg:35.8, sr:141.2, runs2024:430, fifties:4, hundreds:0, catches:12 }, form:76, basePrice:10 },
-  { id:'b6', name:'David Warner', nation:'🇦🇺', role:'BAT', battingStyle:'LHB', bowlingStyle:'LS', stats:{ avg:41.5, sr:144.2, runs2024:516, fifties:5, hundreds:1, catches:9 }, form:80, basePrice:12 },
-  { id:'b7', name:'Jos Buttler', nation:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', role:'WK-BAT', battingStyle:'RHB', bowlingStyle:'-', stats:{ avg:52.1, sr:149.3, runs2024:581, fifties:5, hundreds:2, catches:22 }, form:88, basePrice:16 },
-  { id:'b8', name:'Sanju Samson', nation:'🇮🇳', role:'WK-BAT', battingStyle:'RHB', bowlingStyle:'-', stats:{ avg:41.8, sr:151.4, runs2024:531, fifties:4, hundreds:1, catches:20 }, form:86, basePrice:14 },
-  { id:'b9', name:'Rishabh Pant', nation:'🇮🇳', role:'WK-BAT', battingStyle:'LHB', bowlingStyle:'-', stats:{ avg:35.2, sr:148.7, runs2024:446, fifties:3, hundreds:1, catches:24 }, form:83, basePrice:16 },
-  { id:'b10', name:'Prithvi Shaw', nation:'🇮🇳', role:'BAT', battingStyle:'RHB', bowlingStyle:'OB', stats:{ avg:28.4, sr:155.2, runs2024:210, fifties:2, hundreds:0, catches:4 }, form:62, basePrice:4 },
-  { id:'b11', name:'Devdutt Padikkal', nation:'🇮🇳', role:'BAT', battingStyle:'LHB', bowlingStyle:'LS', stats:{ avg:31.2, sr:138.5, runs2024:340, fifties:3, hundreds:0, catches:8 }, form:71, basePrice:5 },
-  { id:'b12', name:'Ruturaj Gaikwad', nation:'🇮🇳', role:'BAT', battingStyle:'RHB', bowlingStyle:'OB', stats:{ avg:45.6, sr:140.3, runs2024:583, fifties:5, hundreds:1, catches:9 }, form:87, basePrice:14 },
-  { id:'b13', name:'Yashasvi Jaiswal', nation:'🇮🇳', role:'BAT', battingStyle:'LHB', bowlingStyle:'LS', stats:{ avg:48.9, sr:161.2, runs2024:752, fifties:6, hundreds:2, catches:7 }, form:93, basePrice:18 },
-  { id:'b14', name:'Travis Head', nation:'🇦🇺', role:'BAT', battingStyle:'LHB', bowlingStyle:'OB', stats:{ avg:43.2, sr:165.8, runs2024:567, fifties:4, hundreds:2, catches:8 }, form:89, basePrice:15 },
-  { id:'b15', name:'Quinton de Kock', nation:'🇿🇦', role:'WK-BAT', battingStyle:'LHB', bowlingStyle:'-', stats:{ avg:38.6, sr:145.1, runs2024:418, fifties:4, hundreds:0, catches:21 }, form:78, basePrice:10 },
-  { id:'b16', name:'Ishan Kishan', nation:'🇮🇳', role:'WK-BAT', battingStyle:'LHB', bowlingStyle:'-', stats:{ avg:32.4, sr:143.9, runs2024:384, fifties:3, hundreds:1, catches:18 }, form:73, basePrice:8 },
-  { id:'b17', name:'Tilak Varma', nation:'🇮🇳', role:'BAT', battingStyle:'LHB', bowlingStyle:'SLA', stats:{ avg:39.1, sr:145.8, runs2024:484, fifties:4, hundreds:1, catches:10 }, form:82, basePrice:12 },
-  { id:'b18', name:'Suryakumar Yadav', nation:'🇮🇳', role:'BAT', battingStyle:'RHB', bowlingStyle:'RM', stats:{ avg:46.7, sr:187.4, runs2024:641, fifties:5, hundreds:2, catches:14 }, form:91, basePrice:18 },
-  { id:'b19', name:'Nicholas Pooran', nation:'🇹🇹', role:'WK-BAT', battingStyle:'LHB', bowlingStyle:'-', stats:{ avg:33.8, sr:163.2, runs2024:421, fifties:3, hundreds:1, catches:19 }, form:81, basePrice:11 },
-  { id:'b20', name:'Glenn Maxwell', nation:'🇦🇺', role:'ALL', battingStyle:'RHB', bowlingStyle:'OB', stats:{ avg:22.1, sr:154.9, runs2024:252, fifties:1, hundreds:0, catches:11, wkts2024:8 }, form:68, basePrice:9 },
-  { id:'b21', name:'Liam Livingstone', nation:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', role:'ALL', battingStyle:'RHB', bowlingStyle:'LBG', stats:{ avg:28.4, sr:162.8, runs2024:312, fifties:2, hundreds:0, catches:10, wkts2024:10 }, form:74, basePrice:9 },
-  { id:'b22', name:'Rinku Singh', nation:'🇮🇳', role:'BAT', battingStyle:'LHB', bowlingStyle:'RM', stats:{ avg:44.2, sr:150.3, runs2024:378, fifties:3, hundreds:1, catches:7 }, form:85, basePrice:13 },
-  { id:'b23', name:'Abhishek Sharma', nation:'🇮🇳', role:'ALL', battingStyle:'LHB', bowlingStyle:'SLA', stats:{ avg:33.5, sr:174.8, runs2024:484, fifties:4, hundreds:1, catches:9, wkts2024:6 }, form:84, basePrice:12 },
-  { id:'b24', name:'Heinrich Klaasen', nation:'🇿🇦', role:'WK-BAT', battingStyle:'RHB', bowlingStyle:'-', stats:{ avg:44.1, sr:179.8, runs2024:479, fifties:4, hundreds:1, catches:23 }, form:88, basePrice:15 },
-  { id:'b25', name:'Tim David', nation:'🇸🇬', role:'BAT', battingStyle:'RHB', bowlingStyle:'OB', stats:{ avg:38.2, sr:156.4, runs2024:326, fifties:3, hundreds:0, catches:6 }, form:79, basePrice:8 },
-  // ALL-ROUNDERS
-  { id:'ar1', name:'Hardik Pandya', nation:'🇮🇳', role:'ALL', battingStyle:'RHB', bowlingStyle:'RF', stats:{ avg:28.1, sr:143.2, runs2024:302, fifties:1, hundreds:0, catches:8, wkts2024:14, economy:8.9 }, form:77, basePrice:15 },
-  { id:'ar2', name:'Ravindra Jadeja', nation:'🇮🇳', role:'ALL', battingStyle:'LHB', bowlingStyle:'SLA', stats:{ avg:26.8, sr:141.5, runs2024:284, fifties:1, hundreds:0, catches:15, wkts2024:16, economy:7.6 }, form:82, basePrice:14 },
-  { id:'ar3', name:'Axar Patel', nation:'🇮🇳', role:'ALL', battingStyle:'LHB', bowlingStyle:'SLA', stats:{ avg:24.3, sr:152.8, runs2024:248, fifties:2, hundreds:0, catches:10, wkts2024:18, economy:7.8 }, form:80, basePrice:12 },
-  { id:'ar4', name:'Krunal Pandya', nation:'🇮🇳', role:'ALL', battingStyle:'LHB', bowlingStyle:'SLA', stats:{ avg:22.5, sr:138.4, runs2024:198, fifties:1, hundreds:0, catches:8, wkts2024:12, economy:8.1 }, form:73, basePrice:8 },
-  { id:'ar5', name:'Washington Sundar', nation:'🇮🇳', role:'ALL', battingStyle:'RHB', bowlingStyle:'OB', stats:{ avg:19.2, sr:134.6, runs2024:168, fifties:0, hundreds:0, catches:7, wkts2024:14, economy:7.4 }, form:75, basePrice:7 },
-  { id:'ar6', name:'Shahbaz Ahmed', nation:'🇮🇳', role:'ALL', battingStyle:'LHB', bowlingStyle:'SLA', stats:{ avg:21.4, sr:142.1, runs2024:192, fifties:1, hundreds:0, catches:9, wkts2024:10, economy:8.0 }, form:70, basePrice:5 },
-  { id:'ar7', name:'Marcus Stoinis', nation:'🇦🇺', role:'ALL', battingStyle:'RHB', bowlingStyle:'RM', stats:{ avg:30.2, sr:148.7, runs2024:318, fifties:2, hundreds:0, catches:9, wkts2024:9, economy:9.1 }, form:78, basePrice:10 },
-  { id:'ar8', name:'Sam Curran', nation:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', role:'ALL', battingStyle:'LHB', bowlingStyle:'LMF', stats:{ avg:21.8, sr:146.3, runs2024:188, fifties:1, hundreds:0, catches:7, wkts2024:17, economy:8.7 }, form:76, basePrice:9 },
-  { id:'ar9', name:'Shivam Dube', nation:'🇮🇳', role:'ALL', battingStyle:'LHB', bowlingStyle:'RM', stats:{ avg:32.5, sr:157.8, runs2024:347, fifties:3, hundreds:1, catches:6, wkts2024:5, economy:9.2 }, form:83, basePrice:11 },
-  { id:'ar10', name:'Venkatesh Iyer', nation:'🇮🇳', role:'ALL', battingStyle:'LHB', bowlingStyle:'RM', stats:{ avg:28.8, sr:154.2, runs2024:298, fifties:2, hundreds:1, catches:8, wkts2024:7, economy:9.5 }, form:79, basePrice:10 },
-  // PACE BOWLERS
-  { id:'p1', name:'Jasprit Bumrah', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'RF', stats:{ wkts2024:20, economy:6.51, avg:14.2, sr:11.2, maidens:2, dot_pct:48 }, form:97, basePrice:20 },
-  { id:'p2', name:'Mohammed Shami', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'RMF', stats:{ wkts2024:17, economy:7.12, avg:16.8, sr:13.6, maidens:1, dot_pct:42 }, form:89, basePrice:16 },
-  { id:'p3', name:'Trent Boult', nation:'🇳🇿', role:'BOWL', battingStyle:'RHB', bowlingStyle:'LMF', stats:{ wkts2024:14, economy:8.21, avg:19.4, sr:14.2, maidens:0, dot_pct:38 }, form:82, basePrice:12 },
-  { id:'p4', name:'Kagiso Rabada', nation:'🇿🇦', role:'BOWL', battingStyle:'RHB', bowlingStyle:'RF', stats:{ wkts2024:20, economy:8.41, avg:18.1, sr:12.9, maidens:0, dot_pct:40 }, form:88, basePrice:16 },
-  { id:'p5', name:'Pat Cummins', nation:'🇦🇺', role:'ALL', battingStyle:'RHB', bowlingStyle:'RF', stats:{ wkts2024:17, economy:8.82, avg:20.2, sr:13.8, maidens:0, dot_pct:36, runs2024:142 }, form:85, basePrice:15 },
-  { id:'p6', name:'Harshal Patel', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'RMF', stats:{ wkts2024:16, economy:8.51, avg:21.4, sr:15.1, maidens:0, dot_pct:35 }, form:79, basePrice:9 },
-  { id:'p7', name:'Arshdeep Singh', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'LMF', stats:{ wkts2024:19, economy:8.14, avg:18.6, sr:13.0, maidens:0, dot_pct:38 }, form:86, basePrice:14 },
-  { id:'p8', name:'Mohammed Siraj', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'RMF', stats:{ wkts2024:15, economy:8.94, avg:22.1, sr:14.8, maidens:0, dot_pct:34 }, form:78, basePrice:9 },
-  { id:'p9', name:'Josh Hazlewood', nation:'🇦🇺', role:'BOWL', battingStyle:'RHB', bowlingStyle:'RF', stats:{ wkts2024:13, economy:7.21, avg:18.4, sr:15.3, maidens:1, dot_pct:43 }, form:82, basePrice:11 },
-  { id:'p10', name:'Bhuvneshwar Kumar', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'RMF', stats:{ wkts2024:11, economy:7.84, avg:23.1, sr:17.6, maidens:1, dot_pct:37 }, form:72, basePrice:7 },
-  { id:'p11', name:'Avesh Khan', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'RF', stats:{ wkts2024:14, economy:9.12, avg:24.2, sr:15.9, maidens:0, dot_pct:32 }, form:74, basePrice:7 },
-  { id:'p12', name:'T Natarajan', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'LMF', stats:{ wkts2024:12, economy:8.71, avg:22.8, sr:15.7, maidens:0, dot_pct:33 }, form:73, basePrice:5 },
-  { id:'p13', name:'Gerald Coetzee', nation:'🇿🇦', role:'BOWL', battingStyle:'RHB', bowlingStyle:'RF', stats:{ wkts2024:13, economy:9.42, avg:25.1, sr:16.0, maidens:0, dot_pct:31 }, form:72, basePrice:7 },
-  { id:'p14', name:'Akash Madhwal', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'RF', stats:{ wkts2024:10, economy:8.84, avg:23.8, sr:16.1, maidens:0, dot_pct:34 }, form:70, basePrice:4 },
-  { id:'p15', name:'Mukesh Kumar', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'RMF', stats:{ wkts2024:9, economy:9.01, avg:25.6, sr:17.0, maidens:0, dot_pct:30 }, form:68, basePrice:4 },
-  { id:'p16', name:'Yash Dayal', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'LMF', stats:{ wkts2024:11, economy:8.62, avg:22.4, sr:15.5, maidens:0, dot_pct:33 }, form:71, basePrice:4 },
-  { id:'p17', name:'Anrich Nortje', nation:'🇿🇦', role:'BOWL', battingStyle:'RHB', bowlingStyle:'RF', stats:{ wkts2024:15, economy:8.24, avg:19.8, sr:14.4, maidens:0, dot_pct:39 }, form:83, basePrice:12 },
-  { id:'p18', name:'Alzarri Joseph', nation:'🇦🇬', role:'BOWL', battingStyle:'RHB', bowlingStyle:'RF', stats:{ wkts2024:12, economy:9.14, avg:23.5, sr:15.4, maidens:0, dot_pct:30 }, form:74, basePrice:8 },
-  // SPINNERS
-  { id:'sp1', name:'Yuzvendra Chahal', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'LBG', stats:{ wkts2024:18, economy:8.12, avg:17.4, sr:12.8, maidens:0, dot_pct:38 }, form:86, basePrice:13 },
-  { id:'sp2', name:'Kuldeep Yadav', nation:'🇮🇳', role:'BOWL', battingStyle:'LHB', bowlingStyle:'LSW', stats:{ wkts2024:21, economy:7.84, avg:15.2, sr:11.6, maidens:0, dot_pct:41 }, form:91, basePrice:15 },
-  { id:'sp3', name:'Rashid Khan', nation:'🇦🇫', role:'ALL', battingStyle:'LHB', bowlingStyle:'LBG', stats:{ wkts2024:19, economy:7.12, avg:15.8, sr:12.2, maidens:1, dot_pct:44, runs2024:142 }, form:93, basePrice:18 },
-  { id:'sp4', name:'Sunil Narine', nation:'🇹🇹', role:'ALL', battingStyle:'LHB', bowlingStyle:'OB', stats:{ wkts2024:15, economy:6.71, avg:17.2, sr:15.4, maidens:2, dot_pct:46, runs2024:488 }, form:87, basePrice:14 },
-  { id:'sp5', name:'Varun Chakravarthy', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'OB', stats:{ wkts2024:17, economy:7.98, avg:18.1, sr:13.6, maidens:0, dot_pct:39 }, form:84, basePrice:12 },
-  { id:'sp6', name:'Piyush Chawla', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'LBG', stats:{ wkts2024:12, economy:8.41, avg:21.2, sr:15.1, maidens:0, dot_pct:34 }, form:72, basePrice:5 },
-  { id:'sp7', name:'Ravi Bishnoi', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'LBG', stats:{ wkts2024:16, economy:7.64, avg:18.8, sr:14.8, maidens:0, dot_pct:40 }, form:82, basePrice:10 },
-  { id:'sp8', name:'Noor Ahmad', nation:'🇦🇫', role:'BOWL', battingStyle:'RHB', bowlingStyle:'LSW', stats:{ wkts2024:14, economy:7.42, avg:18.4, sr:14.9, maidens:1, dot_pct:41 }, form:80, basePrice:9 },
-  { id:'sp9', name:'Karn Sharma', nation:'🇮🇳', role:'BOWL', battingStyle:'RHB', bowlingStyle:'LBG', stats:{ wkts2024:10, economy:8.82, avg:23.1, sr:15.7, maidens:0, dot_pct:30 }, form:68, basePrice:4 },
-  { id:'sp10', name:'Imran Tahir', nation:'🇿🇦', role:'BOWL', battingStyle:'RHB', bowlingStyle:'LBG', stats:{ wkts2024:11, economy:8.12, avg:20.4, sr:15.0, maidens:0, dot_pct:35 }, form:70, basePrice:5 },
-  { id:'sp11', name:'Mujeeb Ur Rahman', nation:'🇦🇫', role:'BOWL', battingStyle:'RHB', bowlingStyle:'OB', stats:{ wkts2024:13, economy:7.21, avg:19.2, sr:15.9, maidens:1, dot_pct:42 }, form:78, basePrice:8 },
-  { id:'sp12', name:'Maheesh Theekshana', nation:'🇱🇰', role:'BOWL', battingStyle:'RHB', bowlingStyle:'OB', stats:{ wkts2024:12, economy:7.84, avg:20.1, sr:15.4, maidens:0, dot_pct:37 }, form:75, basePrice:7 },
-];
+// ═══════════════════════════════════════════════════════
+// IPL MUN SIMULATION ENGINE — Cricket-Accurate Logic
+// ═══════════════════════════════════════════════════════
 
-const IPL_TEAMS_DEFAULT = [
-  { id:'csk', name:'Chennai Super Kings', shortName:'CSK', color:'#F5A000', homeGround:'Chepauk, Chennai' },
-  { id:'mi', name:'Mumbai Indians', shortName:'MI', color:'#004BA0', homeGround:'Wankhede, Mumbai' },
-  { id:'rcb', name:'Royal Challengers Bengaluru', shortName:'RCB', color:'#CC0000', homeGround:'Chinnaswamy, Bengaluru' },
-  { id:'kkr', name:'Kolkata Knight Riders', shortName:'KKR', color:'#3A225D', homeGround:'Eden Gardens, Kolkata' },
-  { id:'dc', name:'Delhi Capitals', shortName:'DC', color:'#00A0E3', homeGround:'Arun Jaitley, Delhi' },
-  { id:'srh', name:'Sunrisers Hyderabad', shortName:'SRH', color:'#FF822A', homeGround:'Rajiv Gandhi, Hyderabad' },
-  { id:'rr', name:'Rajasthan Royals', shortName:'RR', color:'#D1173F', homeGround:'SMS, Jaipur' },
-  { id:'pk', name:'Punjab Kings', shortName:'PBKS', color:'#ED1B24', homeGround:'PCA, Mohali' },
-  { id:'lsg', name:'Lucknow Super Giants', shortName:'LSG', color:'#A4CFEF', homeGround:'BRSABV, Lucknow' },
-  { id:'gt', name:'Gujarat Titans', shortName:'GT', color:'#1C4280', homeGround:'Narendra Modi, Ahmedabad' },
-];
+const ENGINE = (() => {
 
-const VENUES = [
-  { id:'v1', name:'Wankhede Stadium', city:'Mumbai', pitch:'Batting', dew:true, spinHelp:45, paceHelp:55, avgScore:185, notes:'High scoring, dew in 2nd innings' },
-  { id:'v2', name:'M.A. Chidambaram Stadium', city:'Chennai', pitch:'Spin', dew:false, spinHelp:75, paceHelp:40, avgScore:165, notes:'Spinners dominate, dry surface' },
-  { id:'v3', name:'Eden Gardens', city:'Kolkata', pitch:'Balanced', dew:true, spinHelp:55, paceHelp:60, avgScore:175, notes:'Balanced, large crowd impact' },
-  { id:'v4', name:'Chinnaswamy Stadium', city:'Bengaluru', pitch:'Batting', dew:false, spinHelp:40, paceHelp:50, avgScore:200, notes:'Flat deck, short boundaries' },
-  { id:'v5', name:'Rajiv Gandhi Stadium', city:'Hyderabad', pitch:'Batting', dew:true, spinHelp:50, paceHelp:55, avgScore:190, notes:'Dew factor, good batting surface' },
-  { id:'v6', name:'Narendra Modi Stadium', city:'Ahmedabad', pitch:'Balanced', dew:false, spinHelp:60, paceHelp:55, avgScore:175, notes:'World\'s largest stadium, home crowd advantage' },
-  { id:'v7', name:'PCA Stadium', city:'Mohali', pitch:'Pace', dew:true, spinHelp:40, paceHelp:70, avgScore:180, notes:'Pace and bounce, dew in evening' },
-  { id:'v8', name:'Sawai Mansingh Stadium', city:'Jaipur', pitch:'Spin', dew:false, spinHelp:70, paceHelp:45, avgScore:168, notes:'Spin-friendly, slow surface' },
-  { id:'v9', name:'Arun Jaitley Stadium', city:'Delhi', pitch:'Batting', dew:true, spinHelp:45, paceHelp:55, avgScore:182, notes:'Good batting track, dew plays role' },
-  { id:'v10', name:'BRSABV Ekana Stadium', city:'Lucknow', pitch:'Balanced', dew:true, spinHelp:52, paceHelp:58, avgScore:172, notes:'Balanced surface, good crowd' },
-];
+// ─── PHASE DEFINITIONS ───────────────────────────────
+const PHASES = {
+  POWERPLAY:  { overs: [0,5],   name: 'Powerplay',  fieldRestriction: 2 },
+  MIDDLE:     { overs: [6,14],  name: 'Middle',      fieldRestriction: 5 },
+  DEATH:      { overs: [15,19], name: 'Death',       fieldRestriction: 5 },
+};
+
+function getPhase(over) {
+  if (over <= 5)  return 'POWERPLAY';
+  if (over <= 14) return 'MIDDLE';
+  return 'DEATH';
+}
+
+// ─── ROLE DEFINITIONS ────────────────────────────────
+const ROLE_CONFIG = {
+  'BAT':    { canBat: true,  canBowl: false, battingOrder: 'top',    bowlMax: 0 },
+  'WK':     { canBat: true,  canBowl: false, battingOrder: 'top',    bowlMax: 0 },
+  'WK-BAT': { canBat: true,  canBowl: false, battingOrder: 'top',    bowlMax: 0 },
+  'AR':     { canBat: true,  canBowl: true,  battingOrder: 'middle', bowlMax: 4 },
+  'ALL':    { canBat: true,  canBowl: true,  battingOrder: 'middle', bowlMax: 4 },
+  'BOWL':   { canBat: true,  canBowl: true,  battingOrder: 'tail',   bowlMax: 4 },
+  'PACE':   { canBat: true,  canBowl: true,  battingOrder: 'tail',   bowlMax: 4 },
+  'SPIN':   { canBat: true,  canBowl: true,  battingOrder: 'tail',   bowlMax: 4 },
+};
+
+function getRoleConfig(role) {
+  return ROLE_CONFIG[role?.toUpperCase()] || ROLE_CONFIG['BAT'];
+}
+
+// ─── BATTING ORDER BUILDER ────────────────────────────
+function buildBattingOrder(xi) {
+  const order = ['top', 'middle', 'tail'];
+  const sorted = [];
+  for (const tier of order) {
+    const inTier = xi.filter(p => getRoleConfig(p.role).battingOrder === tier);
+    // Within tier, sort by batting_rating desc
+    inTier.sort((a, b) => (b.batting_rating || b.form || 70) - (a.batting_rating || a.form || 70));
+    sorted.push(...inTier);
+  }
+  // Fill any unslotted players
+  const slotted = new Set(sorted.map(p => p.id));
+  xi.filter(p => !slotted.has(p.id)).forEach(p => sorted.push(p));
+  return sorted.slice(0, 11);
+}
+
+// ─── BOWLING ROTATION BUILDER ─────────────────────────
+function buildBowlingRotation(fieldingXI, totalOvers = 20) {
+  // Only players who can bowl
+  const bowlers = fieldingXI.filter(p => getRoleConfig(p.role).canBowl);
+  if (!bowlers.length) return fieldingXI.slice(0, 5).map(p => ({ ...p }));
+
+  // Each bowler max 4 overs; need 20 overs total
+  // Assign quota: prioritise BOWL/PACE/SPIN, then AR/ALL
+  bowlers.forEach(b => {
+    b.bowlOversLeft = Math.min(4, getRoleConfig(b.role).bowlMax);
+    b.bowlOversDone = 0;
+    b.inningsWkts = 0;
+    b.inningsRuns = 0;
+    b.inningsBalls = 0;
+  });
+  return bowlers;
+}
+
+function selectBowler(bowlers, over, lastBowlerId, innings) {
+  // Cannot bowl same bowler consecutive
+  const eligible = bowlers.filter(b =>
+    b.bowlOversLeft > 0 && b.id !== lastBowlerId
+  );
+  if (!eligible.length) return bowlers.find(b => b.bowlOversLeft > 0) || bowlers[0];
+
+  const phase = getPhase(over);
+  // Prefer pace in death/powerplay, spin in middle
+  let preferred;
+  if (phase === 'POWERPLAY' || phase === 'DEATH') {
+    preferred = eligible.filter(b => b.bowling_type === 'PACE' || b.role === 'PACE');
+  } else {
+    preferred = eligible.filter(b => b.bowling_type === 'SPIN' || b.role === 'SPIN');
+  }
+  if (!preferred.length) preferred = eligible;
+
+  // Sort by bowling_rating desc
+  preferred.sort((a, b) => (b.bowling_rating || 60) - (a.bowling_rating || 60));
+
+  // Add some randomness — top 2-3 compete
+  const pool = preferred.slice(0, Math.min(3, preferred.length));
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// ─── BALL OUTCOME CALCULATOR ──────────────────────────
+function simulateBall(batter, bowler, phase, conditions, pitchState, innings) {
+  if (!batter || !bowler) return { runs: 0, outcome: '0', event: null };
+
+  const batRating = clamp((batter.batting_rating || batter.form || 70), 40, 99);
+  const bowlRating = clamp((bowler.bowling_rating || bowler.form || 65), 40, 99);
+
+  // Phase modifiers
+  const phaseMod = {
+    POWERPLAY: { bat: 0.08,  bowl: -0.04, wkt: -0.02 },
+    MIDDLE:    { bat: 0.0,   bowl: 0.0,   wkt: 0.0   },
+    DEATH:     { bat: 0.12,  bowl: -0.08, wkt: 0.04  },
+  }[phase] || { bat: 0, bowl: 0, wkt: 0 };
+
+  // Pitch modifiers
+  const pitchMod = conditions.pitchMod || 0; // +ve favours batting
+  const dewMod   = (innings === 2 && conditions.dew && conditions.timeOfDay === 'night') ? 0.06 : 0;
+  const spinMod  = conditions.spinAssist || 0;  // fraction 0-1
+  const paceMod  = conditions.paceAssist || 0;
+
+  // Bowler type advantage
+  const bowlerTypeAdv = (() => {
+    const bt = (bowler.bowling_type || '').toUpperCase();
+    if ((bt === 'SPIN' || bt === 'LEG-SPIN' || bt === 'OFF-SPIN') && spinMod > 0.6) return -0.05;
+    if ((bt === 'PACE' || bt === 'FAST' || bt === 'FAST-MEDIUM') && paceMod > 0.6) return -0.05;
+    return 0;
+  })();
+
+  // Net batting dominance: 0 = even, +ve = bat favoured
+  const netBat = clamp(
+    (batRating - bowlRating) / 100 +
+    phaseMod.bat + pitchMod + dewMod + bowlerTypeAdv,
+    -0.4, 0.4
+  );
+
+  // === WICKET PROBABILITY ===
+  // Base wicket rate per ball in T20 is ~5.5% across all phases
+  let wktProb = 0.055 + phaseMod.wkt - netBat * 0.15 - bowlerTypeAdv * 0.5;
+  wktProb = clamp(wktProb, 0.02, 0.18);
+
+  // === DOT BALL PROBABILITY ===
+  let dotProb = 0.35 - netBat * 0.25;
+  dotProb = clamp(dotProb, 0.15, 0.55);
+
+  // === EXTRAS ===
+  const extraProb = 0.04;
+
+  // === SCORING DISTRIBUTION ===
+  // After wkt and dot, distribute 1,2,3,4,6
+  const remaining = 1 - wktProb - dotProb - extraProb;
+
+  // Probability weights for scoring shots — calibrated to IPL avg ~8.5 rpo
+  const w1 = 0.38, w2 = 0.18, w3 = 0.04;
+  const w4 = clamp(0.13 + netBat * 0.12 + (phase === 'DEATH' ? 0.04 : 0), 0.08, 0.25);
+  const w6 = clamp(0.07 + netBat * 0.10 + (phase === 'DEATH' ? 0.06 : 0) +
+    (batter.six_hitter ? 0.05 : 0), 0.03, 0.20);
+  const wTotal = w1 + w2 + w3 + w4 + w6;
+
+  const p1 = remaining * (w1 / wTotal);
+  const p2 = remaining * (w2 / wTotal);
+  const p3 = remaining * (w3 / wTotal);
+  const p4 = remaining * (w4 / wTotal);
+  const p6 = remaining * (w6 / wTotal);
+
+  const r = Math.random();
+  let cum = 0;
+
+  if ((cum += wktProb) > r)  return { runs: 0, outcome: 'W',  isWicket: true };
+  if ((cum += dotProb) > r)  return { runs: 0, outcome: '0' };
+  if ((cum += extraProb) > r) {
+    const extra = Math.random() < 0.6 ? 'WD' : 'NB';
+    return { runs: 1, outcome: extra, isExtra: true, extraType: extra };
+  }
+  if ((cum += p1) > r) return { runs: 1, outcome: '1' };
+  if ((cum += p2) > r) return { runs: 2, outcome: '2' };
+  if ((cum += p3) > r) return { runs: 3, outcome: '3' };
+  if ((cum += p4) > r) return { runs: 4, outcome: '4', isBoundary: true };
+  return { runs: 6, outcome: '6', isBoundary: true, isSix: true };
+}
+
+// ─── INNINGS SIMULATOR ────────────────────────────────
+function simulateInnings(battingXIRaw, fieldingXIRaw, target, conditions, inningsNum) {
+  const battingOrder = buildBattingOrder([...battingXIRaw]);
+  const bowlers = buildBowlingRotation([...fieldingXIRaw]);
+
+  // Init batter states
+  const batters = battingOrder.map(p => ({
+    ...p,
+    runs: 0, balls: 0, fours: 0, sixes: 0, out: false,
+    dismissal: '', bowler: null,
+    strikeRate: () => p.balls > 0 ? (p.runs / p.balls * 100).toFixed(1) : '0.0',
+  }));
+
+  let totalRuns = 0, totalWkts = 0, totalBalls = 0, extras = 0;
+  let strikerIdx = 0, nonStrikerIdx = 1;
+  let lastBowlerId = null;
+  const overByOver = [];
+  const fallOfWickets = [];
+  const events = [];
+  let currentBowler = null;
+  let overRuns = 0, overBalls = 0;
+
+  const pitchState = { wear: conditions.pitchWear || 1, dusty: conditions.pitchWear > 3 };
+
+  const maxBalls = 120; // 20 overs
+
+  for (let ball = 0; ball < maxBalls; ball++) {
+    const over = Math.floor(ball / 6);
+    const ballInOver = ball % 6;
+    const phase = getPhase(over);
+
+    if (totalWkts >= 10) break;
+    if (target && totalRuns >= target) break;
+
+    // New over — rotate bowler
+    if (ballInOver === 0) {
+      overRuns = 0; overBalls = 0;
+      currentBowler = selectBowler(bowlers, over, lastBowlerId, inningsNum);
+      if (!currentBowler) break;
+      lastBowlerId = currentBowler.id;
+      currentBowler.bowlOversLeft--;
+      currentBowler.bowlOversDone++;
+    }
+
+    const striker = batters[strikerIdx];
+    if (!striker || striker.out) {
+      // Find next batter
+      const next = batters.findIndex((b, i) => i > strikerIdx && !b.out && b.balls === 0);
+      if (next < 0) break;
+      strikerIdx = next;
+      continue;
+    }
+
+    const result = simulateBall(striker, currentBowler, phase, conditions, pitchState, inningsNum);
+
+    if (result.isExtra) {
+      totalRuns += result.runs; extras += result.runs;
+      currentBowler.inningsRuns += result.runs;
+      overRuns += result.runs;
+      events.push({ over: over + 1, ball: ballInOver + 1, text: `${result.outcome} — ${result.runs} run`, type: 'extra' });
+      ball--; // extras don't count as a legal ball
+      totalBalls++; // but do count in real overs
+      continue;
+    }
+
+    // Legal ball
+    totalBalls++;
+    overBalls++;
+    striker.balls++;
+    currentBowler.inningsBalls++;
+    totalRuns += result.runs;
+    striker.runs += result.runs;
+    currentBowler.inningsRuns += result.runs;
+    overRuns += result.runs;
+
+    if (result.isSix)      { striker.sixes++; events.push({ over: over+1, ball: ballInOver+1, text: `SIX! ${striker.name} launches one over deep midwicket!`, type: 'six' }); }
+    if (result.isBoundary && !result.isSix) { striker.fours++; events.push({ over: over+1, ball: ballInOver+1, text: `FOUR! ${striker.name} drives through covers!`, type: 'four' }); }
+
+    if (result.isWicket) {
+      striker.out = true;
+      striker.dismissal = randomDismissal(currentBowler);
+      striker.bowler = currentBowler.name;
+      currentBowler.inningsWkts++;
+      totalWkts++;
+      fallOfWickets.push({ runs: totalRuns, wkt: totalWkts, batter: striker.name, over: over + 1, ball: ballInOver + 1 });
+      events.push({ over: over+1, ball: ballInOver+1, text: `WICKET! ${striker.name} ${striker.dismissal} b ${currentBowler.name} — ${totalRuns}/${totalWkts}`, type: 'wicket' });
+
+      // Milestone alert
+      if (totalWkts >= 10) break;
+
+      // New batter
+      const nextIdx = batters.findIndex((b, i) => i > strikerIdx && !b.out);
+      if (nextIdx < 0) break;
+      strikerIdx = nextIdx;
+    }
+
+    // Check 50/100 milestones
+    const prevRuns = striker.runs - result.runs;
+    if (prevRuns < 50 && striker.runs >= 50) events.push({ over: over+1, ball: ballInOver+1, text: `FIFTY! ${striker.name} reaches 50 off ${striker.balls} balls!`, type: 'milestone' });
+    if (prevRuns < 100 && striker.runs >= 100) events.push({ over: over+1, ball: ballInOver+1, text: `CENTURY! ${striker.name} reaches 100 off ${striker.balls} balls!`, type: 'milestone' });
+
+    // Rotate strike on odd runs
+    if (result.runs % 2 !== 0) {
+      [strikerIdx, nonStrikerIdx] = [nonStrikerIdx, strikerIdx];
+    }
+
+    // End of over — rotate strike
+    if ((ball + 1) % 6 === 0) {
+      [strikerIdx, nonStrikerIdx] = [nonStrikerIdx, strikerIdx];
+      overByOver.push({ over: over + 1, runs: overRuns, wkts: currentBowler.inningsWkts, bowler: currentBowler.name });
+    }
+
+    // Check target
+    if (target && totalRuns >= target) break;
+  }
+
+  const oversCompleted = Math.floor(totalBalls / 6);
+  const ballsRemainder = totalBalls % 6;
+  const oversStr = ballsRemainder > 0 ? `${oversCompleted}.${ballsRemainder}` : `${oversCompleted}.0`;
+
+  // Compile bowler figures
+  const bowlingCard = bowlers.map(b => ({
+    name: b.name,
+    overs: Math.floor(b.inningsBalls / 6) + (b.inningsBalls % 6 > 0 ? `.${b.inningsBalls % 6}` : '.0'),
+    maidens: 0,
+    runs: b.inningsRuns,
+    wickets: b.inningsWkts,
+    economy: b.inningsBalls > 0 ? ((b.inningsRuns / (b.inningsBalls / 6))).toFixed(2) : '0.00',
+    role: b.role,
+    id: b.id,
+  })).filter(b => b.overs !== '0.0');
+
+  return {
+    runs: totalRuns, wickets: totalWkts, balls: totalBalls, extras,
+    oversStr, overByOver, fallOfWickets, events,
+    battingCard: batters.filter(b => b.balls > 0 || b.out).map(b => ({
+      name: b.name, runs: b.runs, balls: b.balls,
+      fours: b.fours, sixes: b.sixes,
+      strikeRate: b.balls > 0 ? (b.runs / b.balls * 100).toFixed(1) : '0.0',
+      dismissal: b.out ? b.dismissal : 'not out',
+      bowler: b.bowler || '',
+      id: b.id, role: b.role,
+    })),
+    bowlingCard,
+  };
+}
+
+// ─── DISMISSAL TYPES ─────────────────────────────────
+function randomDismissal(bowler) {
+  const bowlerType = (bowler?.bowling_type || '').toUpperCase();
+  const types = ['caught', 'bowled', 'lbw', 'caught & bowled', 'stumped', 'run out'];
+  const weights = bowlerType === 'SPIN'
+    ? [0.35, 0.15, 0.20, 0.08, 0.12, 0.10]
+    : [0.40, 0.22, 0.18, 0.07, 0.03, 0.10];
+  const r = Math.random();
+  let cum = 0;
+  for (let i = 0; i < types.length; i++) {
+    cum += weights[i];
+    if (r < cum) return types[i];
+  }
+  return 'caught';
+}
+
+// ─── MATCH RESULT ─────────────────────────────────────
+function determineResult(inn1, inn2, batFirstTeam, fieldFirstTeam) {
+  if (inn2.runs >= inn1.runs + 1) {
+    const wktsLeft = 10 - inn2.wickets;
+    const ballsLeft = 120 - inn2.balls;
+    return { winner: fieldFirstTeam, margin: `${wktsLeft} wicket${wktsLeft !== 1 ? 's' : ''}`, detail: `${ballsLeft} balls remaining` };
+  } else if (inn1.runs === inn2.runs) {
+    return { winner: null, margin: 'Tie', detail: 'Super Over needed' };
+  } else {
+    const diff = inn1.runs - inn2.runs;
+    return { winner: batFirstTeam, margin: `${diff} run${diff !== 1 ? 's' : ''}`, detail: '' };
+  }
+}
+
+// ─── FULL MATCH SIMULATOR ─────────────────────────────
+function simulateMatch(teamA, teamB, venue, conditions) {
+  const toss = Math.random() < 0.5 ? 'A' : 'B';
+  const electedTo = conditions.tossElect || (Math.random() < 0.55 ? 'bat' : 'bowl');
+  const batFirst = (toss === 'A' && electedTo === 'bat') || (toss === 'B' && electedTo === 'bowl') ? teamA : teamB;
+  const bowlFirst = batFirst === teamA ? teamB : teamA;
+
+  const conds = {
+    pitchMod: ({'Batting': 0.10, 'Spin': -0.06, 'Pace': -0.04, 'Balanced': 0.0}[venue.pitch] || 0),
+    spinAssist: (venue.spin || 50) / 100,
+    paceAssist: (venue.pace || 50) / 100,
+    dew: venue.dew,
+    timeOfDay: conditions.timeOfDay || 'night',
+    pitchWear: conditions.pitchWear || 2,
+  };
+
+  const batXI  = batFirst.xi  || batFirst.players || [];
+  const fieldXI = bowlFirst.xi || bowlFirst.players || [];
+
+  const inn1 = simulateInnings(batXI, fieldXI, null, conds, 1);
+  const inn2 = simulateInnings(fieldXI, batXI, inn1.runs + 1, { ...conds, pitchWear: Math.min(5, conds.pitchWear + 1) }, 2);
+
+  const result = determineResult(inn1, inn2, batFirst, bowlFirst);
+
+  // MoM — highest composite score
+  const allBatters = [...inn1.battingCard, ...inn2.battingCard];
+  const allBowlers = [...inn1.bowlingCard, ...inn2.bowlingCard];
+  let momScore = -1, mom = null;
+  allBatters.forEach(b => {
+    const s = b.runs * 1.5 + b.fours * 0.5 + b.sixes * 2 + (parseFloat(b.strikeRate) > 150 ? 10 : 0);
+    if (s > momScore) { momScore = s; mom = b; }
+  });
+  allBowlers.forEach(b => {
+    const s = b.wickets * 25 + Math.max(0, 8 - parseFloat(b.economy)) * 5;
+    if (s > momScore) { momScore = s; mom = b; }
+  });
+
+  return {
+    tossWinner: toss === 'A' ? teamA.name : teamB.name,
+    tossElect: electedTo,
+    batFirst: batFirst.name, bowlFirst: bowlFirst.name,
+    inn1: { team: batFirst.name, ...inn1 },
+    inn2: { team: bowlFirst.name, ...inn2 },
+    result, mom, venue: venue.name,
+  };
+}
+
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+return { simulateMatch, simulateInnings, buildBattingOrder, buildBowlingRotation, getPhase };
+})();
