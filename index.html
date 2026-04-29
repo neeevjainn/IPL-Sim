@@ -18,7 +18,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh;font-size:13px;}
 ::-webkit-scrollbar{width:3px;height:3px;}::-webkit-scrollbar-thumb{background:var(--bg4);}
-
+ 
 /* ─── NAV ─── */
 .nav{display:flex;align-items:stretch;background:var(--bg2);border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:100;padding:0 16px;}
 .nav-brand{font-family:var(--fd);font-size:17px;font-weight:700;letter-spacing:.1em;padding:0 16px 0 0;margin-right:4px;border-right:1px solid var(--bdr);display:flex;align-items:center;gap:8px;color:var(--text);}
@@ -29,7 +29,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .nt.on{color:var(--text);border-bottom-color:var(--ipl2);}
 .nav-r{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .pill-sm{font-size:10px;font-family:var(--fm);padding:3px 8px;background:var(--bg3);border:1px solid var(--bdr2);border-radius:20px;color:var(--ipl2);}
-
+ 
 /* ─── LAYOUT ─── */
 .layout{display:flex;min-height:calc(100vh - 48px);}
 .sidebar{width:230px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--bdr);position:sticky;top:48px;height:calc(100vh - 48px);overflow-y:auto;}
@@ -45,13 +45,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .cap-ic{font-size:13px;min-width:18px;}
 .cap-nm{flex:1;color:var(--text2);}
 .cap-val{font-family:var(--fm);color:var(--ipl2);font-size:10px;font-weight:600;}
-
+ 
 /* ─── MAIN ─── */
 .main{flex:1;overflow-y:auto;padding:22px 24px;}
 .page{display:none;}.page.on{display:block;}
 .ph{font-family:var(--fd);font-size:24px;font-weight:700;letter-spacing:.04em;margin-bottom:3px;}
 .ps{font-size:12px;color:var(--text2);margin-bottom:18px;}
-
+ 
 /* ─── CARDS ─── */
 .card{background:var(--surface);border:1px solid var(--bdr);border-radius:var(--rl);padding:16px;margin-bottom:12px;}
 .card-hd{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--text3);margin-bottom:10px;font-weight:700;}
@@ -60,7 +60,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
 .ga{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;}
 .ga-lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
-
+ 
 /* ─── PLAYER CARD ─── */
 .pc{background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--r);padding:11px;cursor:pointer;transition:all .12s;position:relative;overflow:hidden;}
 .pc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--rc,var(--bdr));}
@@ -76,10 +76,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .form-n{font-family:var(--fm);font-size:9px;color:var(--text3);}
 .pc-price{font-size:11px;font-family:var(--fm);color:var(--gold);}
 .pc-stats{font-size:9px;color:var(--text3);margin-top:3px;line-height:1.6;}
-
+ 
 /* role colors */
 .rBAT{--rc:#fb923c;} .rWK{--rc:#eab308;} .rWKBAT{--rc:#eab308;} .rAR{--rc:#22c55e;} .rALL{--rc:#22c55e;} .rBOWL{--rc:#60a5fa;} .rPACE{--rc:#38bdf8;} .rSPIN{--rc:#c084fc;}
-
+ 
 /* ─── TEAM CARD ─── */
 .tc{background:var(--surface);border:1px solid var(--bdr);border-left:3px solid var(--tc);border-radius:var(--rl);padding:14px;margin-bottom:10px;}
 .tc-hd{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bdr);}
@@ -90,7 +90,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .roster-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:600;background:var(--bg3);border:1px solid var(--bdr);margin:2px;cursor:pointer;}
 .roster-chip .chip-role{font-size:8px;text-transform:uppercase;letter-spacing:.06em;}
 .roster-chip:hover{border-color:var(--bdr2);}
-
+ 
 /* ─── MATCHDAY CARD ─── */
 .md-card{background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--rl);overflow:hidden;margin-bottom:10px;}
 .md-hd{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--bdr);gap:10px;}
@@ -101,7 +101,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .md-venue{font-size:10px;color:var(--text3);}
 .md-result{font-size:11px;color:var(--text2);text-align:right;}
 .md-score{font-family:var(--fm);font-size:11px;}
-
+ 
 /* ─── SCORECARD ─── */
 .sc-wrap{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rl);overflow:hidden;margin-bottom:12px;}
 .sc-match-hd{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--bdr);}
@@ -125,7 +125,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .fow{padding:6px 14px;font-size:9px;color:var(--text3);font-family:var(--fm);}
 .inntab{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);font-weight:700;padding:6px 14px;background:var(--bg4);border-bottom:1px solid var(--bdr);}
 .col-hd{background:var(--bg4);font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;}
-
+ 
 /* ─── BUTTONS ─── */
 .btn{padding:7px 14px;border-radius:var(--r);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:1px solid var(--bdr2);background:var(--bg3);color:var(--text);transition:all .12s;}
 .btn:hover{background:var(--bg4);}
@@ -135,13 +135,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .btn-rd{background:var(--red);border-color:var(--red);color:#fff;}.btn-rd:hover{background:#e11d48;}
 .btn-sm{padding:4px 9px;font-size:10px;}
 .btn-xs{padding:3px 7px;font-size:9px;}
-
+ 
 /* ─── PILLS ─── */
 .pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
 .pl{padding:4px 11px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;border:1px solid var(--bdr2);background:var(--bg3);color:var(--text3);transition:all .12s;}
 .pl:hover{color:var(--text);}
 .pl.on{background:var(--ipl2);border-color:var(--ipl2);color:#000;}
-
+ 
 /* ─── POINTS TABLE ─── */
 .pt-row{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--bdr);font-size:11px;}
 .pt-row.hd{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:700;background:var(--bg3);}
@@ -152,14 +152,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .pt-nrr-p{color:var(--green);}
 .pt-nrr-n{color:var(--red);}
 .form-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin:0 1px;}
-
+ 
 /* ─── INPUTS ─── */
 input[type=text],input[type=number],select,textarea{background:var(--bg3);border:1px solid var(--bdr2);border-radius:var(--r);padding:7px 9px;font-size:12px;color:var(--text);font-family:var(--fb);}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ipl2);}
 input[type=range]{accent-color:var(--ipl2);}
 input[type=color]{width:30px;height:26px;border:1px solid var(--bdr2);border-radius:var(--r);padding:2px;background:var(--bg3);cursor:pointer;}
 input[type=checkbox]{accent-color:var(--ipl2);}
-
+ 
 /* ─── MISC ─── */
 .tag{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
 .tg{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2);}
@@ -191,7 +191,7 @@ input[type=checkbox]{accent-color:var(--ipl2);}
 </style>
 </head>
 <body>
-
+ 
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-brand">🏏 <em>IPL</em> MUN</div>
@@ -205,13 +205,14 @@ input[type=checkbox]{accent-color:var(--ipl2);}
     <button class="nt"     onclick="go('points')">Points</button>
     <button class="nt"     onclick="go('trade')">Trade</button>
     <button class="nt"     onclick="go('playoffs')">Playoffs</button>
+    <button class="nt"     onclick="go('stats')">Player Stats</button>
     <button class="nt"     onclick="go('pview')">Player View</button>
   </div>
   <div class="nav-r">
     <div class="pill-sm" id="day-pill">MD 0/14</div>
   </div>
 </nav>
-
+ 
 <div class="layout">
 <!-- SIDEBAR -->
 <aside class="sidebar">
@@ -229,15 +230,15 @@ input[type=checkbox]{accent-color:var(--ipl2);}
   <div class="sb-hd" style="margin-top:4px;">Trade</div>
   <div style="padding:8px 12px;font-size:10px;" id="trade-status"></div>
 </aside>
-
+ 
 <!-- MAIN -->
 <main class="main">
-
+ 
 <!-- ══════ SETUP PAGE ══════ -->
 <div id="pg-setup" class="page on">
   <div class="ph">Season Setup</div>
   <div class="ps">Connect Google Sheets database, configure teams, and prepare the season.</div>
-
+ 
   <div class="card">
     <div class="card-hd">Step 1 — Google Sheets Database</div>
     <div class="gs-setup">
@@ -263,7 +264,7 @@ input[type=checkbox]{accent-color:var(--ipl2);}
       </div>
     </div>
   </div>
-
+ 
   <div class="card">
     <div class="card-hd">Step 2 — Add Teams (up to 10)</div>
     <div class="flex gap10 mb12" style="flex-wrap:wrap;">
@@ -289,7 +290,7 @@ input[type=checkbox]{accent-color:var(--ipl2);}
     </div>
     <div class="ga-lg" id="team-setup-grid"></div>
   </div>
-
+ 
   <div class="card">
     <div class="card-hd">Step 3 — Generate Season Schedule</div>
     <div class="flex gap10">
@@ -299,12 +300,12 @@ input[type=checkbox]{accent-color:var(--ipl2);}
     <div id="sched-preview" style="margin-top:10px;font-size:11px;color:var(--text3);"></div>
   </div>
 </div>
-
+ 
 <!-- ══════ AUCTION PAGE ══════ -->
 <div id="pg-auction" class="page">
   <div class="ph">Auction — Lot System</div>
   <div class="ps">Players arrive in pre-assigned lots. Draw randomly from the active lot and assign to a team with budget tracking.</div>
-
+ 
   <div class="g2">
     <div>
       <div class="card">
@@ -333,7 +334,7 @@ input[type=checkbox]{accent-color:var(--ipl2);}
     </div>
   </div>
 </div>
-
+ 
 <!-- ══════ TEAMS PAGE ══════ -->
 <div id="pg-teams" class="page">
   <div class="ph">Teams & Squads</div>
@@ -344,14 +345,14 @@ input[type=checkbox]{accent-color:var(--ipl2);}
   </div>
   <div id="teams-grid" class="ga-lg"></div>
 </div>
-
+ 
 <!-- ══════ SCHEDULE PAGE ══════ -->
 <div id="pg-schedule" class="page">
   <div class="ph">Season Schedule</div>
   <div class="ps">Auto-generated 14-match league stage. All matches in a matchday play simultaneously.</div>
   <div id="schedule-grid"></div>
 </div>
-
+ 
 <!-- ══════ MATCHDAY PAGE ══════ -->
 <div id="pg-matchday" class="page">
   <div class="ph">Matchday Simulator</div>
@@ -363,7 +364,7 @@ input[type=checkbox]{accent-color:var(--ipl2);}
   </div>
   <div id="matchday-results"></div>
 </div>
-
+ 
 <!-- ══════ SCORECARDS PAGE ══════ -->
 <div id="pg-scorecards" class="page">
   <div class="ph">Match Scorecards</div>
@@ -371,7 +372,7 @@ input[type=checkbox]{accent-color:var(--ipl2);}
   <div class="pills" id="sc-match-pills"></div>
   <div id="scorecard-view"></div>
 </div>
-
+ 
 <!-- ══════ POINTS TABLE PAGE ══════ -->
 <div id="pg-points" class="page">
   <div class="ph">Points Table</div>
@@ -392,7 +393,7 @@ input[type=checkbox]{accent-color:var(--ipl2);}
     <div id="results-log"></div>
   </div>
 </div>
-
+ 
 <!-- ══════ TRADE PAGE ══════ -->
 <div id="pg-trade" class="page">
   <div class="ph">Trade Window</div>
@@ -428,24 +429,62 @@ input[type=checkbox]{accent-color:var(--ipl2);}
     <div style="margin-top:10px;" id="trade-log"></div>
   </div>
 </div>
-
+ 
 <!-- ══════ PLAYOFFS PAGE ══════ -->
 <div id="pg-playoffs" class="page">
   <div class="ph">Playoffs</div>
   <div class="ps">Top 4 qualify. Qualifier 1, Eliminator, Qualifier 2, Final. No trades.</div>
   <div id="playoff-view"></div>
 </div>
-
+ 
+<!-- ══════ PLAYER STATS PAGE ══════ -->
+<div id="pg-stats" class="page">
+  <div class="ph">Player Season Stats</div>
+  <div class="ps">Full batting and bowling statistics across all completed matches.</div>
+  <div class="pills" id="stats-role-pills">
+    <div class="pl on" onclick="setStatRole('all',this)">All</div>
+    <div class="pl" onclick="setStatRole('bat',this)">Batters</div>
+    <div class="pl" onclick="setStatRole('bowl',this)">Bowlers</div>
+    <div class="pl" onclick="setStatRole('all-round',this)">All-Rounders</div>
+  </div>
+  <div class="g2" style="gap:14px;">
+    <div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="display:flex;align-items:center;padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--bdr);">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--ipl2);">🟠 Batting</div>
+          <button class="btn btn-xs btn-bl" style="margin-left:auto;" onclick="downloadBattingStats()">⬇ CSV</button>
+        </div>
+        <div style="display:flex;gap:0;padding:7px 12px;background:var(--bg4);font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">
+          <div style="flex:1.8;">Player</div><div style="min-width:30px;text-align:right;">M</div><div style="min-width:36px;text-align:right;">Runs</div><div style="min-width:30px;text-align:right;">HS</div><div style="min-width:34px;text-align:right;">Avg</div><div style="min-width:36px;text-align:right;">SR</div><div style="min-width:26px;text-align:right;">50s</div><div style="min-width:26px;text-align:right;">100s</div><div style="min-width:26px;text-align:right;">6s</div>
+        </div>
+        <div id="batting-stats-table" style="max-height:520px;overflow-y:auto;"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="display:flex;align-items:center;padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--bdr);">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--purple);">🟣 Bowling</div>
+          <button class="btn btn-xs btn-bl" style="margin-left:auto;" onclick="downloadBowlingStats()">⬇ CSV</button>
+        </div>
+        <div style="display:flex;gap:0;padding:7px 12px;background:var(--bg4);font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;">
+          <div style="flex:1.8;">Player</div><div style="min-width:30px;text-align:right;">M</div><div style="min-width:30px;text-align:right;">Wkts</div><div style="min-width:36px;text-align:right;">Runs</div><div style="min-width:36px;text-align:right;">Econ</div><div style="min-width:36px;text-align:right;">Avg</div><div style="min-width:36px;text-align:right;">BBI</div>
+        </div>
+        <div id="bowling-stats-table" style="max-height:520px;overflow-y:auto;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+ 
 <!-- ══════ PLAYER VIEW PAGE ══════ -->
 <div id="pg-pview" class="page">
   <div class="ph">Player View</div>
   <div class="ps">Projector / delegate screen — shows conditions and standings only. No internal ratings.</div>
   <div id="pview-content"></div>
 </div>
-
+ 
 </main>
 </div>
-
+ 
 <!-- XI MODAL -->
 <div class="modal-ov" id="xi-modal">
   <div class="modal" style="width:740px;">
@@ -457,7 +496,7 @@ input[type=checkbox]{accent-color:var(--ipl2);}
     </div>
   </div>
 </div>
-
+ 
 <!-- SCORECARD DOWNLOAD MODAL -->
 <div class="modal-ov" id="dl-modal">
   <div class="modal">
@@ -470,12 +509,12 @@ input[type=checkbox]{accent-color:var(--ipl2);}
     </div>
   </div>
 </div>
-
+ 
 <script>
 // ════════════════════════════════════════════════════════════
 // IPL MUN SIMULATOR — MAIN SCRIPT
 // ════════════════════════════════════════════════════════════
-
+ 
 // ── VENUES DB ──────────────────────────────────────────────
 const VENUES = {
   wankhede:     { name:'Wankhede',         city:'Mumbai',      pitch:'Batting',  dew:true,  spin:42, pace:58, avgScore:185 },
@@ -491,7 +530,7 @@ const VENUES = {
   barsapara:    { name:'Barsapara',         city:'Guwahati',    pitch:'Spin',     dew:false, spin:65, pace:45, avgScore:168 },
   hpca:         { name:'HPCA Stadium',      city:'Dharamsala',  pitch:'Pace',     dew:false, spin:44, pace:68, avgScore:172 },
 };
-
+ 
 // ── ROLE DEFINITIONS ──────────────────────────────────────
 const ROLE_CFG = {
   'BAT':    { canBowl:false, batOrder:'top',    bowlMax:0 },
@@ -504,7 +543,7 @@ const ROLE_CFG = {
   'SPIN':   { canBowl:true,  batOrder:'tail',   bowlMax:4 },
 };
 function rc(role){ return ROLE_CFG[(role||'BAT').toUpperCase()] || ROLE_CFG['BAT']; }
-
+ 
 // ── STATE ─────────────────────────────────────────────────
 const ST = {
   players: [],           // from Google Sheets
@@ -520,13 +559,13 @@ const ST = {
   assignedSet: new Set(),
   seasonStats: {},       // pid -> {runs,balls,wkts,overs,sixes,fours,fifties,hundreds,momCount,...}
 };
-
+ 
 // ── NAV ───────────────────────────────────────────────────
 function go(pg) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.nt').forEach(t=>t.classList.remove('on'));
   document.getElementById('pg-'+pg).classList.add('on');
-  const pgs=['setup','auction','teams','schedule','matchday','scorecards','points','trade','playoffs','pview'];
+  const pgs=['setup','auction','teams','schedule','matchday','scorecards','points','trade','playoffs','stats','pview'];
   document.querySelectorAll('.nt')[pgs.indexOf(pg)]?.classList.add('on');
   if(pg==='teams') renderTeamsPage();
   if(pg==='auction') renderAuctionPage();
@@ -535,9 +574,10 @@ function go(pg) {
   if(pg==='trade') renderTradePage();
   if(pg==='playoffs') renderPlayoffs();
   if(pg==='scorecards') renderScorecardsPage();
+  if(pg==='stats') renderStatsPage();
   if(pg==='pview') renderPlayerView();
 }
-
+ 
 // ── GOOGLE SHEETS LOADER ──────────────────────────────────
 async function loadGoogleSheet() {
   const url = document.getElementById('gs-url').value.trim();
@@ -556,13 +596,13 @@ async function loadGoogleSheet() {
       <button class="btn btn-sm btn-or" style="margin-top:6px;" onclick="parsePastedCSV()">Parse CSV</button>`;
   }
 }
-
+ 
 function parsePastedCSV() {
   const text = document.getElementById('csv-paste')?.value;
   if (!text) return;
   parseCSV(text);
 }
-
+ 
 function parseCSV(text) {
   const lines = text.trim().split('\n');
   const headers = lines[0].split(',').map(h => h.trim().replace(/"/g,'').toLowerCase());
@@ -600,7 +640,7 @@ function parseCSV(text) {
   ls.innerHTML = '<option value="">Select lot...</option>' + Object.keys(ST.lots).sort().map(l => `<option value="${l}">Lot ${l} (${ST.lots[l].length} players)</option>`).join('');
   updateSidebar();
 }
-
+ 
 function parseCSVLine(line) {
   const result = []; let cur = ''; let inQ = false;
   for (const ch of line) {
@@ -611,7 +651,7 @@ function parseCSVLine(line) {
   result.push(cur);
   return result;
 }
-
+ 
 // ── TEAMS ─────────────────────────────────────────────────
 function addTeam() {
   const name = document.getElementById('t-name').value.trim() || `Team ${ST.teams.length+1}`;
@@ -625,7 +665,7 @@ function addTeam() {
   populateTradeSelects();
   updateSidebar();
 }
-
+ 
 function renderTeamSetupGrid() {
   const el = document.getElementById('team-setup-grid');
   if (!el) return;
@@ -645,7 +685,7 @@ function renderTeamSetupGrid() {
       <div class="budget-bar mt8"><div class="budget-fill" style="width:${Math.min(100,(t.spent/t.budget)*100)}%;background:${t.color};"></div></div>
     </div>`).join('');
 }
-
+ 
 function removeTeam(id) {
   const t = ST.teams.find(x => x.id === id);
   if (t) { (t.roster||[]).forEach(pid => ST.assignedSet.delete(pid)); }
@@ -653,7 +693,7 @@ function removeTeam(id) {
   renderTeamSetupGrid();
   updateSidebar();
 }
-
+ 
 function renderTeamsPage() {
   const el = document.getElementById('teams-grid');
   if (!el) return;
@@ -687,12 +727,12 @@ function renderTeamsPage() {
     </div>`;
   }).join('');
 }
-
+ 
 // ── AUCTION ───────────────────────────────────────────────
 function renderAuctionPage() {
   renderLot();
 }
-
+ 
 function renderLot() {
   const lotNum = document.getElementById('lot-select').value;
   const el = document.getElementById('lot-players');
@@ -713,7 +753,7 @@ function renderLot() {
     </div>`;
   }).join('');
 }
-
+ 
 function drawFromLot() {
   const lotNum = document.getElementById('lot-select').value;
   if (!lotNum) { alert('Select a lot first.'); return; }
@@ -732,7 +772,7 @@ function drawFromLot() {
   renderDrawAssign(p);
   renderLot();
 }
-
+ 
 function drawAll() {
   const lotNum = document.getElementById('lot-select').value;
   if (!lotNum) { alert('Select a lot first.'); return; }
@@ -745,7 +785,7 @@ function drawAll() {
   renderDrawAssign(p);
   renderLot();
 }
-
+ 
 function renderDrawAssign(player) {
   if (!ST.teams.length) { document.getElementById('draw-assign-panel').innerHTML='<div class="dim">No teams created yet.</div>'; return; }
   document.getElementById('draw-assign-panel').innerHTML = `
@@ -762,7 +802,7 @@ function renderDrawAssign(player) {
       }).join('')}
     </div>`;
 }
-
+ 
 function assignPlayer(teamId, pid) {
   const team = ST.teams.find(t => t.id === teamId);
   const p = ST.players.find(x => x.id === pid);
@@ -781,7 +821,7 @@ function assignPlayer(teamId, pid) {
   renderTeamSetupGrid();
   updateSidebar();
 }
-
+ 
 // ── SCHEDULE GENERATOR ────────────────────────────────────
 function generateSchedule() {
   if (ST.teams.length < 2) { alert('Add at least 2 teams first.'); return; }
@@ -813,7 +853,7 @@ function generateSchedule() {
   renderSchedulePage();
   document.getElementById('md-num-label').textContent = '1';
 }
-
+ 
 function renderSchedulePage() {
   const el = document.getElementById('schedule-grid');
   if (!el) return;
@@ -844,7 +884,7 @@ function renderSchedulePage() {
     </div>`;
   }).join('');
 }
-
+ 
 // ── XI MODAL ─────────────────────────────────────────────
 function openXIModal() {
   document.getElementById('xi-md-num').textContent = ST.currentMatchday + 1;
@@ -869,7 +909,7 @@ function openXIModal() {
   }).join('');
   document.getElementById('xi-modal').classList.add('on');
 }
-
+ 
 function toggleXI(teamId, pid, checked, countId) {
   const team = ST.teams.find(t=>t.id===teamId);
   if (!team.xi) team.xi = [];
@@ -878,9 +918,9 @@ function toggleXI(teamId, pid, checked, countId) {
   const el = document.getElementById(countId);
   if (el) el.textContent = `(${team.xi.length}/11)`;
 }
-
+ 
 function saveXIs() { closeModal('xi-modal'); renderTeamsPage(); }
-
+ 
 // ── SIMULATION ENGINE ─────────────────────────────────────
 // Embedded minimal engine (roles-accurate)
 function getPhase(over) {
@@ -888,7 +928,7 @@ function getPhase(over) {
   if (over <= 14) return 'MIDDLE';
   return 'DEATH';
 }
-
+ 
 function buildBattingOrder(xi) {
   const order = ['top','middle','tail'];
   const sorted = [];
@@ -901,13 +941,13 @@ function buildBattingOrder(xi) {
   xi.filter(p=>!used.has(p.id)).forEach(p=>sorted.push(p));
   return sorted.slice(0,11);
 }
-
+ 
 function buildBowlers(fieldXI) {
   const bowlers = fieldXI.filter(p => rc(p.role).canBowl);
   bowlers.forEach(b => { b._bowlLeft=Math.min(4,rc(b.role).bowlMax); b._bowlDone=0; b._runs=0; b._balls=0; b._wkts=0; });
   return bowlers;
 }
-
+ 
 function selectBowler(bowlers, over, lastId) {
   const elig = bowlers.filter(b => b._bowlLeft > 0 && b.id !== lastId);
   if (!elig.length) return bowlers.find(b=>b._bowlLeft>0)||bowlers[0];
@@ -920,7 +960,7 @@ function selectBowler(bowlers, over, lastId) {
   const pool=pref.slice(0,Math.min(3,pref.length));
   return pool[Math.floor(Math.random()*pool.length)];
 }
-
+ 
 function simBall(batter, bowler, phase, conds, inn) {
   const br = clamp(batter.batting_rating||70, 40, 99);
   const blr = clamp(bowler.bowling_rating||60, 40, 99);
@@ -934,7 +974,7 @@ function simBall(batter, bowler, phase, conds, inn) {
     return 0;
   })();
   const net = clamp((br-blr)/100+phMod.b+pitchMod+dewMod+typeAdv, -0.4, 0.4);
-
+ 
   let wP = clamp(0.056+phMod.w-net*0.14+typeAdv*(-0.5), 0.02, 0.19);
   let dotP = clamp(0.34-net*0.24, 0.14, 0.55);
   const extP = 0.04;
@@ -943,7 +983,7 @@ function simBall(batter, bowler, phase, conds, inn) {
   const w6 = clamp(0.07+net*0.10+(phase==='DEATH'?0.06:0)+(batter.six_hitter?0.05:0),0.03,0.22);
   const wt=.38+.18+.04+w4+w6;
   const p1=rem*.38/wt,p2=rem*.18/wt,p3=rem*.04/wt,p4=rem*w4/wt,p6=rem*w6/wt;
-
+ 
   const r=Math.random(); let c=0;
   if((c+=wP)>r) return {runs:0,w:'W'};
   if((c+=dotP)>r) return {runs:0,w:'0'};
@@ -954,22 +994,22 @@ function simBall(batter, bowler, phase, conds, inn) {
   if((c+=p4)>r) return {runs:4,w:'4',four:true};
   return {runs:6,w:'6',six:true};
 }
-
+ 
 function simInnings(batXI, fieldXI, target, conds, innNum) {
   const batters = buildBattingOrder(batXI.map(p=>({...p,_r:0,_b:0,_4s:0,_6s:0,_out:false,_how:'',_bwlr:''}))).slice(0,11);
   const bowlers = buildBowlers(fieldXI.map(p=>({...p})));
-
+ 
   let totalRuns=0,totalWkts=0,legalBalls=0,extras=0;
   let sIdx=0,nsIdx=1,lastBowlId=null,curBowler=null;
   const fow=[], events=[], battingLog=[], oboLog=[];
   let overRuns=0;
-
+ 
   for (let lb=0; lb<120; lb++) {
     const over=Math.floor(lb/6);
     const phase=getPhase(over);
     if(totalWkts>=10) break;
     if(target&&totalRuns>=target) break;
-
+ 
     if(lb%6===0){
       if(over>0) oboLog.push({over,runs:overRuns});
       overRuns=0;
@@ -979,28 +1019,28 @@ function simInnings(batXI, fieldXI, target, conds, innNum) {
       curBowler._bowlLeft--;
       curBowler._bowlDone++;
     }
-
+ 
     let striker=batters[sIdx];
     if(!striker||striker._out){
       const nx=batters.findIndex((b,i)=>i>sIdx&&!b._out);
       if(nx<0) break;
       sIdx=nx; striker=batters[sIdx];
     }
-
+ 
     const res=simBall(striker,curBowler,phase,conds,innNum);
-
+ 
     if(res.extra){
       totalRuns+=res.runs; extras+=res.runs; curBowler._runs+=res.runs; overRuns+=res.runs;
       events.push({t:res.w,ov:`${over}.${lb%6}`,txt:`${res.w} — ${curBowler.name}`});
       lb--;
       continue;
     }
-
+ 
     legalBalls++; striker._b++; curBowler._balls++;
     totalRuns+=res.runs; striker._r+=res.runs; curBowler._runs+=res.runs; overRuns+=res.runs;
     if(res.four){striker._4s++;events.push({t:'4',ov:`${over+1}.${lb%6+1}`,txt:`FOUR! ${striker.name} cuts through covers`});}
     if(res.six){striker._6s++;events.push({t:'6',ov:`${over+1}.${lb%6+1}`,txt:`SIX! ${striker.name} launches one into the stands!`});}
-
+ 
     if(res.w==='W'){
       striker._out=true; striker._how=randDismissal(curBowler);
       striker._bwlr=curBowler.name; curBowler._wkts++;
@@ -1020,7 +1060,7 @@ function simInnings(batXI, fieldXI, target, conds, innNum) {
     if((lb+1)%6===0)[sIdx,nsIdx]=[nsIdx,sIdx];
     if(target&&totalRuns>=target) break;
   }
-
+ 
   const ov=Math.floor(legalBalls/6)+'.'+legalBalls%6;
   const bowlingCard=bowlers.filter(b=>b._balls>0).map(b=>({
     id:b.id,name:b.name,role:b.role,overs:`${Math.floor(b._balls/6)}.${b._balls%6}`,
@@ -1033,7 +1073,7 @@ function simInnings(batXI, fieldXI, target, conds, innNum) {
   }));
   return {runs:totalRuns,wkts:totalWkts,balls:legalBalls,ov,extras,fow,events,battingCard,bowlingCard};
 }
-
+ 
 function randDismissal(bowler){
   const bt=(bowler?.bowling_type||'').toUpperCase();
   const t=['caught','bowled','lbw','caught & bowled','stumped','run out'];
@@ -1042,33 +1082,33 @@ function randDismissal(bowler){
   for(let i=0;i<t.length;i++){c+=w[i];if(r<c)return t[i];}
   return 'caught';
 }
-
+ 
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
-
+ 
 function simMatch(teamA, teamB, venue, matchday) {
   const tossWin = Math.random()<0.5?teamA:teamB;
   const elect = Math.random()<0.55?'bat':'bowl';
   const batFirst = (tossWin===teamA&&elect==='bat')||(tossWin===teamB&&elect==='bowl') ? teamA : teamB;
   const bowlFirst = batFirst===teamA?teamB:teamA;
-
+ 
   const v = VENUES[venue]||VENUES.wankhede;
   const conds = {
     pitchMod: {Batting:.10,Spin:-.06,Pace:-.04,Balanced:.01}[v.pitch]||0,
     spinA: (v.spin||50)/100, paceA: (v.pace||50)/100, dew: v.dew, tod:'night', pitchWear:1
   };
-
+ 
   function getXI(team) {
     const xi = (team.xi||[]).length>=6 ? team.xi : (team.roster||[]);
     return xi.slice(0,11).map(pid=>ST.players.find(p=>p.id===pid)).filter(Boolean);
   }
-
+ 
   const batXI = getXI(batFirst);
   const bowlXI = getXI(bowlFirst);
   if(!batXI.length||!bowlXI.length) return null;
-
+ 
   const inn1 = simInnings(batXI, bowlXI, null, conds, 1);
   const inn2 = simInnings(bowlXI, batXI, inn1.runs+1, {...conds,pitchWear:2}, 2);
-
+ 
   let result;
   if(inn2.runs>=inn1.runs+1){
     result={winner:bowlFirst,margin:`${10-inn2.wkts} wicket${10-inn2.wkts!==1?'s':''}`,detail:`${120-inn2.balls} balls left`};
@@ -1077,7 +1117,7 @@ function simMatch(teamA, teamB, venue, matchday) {
   } else {
     result={winner:batFirst,margin:`${inn1.runs-inn2.runs} run${inn1.runs-inn2.runs!==1?'s':''}`,detail:''};
   }
-
+ 
   // MoM
   let momScore=-1,mom=null;
   [...inn1.battingCard,...inn2.battingCard].forEach(b=>{
@@ -1088,10 +1128,10 @@ function simMatch(teamA, teamB, venue, matchday) {
     const s=b.wkts*25+Math.max(0,8-parseFloat(b.economy))*5;
     if(s>momScore){momScore=s;mom={...b,type:'bowl'};}
   });
-
+ 
   // Update season stats
   updateSeasonStats(inn1,inn2);
-
+ 
   return {
     matchday, teamA:teamA.name, teamB:teamB.name, aId:teamA.id, bId:teamB.id,
     venue:v.name, tossWin:tossWin.name, elect,
@@ -1102,7 +1142,7 @@ function simMatch(teamA, teamB, venue, matchday) {
     teamAColor:teamA.color, teamBColor:teamB.color,
   };
 }
-
+ 
 function updateSeasonStats(inn1,inn2){
   [...inn1.battingCard,...inn2.battingCard].forEach(b=>{
     initStats(b.id);
@@ -1121,9 +1161,10 @@ function updateSeasonStats(inn1,inn2){
     ST.seasonStats[b.id].bowlBalls+=parseFloat(b.overs)*6||0;
   });
 }
-
+ 
 // ── MATCHDAY SIMULATION ───────────────────────────────────
 function simMatchday() {
+  if (!checkXIsBeforeSim()) return;
   const nextMD = ST.currentMatchday + 1;
   const day = ST.schedule.find(d=>d.matchday===nextMD);
   if (!day) { alert('Schedule complete or not generated.'); return; }
@@ -1154,13 +1195,14 @@ function simMatchday() {
   ST.currentMatchday = nextMD;
   document.getElementById('day-pill').textContent=`MD ${ST.currentMatchday}/14`;
   document.getElementById('md-num-label').textContent = Math.min(ST.currentMatchday+1,14);
-  document.getElementById('md-status-label').textContent = `Matchday ${nextMD} complete — ${dayResults.length} matches`;
+  document.getElementById('md-status-label').textContent = `✅ Matchday ${nextMD} — ${dayResults.length} match${dayResults.length>1?'es':''} done`;
   renderMatchdayResults(dayResults);
   renderSchedulePage();
   updateSidebar();
   updateCaps();
+  checkSeasonComplete();
 }
-
+ 
 function computeNRR(res,ta,tb){
   // Simplified NRR: (runs for/overs faced) - (runs against/overs bowled)
   const b1=res.inn1.balls/6||1,b2=res.inn2.balls/6||1;
@@ -1172,12 +1214,12 @@ function computeNRR(res,ta,tb){
   if(ta){ta.nrr=((ta.nrr||0)*(ta.played-1)+nrrDiff)/(ta.played||1);}
   if(tb){tb.nrr=((tb.nrr||0)*(tb.played-1)-nrrDiff)/(tb.played||1);}
 }
-
+ 
 function simFullSeason(){
   const remaining = ST.schedule.filter(d=>d.matchday>ST.currentMatchday);
   remaining.forEach(()=>simMatchday());
 }
-
+ 
 function renderMatchdayResults(results) {
   const el = document.getElementById('matchday-results');
   if(!results.length){if(el)el.innerHTML='<div class="dim">No results this matchday.</div>';return;}
@@ -1208,14 +1250,14 @@ function renderMatchdayResults(results) {
       </div>
     </div>`).join('');
 }
-
+ 
 // ── SCORECARDS ────────────────────────────────────────────
 function renderScorecardsPage(){
   const pills=document.getElementById('sc-match-pills');
   pills.innerHTML=ST.results.map((r,i)=>`<div class="pl ${ST.dlMatch===i?'on':''}" onclick="viewScorecard(${i})">MD${r.matchday}: ${r.teamA} v ${r.teamB}</div>`).join('');
   if(ST.results.length&&ST.dlMatch===null) viewScorecard(0);
 }
-
+ 
 function viewScorecard(idx){
   ST.dlMatch=idx;
   const r=ST.results[idx]; if(!r) return;
@@ -1224,7 +1266,7 @@ function viewScorecard(idx){
   // refresh pills
   renderScorecardsPage();
 }
-
+ 
 function buildScorecardHTML(r, inline=false){
   function inn(i,num){
     return `<div class="${inline?'sc-wrap':''}" style="${inline?'':'margin-bottom:14px;'}">
@@ -1268,13 +1310,13 @@ function buildScorecardHTML(r, inline=false){
     ${inn(r.inn1,1)}
     ${inn(r.inn2,2)}`;
 }
-
+ 
 function showDLModal(idx){
   ST.dlMatch=idx; const r=ST.results[idx]; if(!r) return;
   document.getElementById('dl-modal-body').innerHTML=`<div style="font-size:12px;color:var(--text2);">Scorecard: <strong>${r.teamA} vs ${r.teamB}</strong> (MD${r.matchday})</div>`;
   document.getElementById('dl-modal').classList.add('on');
 }
-
+ 
 function downloadHTML(){
   const r=ST.results[ST.dlMatch]; if(!r) return;
   const html=`<!DOCTYPE html><html><head><title>Scorecard MD${r.matchday}</title><style>body{font-family:monospace;background:#0b0d11;color:#e8eaf0;padding:20px;}table{border-collapse:collapse;width:100%;margin-bottom:16px;}td,th{padding:6px 10px;border-bottom:1px solid #222;text-align:left;}th{background:#181c24;font-size:11px;color:#666;}h2{color:#ff8c00;}.gold{color:#f5c518;}.green{color:#22c55e;}.red{color:#f43f5e;}</style></head><body>
@@ -1295,7 +1337,7 @@ function downloadHTML(){
     </table></body></html>`;
   dl(`scorecard_md${r.matchday}_${r.teamA.replace(/ /g,'_')}_vs_${r.teamB.replace(/ /g,'_')}.html`, html, 'text/html');
 }
-
+ 
 function downloadCSV(){
   const r=ST.results[ST.dlMatch]; if(!r) return;
   let csv=`Match,${r.teamA} vs ${r.teamB},MD${r.matchday},${r.venue}\nResult,${r.result.winner?r.result.winner.name+' won by '+r.result.margin:'Tie'}\n\n`;
@@ -1309,13 +1351,9 @@ function downloadCSV(){
   r.inn2.bowlingCard.forEach(b=>{csv+=`${b.name},${b.overs},${b.runs},${b.wkts},${b.economy}\n`;});
   dl(`scorecard_md${r.matchday}.csv`,csv,'text/csv');
 }
-
-function dl(fname,content,type){
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([content],{type}));
-  a.download=fname; a.click();
-}
-
+ 
+ 
+ 
 // ── POINTS TABLE ──────────────────────────────────────────
 function renderPointsPage(){
   const sorted=[...ST.teams].sort((a,b)=>b.points-a.points||(b.nrr||0)-(a.nrr||0));
@@ -1343,7 +1381,7 @@ function renderPointsPage(){
       <span class="grn fw7">${r.result.winner?r.result.winner.name+' by '+r.result.margin:'Tied'}</span>
     </div>`).join('');
 }
-
+ 
 // ── TRADE ─────────────────────────────────────────────────
 function renderTradePage(){
   const open=ST.currentMatchday>0&&ST.currentMatchday%2===0&&ST.currentMatchday<14;
@@ -1352,13 +1390,13 @@ function renderTradePage(){
   document.getElementById('trade-pg-info').textContent=open?`Trade window active.`:`Next window opens after MD${Math.ceil((ST.currentMatchday+1)/2)*2}.`;
   populateTradeSelects();
 }
-
+ 
 function populateTradeSelects(){
   const opts='<option value="">Select...</option>'+ST.teams.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
   const ta=document.getElementById('tr-ta'),tb=document.getElementById('tr-tb');
   if(ta)ta.innerHTML=opts;if(tb)tb.innerHTML=opts;
 }
-
+ 
 function renderTradeRosters(){
   const aid=document.getElementById('tr-ta').value;
   const bid=document.getElementById('tr-tb').value;
@@ -1377,7 +1415,7 @@ function renderTradeRosters(){
   document.getElementById('tr-roster-a').innerHTML=rList(aid,'a');
   document.getElementById('tr-roster-b').innerHTML=rList(bid,'b');
 }
-
+ 
 function selectTrade(side,pid){
   if(side==='a')ST.tradeA=pid; else ST.tradeB=pid;
   const pa=ST.players.find(p=>p.id===ST.tradeA);
@@ -1386,7 +1424,7 @@ function selectTrade(side,pid){
   document.getElementById('tr-b-gives').textContent=pb?pb.name:'Nothing selected';
   renderTradeRosters();
 }
-
+ 
 function execTrade(){
   if(!ST.tradeA||!ST.tradeB){alert('Select players from both teams.');return;}
   const open=ST.currentMatchday>0&&ST.currentMatchday%2===0&&ST.currentMatchday<14;
@@ -1405,9 +1443,9 @@ function execTrade(){
   alert(`✓ Trade done: ${pa.name} ↔ ${pb.name}`);
   renderTradeRosters();
 }
-
+ 
 function clearTrade(){ST.tradeA=null;ST.tradeB=null;renderTradeRosters();}
-
+ 
 // ── PLAYOFFS ──────────────────────────────────────────────
 function renderPlayoffs(){
   const el=document.getElementById('playoff-view');
@@ -1440,7 +1478,7 @@ function renderPlayoffs(){
     </div>
   </div>`;
 }
-
+ 
 function simPlayoffMatch(i1,i2,label){
   const top4=[...ST.teams].sort((a,b)=>b.points-a.points||b.nrr-a.nrr).slice(0,4);
   const ta=top4[i1],tb=top4[i2];if(!ta||!tb)return;
@@ -1449,7 +1487,7 @@ function simPlayoffMatch(i1,i2,label){
   const w=res?.result?.winner;
   document.getElementById(resultId).innerHTML=`<div style="font-size:12px;font-weight:700;color:var(--green);">${w?w.name+' won by '+res.result.margin:'Tie'}</div>${res?.mom?`<div style="font-size:10px;color:var(--gold);">MoM: ${res.mom.name}</div>`:''}`;
 }
-
+ 
 // ── PLAYER VIEW ───────────────────────────────────────────
 function renderPlayerView(){
   const sorted=[...ST.teams].sort((a,b)=>b.points-a.points);
@@ -1481,82 +1519,527 @@ function renderPlayerView(){
       </div>
     </div>`;
 }
-
-function getTopBatters(n){
-  return Object.entries(ST.seasonStats).filter(([,s])=>s.runs>0).map(([pid,s])=>{
-    const p=ST.players.find(x=>x.id===pid);
-    return {name:p?.name||pid,runs:s.runs,balls:s.balls};
-  }).sort((a,b)=>b.runs-a.runs).slice(0,n);
+ 
+// ── PLAYER STATS PAGE ────────────────────────────────────
+let statsRoleFilter = 'all';
+ 
+function setStatRole(role, el) {
+  statsRoleFilter = role;
+  document.querySelectorAll('#stats-role-pills .pl').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  renderStatsPage();
 }
-
-function getTopBowlers(n){
-  return Object.entries(ST.seasonStats).filter(([,s])=>s.wkts>0).map(([pid,s])=>{
-    const p=ST.players.find(x=>x.id===pid);
-    return {name:p?.name||pid,wkts:s.wkts};
-  }).sort((a,b)=>b.wkts-a.wkts).slice(0,n);
+ 
+function renderStatsPage() {
+  renderBattingStatsTable();
+  renderBowlingStatsTable();
 }
-
-// ── SIDEBAR & CAPS ────────────────────────────────────────
-function updateSidebar(){
-  const sorted=[...ST.teams].sort((a,b)=>b.points-a.points||(b.nrr||0)-(a.nrr||0));
-  const lead=sorted[0]?.points||0;
-  document.getElementById('sb-pts').innerHTML=sorted.map((t,i)=>`
+ 
+function getBattingRows() {
+  // Collect from all match scorecards directly for accuracy
+  const pmap = {}; // pid -> {name, team, role, matches:Set, runs, balls, hs, fours, sixes, fifties, hundreds, dismissals}
+  ST.results.forEach(r => {
+    [r.inn1, r.inn2].forEach(inn => {
+      (inn.battingCard || []).forEach(b => {
+        if (!b.id) return;
+        if (!pmap[b.id]) pmap[b.id] = { name: b.name, role: b.role, matches: new Set(), runs: 0, balls: 0, hs: 0, fours: 0, sixes: 0, fifties: 0, hundreds: 0, outs: 0 };
+        const px = pmap[b.id];
+        px.matches.add(r.matchday + '-' + r.teamA + r.teamB);
+        px.runs += b.runs;
+        px.balls += b.balls;
+        px.fours += b.fours || 0;
+        px.sixes += b.sixes || 0;
+        if (b.runs > px.hs) px.hs = b.runs;
+        if (b.runs >= 100) px.hundreds++;
+        else if (b.runs >= 50) px.fifties++;
+        if (b.dismissal !== 'not out') px.outs++;
+      });
+    });
+  });
+  return Object.values(pmap).filter(p => {
+    if (statsRoleFilter === 'bat') return ['BAT','WK','WK-BAT'].includes((p.role||'').toUpperCase());
+    if (statsRoleFilter === 'bowl') return ['BOWL','PACE','SPIN'].includes((p.role||'').toUpperCase());
+    if (statsRoleFilter === 'all-round') return ['AR','ALL'].includes((p.role||'').toUpperCase());
+    return true;
+  }).sort((a, b) => b.runs - a.runs);
+}
+ 
+function getBowlingRows() {
+  const pmap = {};
+  ST.results.forEach(r => {
+    [r.inn1, r.inn2].forEach(inn => {
+      (inn.bowlingCard || []).forEach(b => {
+        if (!b.id) return;
+        if (!pmap[b.id]) pmap[b.id] = { name: b.name, role: b.role, matches: new Set(), wkts: 0, runs: 0, balls: 0, bestWkts: 0, bestRuns: 999 };
+        const px = pmap[b.id];
+        px.matches.add(r.matchday + '-' + r.teamA + r.teamB);
+        px.wkts += b.wkts || 0;
+        px.runs  += b.runs || 0;
+        const overs = parseFloat(b.overs) || 0;
+        const ovInt = Math.floor(overs), ovFrac = Math.round((overs - ovInt) * 10);
+        px.balls += ovInt * 6 + ovFrac;
+        if (b.wkts > px.bestWkts || (b.wkts === px.bestWkts && b.runs < px.bestRuns)) {
+          px.bestWkts = b.wkts; px.bestRuns = b.runs;
+        }
+      });
+    });
+  });
+  return Object.values(pmap).filter(p => {
+    if (statsRoleFilter === 'bat') return false;
+    if (statsRoleFilter === 'all-round') return ['AR','ALL'].includes((p.role||'').toUpperCase());
+    return true;
+  }).filter(p => p.wkts > 0 || p.balls > 0).sort((a, b) => b.wkts - a.wkts || a.runs - b.runs);
+}
+ 
+function renderBattingStatsTable() {
+  const rows = getBattingRows();
+  const el = document.getElementById('batting-stats-table');
+  if (!rows.length) { if(el) el.innerHTML = '<div class="dim" style="padding:12px;">No batting data yet.</div>'; return; }
+  el.innerHTML = rows.map((p, i) => {
+    const avg = p.outs > 0 ? (p.runs / p.outs).toFixed(1) : p.runs > 0 ? '∞' : '0.0';
+    const sr  = p.balls > 0 ? (p.runs / p.balls * 100).toFixed(1) : '0.0';
+    const c   = roleColor(p.role);
+    const isTop = i === 0;
+    return `<div style="display:flex;align-items:center;gap:0;padding:7px 12px;border-bottom:1px solid var(--bdr);font-size:11px;background:${isTop?'rgba(245,197,24,.04)':''};">
+      <div style="flex:1.8;font-weight:600;">${p.name} <span style="font-size:9px;color:${c};font-weight:700;">${p.role}</span></div>
+      <div style="min-width:30px;text-align:right;color:var(--text3);">${p.matches.size}</div>
+      <div style="min-width:36px;text-align:right;font-weight:700;color:${isTop?'var(--gold)':'var(--text)'};">${p.runs}</div>
+      <div style="min-width:30px;text-align:right;color:var(--ipl2);">${p.hs}</div>
+      <div style="min-width:34px;text-align:right;color:var(--text2);">${avg}</div>
+      <div style="min-width:36px;text-align:right;color:${parseFloat(sr)>=150?'var(--orange)':parseFloat(sr)>=130?'var(--green)':'var(--text2)'};">${sr}</div>
+      <div style="min-width:26px;text-align:right;color:var(--gold);">${p.fifties}</div>
+      <div style="min-width:26px;text-align:right;color:var(--ipl2);">${p.hundreds}</div>
+      <div style="min-width:26px;text-align:right;color:var(--orange);">${p.sixes}</div>
+    </div>`;
+  }).join('');
+}
+ 
+function renderBowlingStatsTable() {
+  const rows = getBowlingRows();
+  const el = document.getElementById('bowling-stats-table');
+  if (!rows.length) { if(el) el.innerHTML = '<div class="dim" style="padding:12px;">No bowling data yet.</div>'; return; }
+  el.innerHTML = rows.map((p, i) => {
+    const eco  = p.balls > 0 ? (p.runs / (p.balls / 6)).toFixed(2) : '0.00';
+    const avg  = p.wkts > 0 ? (p.runs / p.wkts).toFixed(1) : '—';
+    const c    = roleColor(p.role);
+    const isTop = i === 0;
+    return `<div style="display:flex;align-items:center;gap:0;padding:7px 12px;border-bottom:1px solid var(--bdr);font-size:11px;background:${isTop?'rgba(168,85,247,.04)':''};">
+      <div style="flex:1.8;font-weight:600;">${p.name} <span style="font-size:9px;color:${c};font-weight:700;">${p.role}</span></div>
+      <div style="min-width:30px;text-align:right;color:var(--text3);">${p.matches.size}</div>
+      <div style="min-width:30px;text-align:right;font-weight:700;color:${isTop?'var(--purple)':'var(--text)'};">${p.wkts}</div>
+      <div style="min-width:36px;text-align:right;color:var(--text2);">${p.runs}</div>
+      <div style="min-width:36px;text-align:right;color:${parseFloat(eco)<7?'var(--green)':parseFloat(eco)>10?'var(--red)':'var(--text2)'};">${eco}</div>
+      <div style="min-width:36px;text-align:right;color:var(--text2);">${avg}</div>
+      <div style="min-width:36px;text-align:right;color:var(--purple);">${p.bestWkts}/${p.bestRuns}</div>
+    </div>`;
+  }).join('');
+}
+ 
+function downloadBattingStats() {
+  const rows = getBattingRows();
+  let csv = 'Player,Role,Matches,Runs,HS,Avg,SR,50s,100s,4s,6s\n';
+  rows.forEach(p => {
+    const avg = p.outs > 0 ? (p.runs/p.outs).toFixed(1) : p.runs > 0 ? 'N/O' : '0';
+    const sr  = p.balls > 0 ? (p.runs/p.balls*100).toFixed(1) : '0';
+    csv += `${p.name},${p.role},${p.matches.size},${p.runs},${p.hs},${avg},${sr},${p.fifties},${p.hundreds},${p.fours},${p.sixes}\n`;
+  });
+  dl('batting_stats.csv', csv, 'text/csv');
+}
+ 
+function downloadBowlingStats() {
+  const rows = getBowlingRows();
+  let csv = 'Player,Role,Matches,Wickets,Runs,Overs,Economy,Avg,BBI\n';
+  rows.forEach(p => {
+    const eco  = p.balls > 0 ? (p.runs/(p.balls/6)).toFixed(2) : '0';
+    const avg  = p.wkts > 0 ? (p.runs/p.wkts).toFixed(1) : '-';
+    const ovs  = Math.floor(p.balls/6) + '.' + (p.balls%6);
+    csv += `${p.name},${p.role},${p.matches.size},${p.wkts},${p.runs},${ovs},${eco},${avg},${p.bestWkts}/${p.bestRuns}\n`;
+  });
+  dl('bowling_stats.csv', csv, 'text/csv');
+}
+ 
+// ── COMPLETE PLAYOFFS WITH Q2 + FINAL ────────────────────
+// Override renderPlayoffs with full bracket
+function renderPlayoffs() {
+  const el = document.getElementById('playoff-view');
+  if (ST.currentMatchday < 14) {
+    const proj = [...ST.teams].sort((a,b) => b.points-a.points || (b.nrr||0)-(a.nrr||0)).slice(0,4);
+    el.innerHTML = `<div class="announce"><strong>Playoffs unlock after all 14 matchdays.</strong> Current: MD${ST.currentMatchday}/14</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px;">Projected Top 4:</div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        ${proj.map((t,i) => `<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--bdr);font-size:12px;">
+          <span class="mono" style="color:var(--gold);min-width:20px;font-weight:700;">${i+1}</span>
+          <div style="width:8px;height:8px;border-radius:50%;background:${t.color};"></div>
+          <span style="flex:1;font-weight:600;">${t.name}</span>
+          <span class="mono gold">${t.points}pts</span>
+          <span class="mono muted" style="font-size:10px;">${t.wins}W-${t.losses}L</span>
+          <span class="mono" style="font-size:10px;color:${(t.nrr||0)>=0?'var(--green)':'var(--red)'};">${(t.nrr||0)>=0?'+':''}${(t.nrr||0).toFixed(3)}</span>
+        </div>`).join('')}
+      </div>`;
+    return;
+  }
+ 
+  const top4 = [...ST.teams].sort((a,b) => b.points-a.points || (b.nrr||0)-(a.nrr||0)).slice(0,4);
+  if (!ST.playoffState) {
+    ST.playoffState = {
+      q1: null, elim: null, q2: null, final: null,
+      q1Teams: [top4[0], top4[1]],
+      elimTeams: [top4[2], top4[3]],
+      q2Teams: null,
+      finalTeams: null,
+      champion: null,
+    };
+  }
+  const po = ST.playoffState;
+ 
+  function matchBlock(id, label, ta, tb, result, simFn, nextNote) {
+    const done = !!result;
+    return `<div class="card" style="text-align:center;padding:14px;">
+      <div class="card-hd">${label}</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:10px;">
+        <div style="font-family:var(--fd);font-size:14px;font-weight:700;color:${ta?.color||'var(--text)'};">${ta?.name||'TBD'}</div>
+        <div class="muted" style="font-size:11px;">vs</div>
+        <div style="font-family:var(--fd);font-size:14px;font-weight:700;color:${tb?.color||'var(--text)'};">${tb?.name||'TBD'}</div>
+      </div>
+      ${done
+        ? `<div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:4px;">✓ ${result.winner} won by ${result.margin}</div>
+           ${result.mom ? `<div style="font-size:10px;color:var(--gold);">🌟 MoM: ${result.mom}</div>` : ''}
+           <div style="font-size:10px;color:var(--text3);">${result.scoreA} · ${result.scoreB}</div>`
+        : (ta && tb ? `<button class="btn btn-sm btn-or mt8" onclick="${simFn}">▶ Simulate</button>` : '<div class="muted" style="font-size:11px;margin-top:8px;">Awaiting results above</div>')}
+      ${nextNote ? `<div style="font-size:9px;color:var(--text3);margin-top:6px;">${nextNote}</div>` : ''}
+    </div>`;
+  }
+ 
+  el.innerHTML = `
+    <div class="announce" style="margin-bottom:14px;"><strong>🏆 IPL Playoffs</strong> — No trades permitted. Top 4 qualified.</div>
+    
+    <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Round 1</div>
+    <div class="g2" style="margin-bottom:14px;">
+      ${matchBlock('q1','Qualifier 1 (1st vs 2nd)',po.q1Teams[0],po.q1Teams[1],po.q1,'simPOMatch("q1")', 'Winner → Final · Loser → Q2')}
+      ${matchBlock('el','Eliminator (3rd vs 4th)',po.elimTeams[0],po.elimTeams[1],po.elim,'simPOMatch("el")','Winner → Q2 · Loser out')}
+    </div>
+    
+    <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Round 2</div>
+    <div class="g2" style="margin-bottom:14px;">
+      ${matchBlock('q2','Qualifier 2',po.q2Teams?.[0],po.q2Teams?.[1],po.q2,'simPOMatch("q2")','Winner → Final')}
+      <div class="card" style="display:flex;align-items:center;justify-content:center;">
+        <div style="text-align:center;color:var(--text3);">
+          <div style="font-size:28px;margin-bottom:6px;">🏆</div>
+          <div style="font-size:12px;">Final awaits</div>
+        </div>
+      </div>
+    </div>
+ 
+    <div style="font-size:11px;font-weight:700;color:var(--ipl2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Grand Final</div>
+    ${matchBlock('final','IPL Final',po.finalTeams?.[0],po.finalTeams?.[1],po.final,'simPOMatch("final")','')}
+ 
+    ${po.champion ? `<div style="margin-top:14px;background:linear-gradient(135deg,rgba(245,197,24,.15),rgba(255,140,0,.1));border:2px solid var(--gold);border-radius:var(--rl);padding:24px;text-align:center;">
+      <div style="font-size:40px;margin-bottom:8px;">🏆</div>
+      <div style="font-family:var(--fd);font-size:28px;font-weight:900;color:var(--gold);letter-spacing:.06em;">${po.champion}</div>
+      <div style="font-size:14px;color:var(--text2);margin-top:4px;">IPL MUN Champions!</div>
+    </div>` : ''}`;
+}
+ 
+function simPOMatch(stage) {
+  const po = ST.playoffState;
+  if (!po) return;
+ 
+  let ta, tb;
+  if (stage === 'q1')    { ta = po.q1Teams[0];   tb = po.q1Teams[1]; }
+  else if (stage === 'el'){ ta = po.elimTeams[0]; tb = po.elimTeams[1]; }
+  else if (stage === 'q2'){ ta = po.q2Teams?.[0]; tb = po.q2Teams?.[1]; }
+  else if (stage === 'final'){ ta = po.finalTeams?.[0]; tb = po.finalTeams?.[1]; }
+  if (!ta || !tb) { alert('Previous round not completed yet.'); return; }
+ 
+  const venue = VENUES[ta.venue] || VENUES.wankhede;
+  const conds = {
+    pitchMod: {Batting:.10,Spin:-.06,Pace:-.04,Balanced:.01}[venue.pitch]||0,
+    spinA: (venue.spin||50)/100, paceA: (venue.pace||50)/100, dew: venue.dew, tod:'night', pitchWear:2
+  };
+  function getXI(team) {
+    const xi = (team.xi||[]).length>=6 ? team.xi : (team.roster||[]);
+    return xi.slice(0,11).map(pid => ST.players.find(p=>p.id===pid)).filter(Boolean);
+  }
+  const batXI = getXI(ta); const bowlXI = getXI(tb);
+  const inn1 = simInnings(batXI, bowlXI, null, conds, 1);
+  const inn2 = simInnings(bowlXI, batXI, inn1.runs+1, {...conds,pitchWear:3}, 2);
+ 
+  let winner, margin;
+  if (inn2.runs >= inn1.runs+1) { winner = tb; margin = `${10-inn2.wkts} wicket${10-inn2.wkts!==1?'s':''}`; }
+  else if (inn1.runs === inn2.runs) { winner = ta; margin = 'Super Over (tie)'; }
+  else { winner = ta; margin = `${inn1.runs-inn2.runs} run${inn1.runs-inn2.runs!==1?'s':''}`; }
+ 
+  // MoM
+  let momScore=-1, momName='';
+  [...inn1.battingCard,...inn2.battingCard].forEach(b=>{ const s=b.runs*1.5+(b.sixes||0)*2; if(s>momScore){momScore=s;momName=b.name;} });
+  [...inn1.bowlingCard,...inn2.bowlingCard].forEach(b=>{ const s=b.wkts*25; if(s>momScore){momScore=s;momName=b.name;} });
+ 
+  const res = {
+    winner: winner.name, loser: (winner===ta?tb:ta).name, margin,
+    scoreA: `${inn1.runs}/${inn1.wkts} (${inn1.ov})`,
+    scoreB: `${inn2.runs}/${inn2.wkts} (${inn2.ov})`,
+    mom: momName,
+  };
+ 
+  if (stage==='q1') {
+    po.q1 = res;
+    const loser = winner===ta?tb:ta;
+    po.q2Teams = [loser, null]; // loser goes to Q2
+  } else if (stage==='el') {
+    po.elim = res;
+    if (po.q2Teams) po.q2Teams[1] = winner; else po.q2Teams = [null, winner];
+  } else if (stage==='q2') {
+    po.q2 = res;
+    const q1Winner = ST.teams.find(t=>t.name===po.q1?.winner);
+    po.finalTeams = [q1Winner, winner];
+  } else if (stage==='final') {
+    po.final = res;
+    po.champion = winner.name;
+  }
+ 
+  renderPlayoffs();
+}
+ 
+// ── IMPROVED MATCHDAY RESULTS: track individual team match stats ──────────
+// Override updateSeasonStats to also track per-match HS and BBI
+function updateSeasonStats(inn1, inn2) {
+  [inn1, inn2].forEach(inn => {
+    (inn.battingCard || []).forEach(b => {
+      if (!b.id) return;
+      initStats(b.id);
+      const s = ST.seasonStats[b.id];
+      s.runs   += b.runs;
+      s.balls  += b.balls;
+      s.sixes  += b.sixes || 0;
+      s.fours  += b.fours || 0;
+      s.matches++;
+      if (b.runs > (s.hs||0)) s.hs = b.runs;
+      if (b.runs >= 100) s.hundreds++;
+      else if (b.runs >= 50) s.fifties++;
+      if (b.dismissal !== 'not out') s.outs = (s.outs||0)+1;
+    });
+    (inn.bowlingCard || []).forEach(b => {
+      if (!b.id) return;
+      initStats(b.id);
+      const s = ST.seasonStats[b.id];
+      s.wkts     += b.wkts || 0;
+      s.bowlRuns += b.runs || 0;
+      const ov    = parseFloat(b.overs)||0;
+      s.bowlBalls += Math.floor(ov)*6 + Math.round((ov-Math.floor(ov))*10);
+      if ((b.wkts||0) > (s.bbiW||0) || ((b.wkts||0)===(s.bbiW||0)&&(b.runs||0)<(s.bbiR||999))) {
+        s.bbiW = b.wkts; s.bbiR = b.runs;
+      }
+    });
+  });
+}
+ 
+// ── TEAM PLAYERS PANEL - show in setup page too ────────────────────────
+function refreshSetupTeams() {
+  renderTeamSetupGrid();
+}
+ 
+// ── IMPROVED SCHEDULE DISPLAY: show times + highlight today ────────────────
+function renderSchedulePage() {
+  const el = document.getElementById('schedule-grid');
+  if (!el) return;
+  if (!ST.schedule.length) {
+    el.innerHTML = '<div class="dim">No schedule generated yet. Go to Setup → Generate Schedule.</div>';
+    return;
+  }
+  el.innerHTML = ST.schedule.map(day => {
+    const done = day.matchday <= ST.currentMatchday;
+    const current = day.matchday === ST.currentMatchday + 1;
+    return `<div class="card" style="padding:0;overflow:hidden;${current?'border-color:var(--ipl2);':done?'opacity:.7;':''}">
+      <div style="display:flex;align-items:center;padding:10px 14px;background:${current?'rgba(255,140,0,.08)':'var(--bg3)'};border-bottom:1px solid var(--bdr);">
+        <div style="font-family:var(--fm);font-size:10px;color:${current?'var(--ipl2)':'var(--text3)'};min-width:60px;font-weight:700;">MD ${day.matchday}</div>
+        <div style="flex:1;font-size:11px;color:var(--text2);">${day.matches.length} match${day.matches.length>1?'es':''} — simultaneous</div>
+        <span class="tag ${done?'tg':current?'to':'tb'}">${done?'DONE':current?'NEXT':'UPCOMING'}</span>
+      </div>
+      ${day.matches.map(m => {
+        const ta = ST.teams.find(t=>t.id===m.home), tb = ST.teams.find(t=>t.id===m.away);
+        const v = VENUES[ta?.venue||'wankhede'];
+        const res = (ST.results||[]).find(r =>
+          r.matchday===day.matchday &&
+          ((r.aId===m.home&&r.bId===m.away)||(r.aId===m.away&&r.bId===m.home)));
+        return `<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--bdr);">
+          <div style="flex:1;display:flex;align-items:center;gap:8px;">
+            <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:${ta?.color||'var(--text)'};">${ta?.name||'?'}</div>
+            <div class="dim" style="font-size:10px;">vs</div>
+            <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:${tb?.color||'var(--text)'};">${tb?.name||'?'}</div>
+          </div>
+          <div style="font-size:10px;color:var(--text3);">${v?.name||'—'}</div>
+          ${res ? `
+            <div style="text-align:right;font-size:10px;">
+              <div class="mono" style="color:var(--text2);">${res.inn1.runs}/${res.inn1.wkts} · ${res.inn2.runs}/${res.inn2.wkts}</div>
+              <div style="color:var(--green);font-weight:700;">${res.result.winner?res.result.winner.name+' won':'Tie'}</div>
+            </div>
+            <button class="btn btn-xs" onclick="go('scorecards');viewScorecard(${ST.results.indexOf(res)})">Card</button>
+          ` : '<div class="dim" style="font-size:10px;min-width:60px;text-align:right;">Not played</div>'}
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+ 
+// ── MATCHDAY: XI check warning before simulating ─────────────────────────
+function checkXIsBeforeSim() {
+  const nextMD = ST.currentMatchday + 1;
+  const day = ST.schedule.find(d=>d.matchday===nextMD);
+  if (!day) return true;
+  const warnings = [];
+  day.matches.forEach(m => {
+    const ta = ST.teams.find(t=>t.id===m.home);
+    const tb = ST.teams.find(t=>t.id===m.away);
+    [ta,tb].forEach(t => {
+      if (!t) return;
+      const xiLen = (t.xi||[]).length;
+      if (xiLen < 11 && (t.roster||[]).length >= 11) warnings.push(`${t.name} has only ${xiLen}/11 XI set`);
+    });
+  });
+  if (warnings.length) {
+    return confirm(`⚠️ Warning:\n${warnings.join('\n')}\n\nProceed? Auto-fill used for incomplete XIs.`);
+  }
+  return true;
+}
+ 
+// ── IMPROVED MATCHDAY DISPLAY ─────────────────────────────────────────────
+function renderMatchdayResults(results) {
+  const el = document.getElementById('matchday-results');
+  if (!results.length) { if(el) el.innerHTML='<div class="dim">No results this matchday.</div>'; return; }
+  el.innerHTML = `
+    <div style="font-size:11px;font-weight:700;color:var(--ipl2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em;">
+      Matchday ${ST.currentMatchday} — ${results.length} match${results.length>1?'es':''} completed simultaneously
+    </div>
+    ${results.map((r, idx) => {
+      const tossInfo = `Toss: ${r.tossWin} elected to ${r.elect}`;
+      return `<div class="sc-wrap">
+        <div class="sc-match-hd">
+          <div class="sc-team">
+            <div class="sc-tnm" style="color:${r.inn1.color||'var(--ipl2)'};">${r.inn1.team}</div>
+            <div class="sc-score">${r.inn1.runs}/${r.inn1.wkts}</div>
+            <div class="sc-ov">${r.inn1.ov} overs · ${r.inn1.extras} extras</div>
+          </div>
+          <div style="text-align:center;padding:0 8px;">
+            <div class="sc-ov muted">vs</div>
+            <div style="font-size:9px;color:var(--text3);margin-top:3px;">${r.venue}</div>
+          </div>
+          <div class="sc-team" style="text-align:right;">
+            <div class="sc-tnm" style="color:${r.inn2.color||'var(--ipl)'};">${r.inn2.team}</div>
+            <div class="sc-score">${r.inn2.runs}/${r.inn2.wkts}</div>
+            <div class="sc-ov">${r.inn2.ov} overs</div>
+          </div>
+        </div>
+        <div style="padding:8px 16px;background:var(--bg3);border-bottom:1px solid var(--bdr);">
+          <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:2px;">${r.result.winner?r.result.winner.name+' won by '+r.result.margin:'Match Tied'}</div>
+          <div style="font-size:10px;color:var(--text3);">${tossInfo}${r.mom?` · 🌟 MoM: ${r.mom.name}`:''}</div>
+        </div>
+        <div style="padding:0;">
+          <div class="inntab">Top Performances</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--bdr);">
+            <div style="padding:8px 14px;border-right:1px solid var(--bdr);">
+              <div style="font-size:9px;color:var(--ipl2);font-weight:700;margin-bottom:5px;">BAT</div>
+              ${r.inn1.battingCard.slice().sort((a,b)=>b.runs-a.runs).slice(0,2).map(b=>
+                `<div style="font-size:11px;padding:2px 0;"><span style="font-weight:600;">${b.name}</span> <span class="mono gold">${b.runs}</span><span class="dim">(${b.balls}b)</span>${b.sixes?` <span style="color:var(--orange);">• ${b.sixes}×6</span>`:''}</div>`
+              ).join('')}
+              ${r.inn2.battingCard.slice().sort((a,b)=>b.runs-a.runs).slice(0,2).map(b=>
+                `<div style="font-size:11px;padding:2px 0;"><span style="font-weight:600;">${b.name}</span> <span class="mono gold">${b.runs}</span><span class="dim">(${b.balls}b)</span>${b.sixes?` <span style="color:var(--orange);">• ${b.sixes}×6</span>`:''}</div>`
+              ).join('')}
+            </div>
+            <div style="padding:8px 14px;">
+              <div style="font-size:9px;color:var(--purple);font-weight:700;margin-bottom:5px;">BOWL</div>
+              ${[...r.inn1.bowlingCard,...r.inn2.bowlingCard].filter(b=>b.wkts>0).sort((a,b)=>b.wkts-a.wkts||(parseFloat(a.economy)-parseFloat(b.economy))).slice(0,3).map(b=>
+                `<div style="font-size:11px;padding:2px 0;"><span style="font-weight:600;">${b.name}</span> <span class="mono" style="color:var(--purple);">${b.wkts}/${b.runs}</span> <span class="dim">${b.economy}</span></div>`
+              ).join('') || '<div class="dim" style="font-size:11px;">No wickets</div>'}
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;padding:8px 14px;">
+          <button class="btn btn-sm" onclick="go('scorecards');viewScorecard(${ST.results.indexOf(r)})">📋 Full Scorecard</button>
+          <button class="btn btn-sm btn-bl" onclick="showDLModal(${ST.results.indexOf(r)})">⬇ Download</button>
+        </div>
+      </div>`;
+    }).join('')}`;
+}
+ 
+// ── SEASON COMPLETE CHECK ────────────────────────────────
+function checkSeasonComplete() {
+  if (ST.currentMatchday >= 14 && !ST.seasonSummaryShown) {
+    ST.seasonSummaryShown = true;
+    setTimeout(() => {
+      const btn = document.getElementById('btn-sim-md');
+      const lbl = document.getElementById('md-status-label');
+      if (btn) { btn.disabled = true; btn.textContent = '✅ Season Complete'; }
+      if (lbl) lbl.textContent = 'League stage complete! Playoffs unlocked.';
+    }, 200);
+  }
+}
+ 
+// ── CORE HELPERS ─────────────────────────────────────────
+function initStats(pid) {
+  if (!pid || ST.seasonStats[pid]) return;
+  ST.seasonStats[pid] = { runs:0, balls:0, outs:0, hs:0, wkts:0, bowlRuns:0, bowlBalls:0, sixes:0, fours:0, fifties:0, hundreds:0, momCount:0, matches:0, bbiW:0, bbiR:999 };
+}
+ 
+function roleColor(role) {
+  const m = { 'BAT':'#fb923c','WK':'#eab308','WK-BAT':'#eab308','AR':'#22c55e','ALL':'#22c55e','BOWL':'#60a5fa','PACE':'#38bdf8','SPIN':'#c084fc' };
+  return m[(role||'BAT').toUpperCase()] || '#8890a8';
+}
+ 
+function closeModal(id) { document.getElementById(id)?.classList.remove('on'); }
+ 
+function dl(fname, content, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+ 
+// ── CAPS / SIDEBAR UPDATES ────────────────────────────────
+function updateSidebar() {
+  const sorted = [...ST.teams].sort((a,b) => b.points-a.points || (b.nrr||0)-(a.nrr||0));
+  const lead = sorted[0]?.points || 0;
+  document.getElementById('sb-pts').innerHTML = sorted.map((t,i) => `
     <div class="sb-row" style="--tc:${t.color};">
       <div class="sb-pos">${i+1}</div>
       <div class="sb-dot" style="background:${t.color};"></div>
       <div class="sb-nm">${t.name}</div>
       <div class="sb-pts">${t.points||0}</div>
-      ${i>0?`<div class="sb-nrr">-${lead-(t.points||0)}</div>`:''}
+      ${i>0 ? `<div class="sb-nrr">-${lead-(t.points||0)}</div>` : ''}
     </div>`).join('');
-  const open=ST.currentMatchday>0&&ST.currentMatchday%2===0&&ST.currentMatchday<14;
-  document.getElementById('trade-status').innerHTML=open?
-    `<span style="color:var(--green);font-size:10px;font-weight:700;">🔓 TRADE WINDOW OPEN</span>`:
-    `<span style="font-size:10px;color:var(--text3);">Next trade: after MD${Math.ceil((ST.currentMatchday+1)/2)*2}</span>`;
+  const open = ST.currentMatchday > 0 && ST.currentMatchday % 2 === 0 && ST.currentMatchday < 14;
+  const trEl = document.getElementById('trade-status');
+  if (trEl) trEl.innerHTML = open
+    ? `<span style="color:var(--green);font-size:10px;font-weight:700;">🔓 TRADE WINDOW OPEN</span>`
+    : `<span style="font-size:10px;color:var(--text3);">Next trade: after MD${Math.ceil((ST.currentMatchday+1)/2)*2}</span>`;
 }
-
-function updateCaps(){
-  const batTop=getTopBatters(1)[0]; const bowlTop=getTopBowlers(1)[0];
-  document.getElementById('cap-or').textContent=batTop?`${batTop.name} (${batTop.runs})`:'—';
-  document.getElementById('cap-pu').textContent=bowlTop?`${bowlTop.name} (${bowlTop.wkts}w)`:'—';
-  // Best SR (min 50 balls)
-  const srTop=Object.entries(ST.seasonStats).filter(([,s])=>s.balls>=50).map(([pid,s])=>{
-    const p=ST.players.find(x=>x.id===pid);
-    return {name:p?.name||pid,sr:s.balls>0?(s.runs/s.balls*100):0};
-  }).sort((a,b)=>b.sr-a.sr)[0];
-  document.getElementById('cap-sr').textContent=srTop?`${srTop.name} (${srTop.sr.toFixed(0)})`:'—';
-  // Best economy (min 10 overs)
-  const ecTop=Object.entries(ST.seasonStats).filter(([,s])=>s.bowlBalls>=60).map(([pid,s])=>{
-    const p=ST.players.find(x=>x.id===pid);
-    const eco=s.bowlBalls>0?(s.bowlRuns/(s.bowlBalls/6)):99;
-    return {name:p?.name||pid,eco};
-  }).sort((a,b)=>a.eco-b.eco)[0];
-  document.getElementById('cap-ec').textContent=ecTop?`${ecTop.name} (${ecTop.eco.toFixed(2)})`:'—';
-  // MoM
-  const momTop=Object.entries(ST.seasonStats).filter(([,s])=>s.momCount>0).map(([pid,s])=>{
-    const p=ST.players.find(x=>x.id===pid);
-    return {name:p?.name||pid,mom:s.momCount};
-  }).sort((a,b)=>b.mom-a.mom)[0];
-  document.getElementById('cap-mo').textContent=momTop?`${momTop.name} (${momTop.mom})`:'—';
-  // Sixes
-  const sixTop=Object.entries(ST.seasonStats).filter(([,s])=>s.sixes>0).map(([pid,s])=>{
-    const p=ST.players.find(x=>x.id===pid);
-    return {name:p?.name||pid,sixes:s.sixes};
-  }).sort((a,b)=>b.sixes-a.sixes)[0];
-  document.getElementById('cap-6s').textContent=sixTop?`${sixTop.name} (${sixTop.sixes})`:'—';
+ 
+function updateCaps() {
+  // Orange Cap
+  const batters = Object.entries(ST.seasonStats).filter(([,s])=>s.runs>0).map(([pid,s])=>({name:ST.players.find(p=>p.id===pid)?.name||pid,...s})).sort((a,b)=>b.runs-a.runs);
+  const bowlers = Object.entries(ST.seasonStats).filter(([,s])=>s.wkts>0).map(([pid,s])=>({name:ST.players.find(p=>p.id===pid)?.name||pid,...s})).sort((a,b)=>b.wkts-a.wkts||(a.bowlRuns-b.bowlRuns));
+ 
+  document.getElementById('cap-or').textContent = batters[0] ? `${batters[0].name} (${batters[0].runs})` : '—';
+  document.getElementById('cap-pu').textContent = bowlers[0] ? `${bowlers[0].name} (${bowlers[0].wkts}w)` : '—';
+ 
+  const srTop = Object.entries(ST.seasonStats).filter(([,s])=>s.balls>=40).map(([pid,s])=>({name:ST.players.find(p=>p.id===pid)?.name||pid,sr:s.balls>0?(s.runs/s.balls*100):0})).sort((a,b)=>b.sr-a.sr)[0];
+  document.getElementById('cap-sr').textContent = srTop ? `${srTop.name} (${srTop.sr.toFixed(0)})` : '—';
+ 
+  const ecTop = Object.entries(ST.seasonStats).filter(([,s])=>s.bowlBalls>=30).map(([pid,s])=>({name:ST.players.find(p=>p.id===pid)?.name||pid,eco:s.bowlBalls>0?(s.bowlRuns/(s.bowlBalls/6)):99})).sort((a,b)=>a.eco-b.eco)[0];
+  document.getElementById('cap-ec').textContent = ecTop ? `${ecTop.name} (${ecTop.eco.toFixed(2)})` : '—';
+ 
+  const momTop = Object.entries(ST.seasonStats).filter(([,s])=>s.momCount>0).map(([pid,s])=>({name:ST.players.find(p=>p.id===pid)?.name||pid,mom:s.momCount})).sort((a,b)=>b.mom-a.mom)[0];
+  document.getElementById('cap-mo').textContent = momTop ? `${momTop.name} (${momTop.mom})` : '—';
+ 
+  const sixTop = Object.entries(ST.seasonStats).filter(([,s])=>s.sixes>0).map(([pid,s])=>({name:ST.players.find(p=>p.id===pid)?.name||pid,sixes:s.sixes})).sort((a,b)=>b.sixes-a.sixes)[0];
+  document.getElementById('cap-6s').textContent = sixTop ? `${sixTop.name} (${sixTop.sixes})` : '—';
 }
-
-// ── HELPERS ───────────────────────────────────────────────
-function initStats(pid){
-  if(!pid||!ST.seasonStats[pid]) ST.seasonStats[pid]={runs:0,balls:0,wkts:0,bowlRuns:0,bowlBalls:0,sixes:0,fours:0,fifties:0,hundreds:0,momCount:0,matches:0};
-}
-function roleColor(role){
-  const m={'BAT':'#fb923c','WK':'#eab308','WK-BAT':'#eab308','AR':'#22c55e','ALL':'#22c55e','BOWL':'#60a5fa','PACE':'#38bdf8','SPIN':'#c084fc'};
-  return m[(role||'BAT').toUpperCase()]||'#8890a8';
-}
-function closeModal(id){document.getElementById(id).classList.remove('on');}
-
-// INIT
+ 
+// ── INIT — ensure team setup grid renders on load
 updateSidebar();
+renderTeamSetupGrid();
+ 
 </script>
 </body>
 </html>
