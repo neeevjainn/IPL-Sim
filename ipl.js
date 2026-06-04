@@ -1914,3 +1914,1419 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   console.log('%c IPL MUN v3.0 loaded ','background:#ff6b1a;color:#fff;font-family:monospace;font-weight:bold;padding:4px 10px;border-radius:4px;font-size:13px');
 });
+
+/* ══════════════════════════════════════════════════════
+   AUCTION OVERHAUL — replaces all Part 2 auction fns
+   Fixes: assignment, lot structure, unsold re-auction
+   ══════════════════════════════════════════════════════ */
+
+/* ── State migration for new auction fields ─────────── */
+function ensureAuctionFields() {
+  if (!Array.isArray(STATE.auction.unsold))     STATE.auction.unsold = [];
+  if (!STATE.auction.round)                     STATE.auction.round = 1;
+  if (!STATE.auction.drawnThisRound)            STATE.auction.drawnThisRound = 0;
+  if (STATE.auction.currentPlayerId === undefined) STATE.auction.currentPlayerId = null;
+}
+
+/* ── RENDER AUCTION PAGE (full rebuild) ─────────────── */
+function renderAuction() {
+  ensureAuctionFields();
+
+  // Inject new structure if not already present
+  if (!document.getElementById('auction-bidding-zone')) {
+    buildAuctionPageStructure();
+  }
+
+  renderAuctionBudgets();
+  renderAuctionPoolV2();
+  renderAuctionLogV2();
+  updateAuctionHeader();
+  updateReAuctionBanner();
+
+  // Restore active player if state has one
+  if (STATE.auction.currentPlayerId) {
+    const p = getPlayer(STATE.auction.currentPlayerId);
+    if (p) showBiddingPanel(p); else clearBiddingPanel();
+  } else {
+    clearBiddingPanel();
+  }
+}
+
+function buildAuctionPageStructure() {
+  const page = document.getElementById('page-auction');
+
+  // Replace inner content entirely with clean structure
+  page.innerHTML = `
+  <div class="page-header">
+    <h1 class="page-title">Auction</h1>
+    <div id="auction-round-header" class="auction-round-header">
+      <span class="auction-round-pill" id="auction-round-pill">Round 1</span>
+      <span class="auction-meta" id="auction-meta">0 of 0 drawn · 0 unsold</span>
+    </div>
+  </div>
+
+  <!-- Re-auction banner (hidden until needed) -->
+  <div id="reauction-banner" class="reauction-banner hidden">
+    <div class="reauction-icon">🔄</div>
+    <div class="reauction-text">
+      <div class="reauction-title">Round <span id="reauction-from-round"></span> Complete</div>
+      <div class="reauction-sub"><span id="reauction-unsold-count"></span> players remain unsold</div>
+    </div>
+    <div class="reauction-actions">
+      <button class="btn btn-primary" onclick="startReAuction()">Start Re-auction Round</button>
+      <button class="btn btn-secondary" onclick="finaliseAuction()">Finalise &amp; Skip Unsold</button>
+    </div>
+  </div>
+
+  <div class="auction-layout">
+
+    <!-- LEFT: Draw + Bidding + Log -->
+    <div class="auction-main">
+
+      <!-- Draw Controls -->
+      <div class="card" id="auction-draw-card">
+        <div class="card-header">
+          <h2 class="card-title">🎰 Draw Lot</h2>
+          <div class="auction-lot-counter">
+            Lot <span id="auction-lot-current">0</span> / <span id="auction-lot-total">0</span>
+          </div>
+        </div>
+        <div class="card-body" style="padding:12px 16px">
+          <!-- Reveal stage (animation only) -->
+          <div id="auction-reveal-stage" class="auction-reveal-stage">
+            <div class="auction-reveal-idle" id="auction-idle-hint">
+              <div class="auction-reveal-icon">🎰</div>
+              <p>Press "Draw Next Lot" to reveal a player</p>
+            </div>
+            <div id="auction-stage-1" class="auction-stage hidden">
+              <div class="auction-lot-card">
+                <div class="lot-card-inner" id="lot-card-inner">
+                  <div class="lot-card-front">
+                    <span class="lot-number">LOT <span id="auction-lot-num">?</span></span>
+                  </div>
+                  <div class="lot-card-back">
+                    <div id="auction-player-reveal" class="auction-player-reveal">
+                      <div id="reveal-role-badge" class="player-reveal-role"></div>
+                      <div id="reveal-player-name" class="player-reveal-name">Player Name</div>
+                      <div id="reveal-player-stats" class="player-reveal-stats"></div>
+                      <div class="player-reveal-base">Base: ₹<span id="reveal-base-price">0</span> Cr</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Draw buttons -->
+          <div class="auction-controls">
+            <button class="btn btn-large btn-primary" id="btn-draw-lot" onclick="drawNextLot()">
+              🎰 Draw Next Lot
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bidding Zone (appears after draw) -->
+      <div id="auction-bidding-zone" class="card hidden" style="border-color:rgba(255,140,0,0.25)">
+        <div class="card-header" style="background:rgba(255,107,26,0.06)">
+          <h2 class="card-title">🏏 Now Bidding</h2>
+          <div id="bidding-player-badge" class="bidding-player-badge"></div>
+        </div>
+        <div class="card-body">
+
+          <!-- Player summary bar -->
+          <div id="bidding-player-bar" class="bidding-player-bar">
+            <!-- filled by JS -->
+          </div>
+
+          <!-- Rating mini-bars -->
+          <div id="bidding-rating-row" class="bidding-rating-row"></div>
+
+          <!-- Price row -->
+          <div class="bidding-price-row">
+            <div class="form-group" style="flex:1;max-width:200px">
+              <label class="form-label">Final Price <span class="form-unit">₹ Cr</span></label>
+              <input id="auction-price-input" class="form-input" type="number" step="0.25" min="0"
+                     style="font-size:18px;font-weight:700;color:var(--gold);font-family:var(--fm)">
+            </div>
+          </div>
+
+          <!-- Team selection -->
+          <div class="bidding-team-label">Select Team:</div>
+          <div id="auction-team-assign-grid" class="auction-team-assign-grid">
+            <!-- filled by JS -->
+          </div>
+
+          <!-- Action buttons -->
+          <div class="bidding-actions">
+            <button class="btn btn-large btn-primary" onclick="confirmAssign()">
+              ✓ Confirm Assignment
+            </button>
+            <button class="btn btn-secondary btn-large" onclick="markUnsold()">
+              ✕ Mark Unsold
+            </button>
+          </div>
+
+          <!-- Per-team error -->
+          <div id="bidding-error" class="login-error hidden" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <!-- Auction Log -->
+      <div class="card" id="auction-log-card">
+        <div class="card-header">
+          <h2 class="card-title">📝 Auction Log</h2>
+          <span id="auction-log-count" class="card-badge">0 assigned</span>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div id="auction-log-list" class="auction-log-list">
+            <div class="list-empty">No players assigned yet.</div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /auction-main -->
+
+    <!-- RIGHT: Budgets + Pool + Unsold -->
+    <div class="auction-sidebar">
+
+      <!-- Budget dials -->
+      <div class="card" id="auction-budgets-card">
+        <div class="card-header"><h2 class="card-title">💰 Budgets</h2></div>
+        <div class="card-body" style="padding:0">
+          <div id="auction-budget-list" class="auction-budget-list"></div>
+        </div>
+      </div>
+
+      <!-- Active Pool -->
+      <div class="card" id="auction-pool-card">
+        <div class="card-header">
+          <h2 class="card-title">👤 Pool Remaining</h2>
+          <span id="auction-pool-count" class="card-badge">0</span>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div id="auction-pool-list" class="auction-pool-list"></div>
+        </div>
+      </div>
+
+      <!-- Unsold Players -->
+      <div class="card hidden" id="auction-unsold-card" style="border-color:rgba(244,63,94,0.20)">
+        <div class="card-header">
+          <h2 class="card-title" style="color:var(--red)">✕ Unsold</h2>
+          <span id="auction-unsold-count-badge" class="card-badge" style="color:var(--red)">0</span>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div id="auction-unsold-list" class="auction-pool-list"></div>
+        </div>
+      </div>
+
+      <!-- Finalise -->
+      <button class="btn btn-primary btn-block" onclick="finaliseAuction()" style="margin-top:4px">
+        Finalise Auction →
+      </button>
+
+    </div><!-- /auction-sidebar -->
+  </div>`;
+
+  // Inject needed CSS for new elements
+  if (!document.getElementById('auction-overhaul-css')) {
+    const style = document.createElement('style');
+    style.id = 'auction-overhaul-css';
+    style.textContent = `
+      .auction-round-header{display:flex;align-items:center;gap:10px;margin-top:4px}
+      .auction-round-pill{font-family:var(--fm);font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:var(--ipl-dim);color:var(--ipl2);border:1px solid rgba(255,140,0,.25)}
+      .auction-meta{font-family:var(--fm);font-size:11px;color:var(--text3)}
+      .reauction-banner{display:flex;align-items:center;gap:16px;background:var(--gold-dim);border:1px solid rgba(245,200,66,.25);border-radius:var(--rl);padding:14px 18px;margin-bottom:14px;flex-wrap:wrap}
+      .reauction-icon{font-size:28px;flex-shrink:0}
+      .reauction-title{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--gold)}
+      .reauction-sub{font-size:12px;color:var(--text2);margin-top:2px}
+      .reauction-actions{display:flex;gap:8px;flex-shrink:0;margin-left:auto}
+      .bidding-player-badge{font-family:var(--fm);font-size:10px;color:var(--ipl2);background:var(--ipl-dim);padding:3px 10px;border-radius:20px;border:1px solid rgba(255,140,0,.25);font-weight:700;letter-spacing:.06em}
+      .bidding-player-bar{display:flex;align-items:center;gap:10px;padding:10px 0;margin-bottom:8px;border-bottom:1px solid var(--bdr)}
+      .bidding-player-bar .bp-role{flex-shrink:0}
+      .bidding-player-bar .bp-name{font-family:var(--fd);font-size:20px;font-weight:700;flex:1}
+      .bidding-player-bar .bp-base{font-family:var(--fm);font-size:11px;color:var(--text2)}
+      .bidding-rating-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+      .br-chip{background:var(--bg3);border:1px solid var(--bdr);border-radius:6px;padding:4px 10px;font-family:var(--fm);font-size:10px;display:flex;align-items:center;gap:5px}
+      .br-chip-lbl{color:var(--text3)}
+      .br-chip-val{font-weight:700;color:var(--text)}
+      .bidding-price-row{margin-bottom:12px}
+      .bidding-team-label{font-family:var(--fm);font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);font-weight:700;margin-bottom:7px}
+      .bidding-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+      .team-assign-btn.selected{background:var(--ipl-dim)!important;border-color:var(--ipl2)!important;color:var(--ipl2)!important}
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+/* ── UPDATE HEADER / COUNTERS ────────────────────────── */
+function updateAuctionHeader() {
+  ensureAuctionFields();
+  const total  = STATE.auction.pool.length + STATE.auction.log.length + STATE.auction.unsold.length;
+  const drawn  = STATE.auction.drawnThisRound || 0;
+  const unsold = STATE.auction.unsold.length;
+
+  const pill = document.getElementById('auction-round-pill');
+  const meta = document.getElementById('auction-meta');
+  if (pill) pill.textContent = `Round ${STATE.auction.round}`;
+  if (meta) meta.textContent = `${drawn} drawn · ${unsold} unsold · ${STATE.auction.pool.length} remaining`;
+
+  const lotCurEl = document.getElementById('auction-lot-current');
+  const lotTotEl = document.getElementById('auction-lot-total');
+  if (lotCurEl) lotCurEl.textContent = STATE.auction.currentLot;
+  if (lotTotEl) lotTotEl.textContent = total;
+}
+
+function updateReAuctionBanner() {
+  ensureAuctionFields();
+  const banner = document.getElementById('reauction-banner');
+  if (!banner) return;
+  const poolEmpty  = STATE.auction.pool.length === 0;
+  const hasUnsold  = STATE.auction.unsold.length > 0;
+  const noActive   = !STATE.auction.currentPlayerId;
+  banner.classList.toggle('hidden', !(poolEmpty && hasUnsold && noActive));
+  if (poolEmpty && hasUnsold) {
+    const fromRound = document.getElementById('reauction-from-round');
+    const unsoldCnt = document.getElementById('reauction-unsold-count');
+    if (fromRound) fromRound.textContent = STATE.auction.round;
+    if (unsoldCnt) unsoldCnt.textContent = STATE.auction.unsold.length;
+  }
+}
+
+/* ── DRAW NEXT LOT ───────────────────────────────────── */
+function drawNextLot() {
+  ensureAuctionFields();
+
+  // If there's already an active player, warn
+  if (STATE.auction.currentPlayerId) {
+    showBidError('Assign or mark unsold the current player before drawing the next lot.');
+    return;
+  }
+
+  if (!STATE.auction.pool.length) {
+    if (STATE.auction.unsold.length) {
+      showToast(`Round ${STATE.auction.round} done — ${STATE.auction.unsold.length} unsold. Start re-auction or finalise.`, 'warn');
+    } else {
+      showToast('All players have been assigned!', 'success');
+    }
+    updateReAuctionBanner();
+    return;
+  }
+
+  // Pick random player from pool
+  const idx = Math.floor(Math.random() * STATE.auction.pool.length);
+  const playerId = STATE.auction.pool[idx];
+  const player = getPlayer(playerId);
+
+  if (!player) {
+    // Ghost ID — remove and retry
+    STATE.auction.pool.splice(idx, 1);
+    saveState();
+    drawNextLot();
+    return;
+  }
+
+  // Store current player in state (NOT a closure variable)
+  STATE.auction.currentPlayerId = playerId;
+  STATE.auction.currentLot++;
+  STATE.auction.drawnThisRound = (STATE.auction.drawnThisRound || 0) + 1;
+
+  // ── Reveal animation (cosmetic only) ──
+  const idle  = document.getElementById('auction-idle-hint');
+  const stage = document.getElementById('auction-stage-1');
+  const inner = document.getElementById('lot-card-inner');
+  if (idle)  idle.style.display = 'none';
+  if (stage) stage.classList.remove('hidden');
+  if (inner) {
+    inner.classList.remove('flipped');
+    void inner.offsetWidth;                    // Force reflow
+    fillPlayerReveal(player);                  // Fill card back BEFORE flip
+    setTimeout(() => inner.classList.add('flipped'), 120);
+  }
+
+  // ── Show bidding zone IMMEDIATELY (no animation dependency) ──
+  showBiddingPanel(player);
+  updateAuctionHeader();
+  renderAuctionPoolV2();
+  saveState();
+}
+
+/* ── BIDDING PANEL ───────────────────────────────────── */
+function showBiddingPanel(player) {
+  const zone = document.getElementById('auction-bidding-zone');
+  if (!zone) return;
+  zone.classList.remove('hidden');
+
+  // Badge
+  const badge = document.getElementById('bidding-player-badge');
+  if (badge) badge.textContent = `LOT ${STATE.auction.currentLot}`;
+
+  // Player bar
+  const bar = document.getElementById('bidding-player-bar');
+  if (bar) bar.innerHTML = `
+    <span class="bp-role squad-player-role-badge ${player.role}">${player.role}</span>
+    <span class="bp-name">${escHtml(player.name)}</span>
+    <span class="bp-base">Base ₹${player.basePrice}Cr</span>`;
+
+  // Rating chips
+  const rr = document.getElementById('bidding-rating-row');
+  if (rr) {
+    const chips = [
+      { lbl:'BAT',  val: player.batting,  color: 'var(--role-bat)' },
+      { lbl:'BOWL', val: player.bowling,  color: 'var(--role-pace)' },
+      { lbl:'FLD',  val: player.fielding, color: 'var(--green)' },
+    ];
+    if (player.role === 'WK') chips.push({ lbl:'KEEP', val: player.keeping, color: 'var(--role-wk)' });
+    rr.innerHTML = chips.map(c =>
+      `<div class="br-chip"><span class="br-chip-lbl">${c.lbl}</span><span class="br-chip-val" style="color:${c.color}">${c.val}</span></div>`
+    ).join('');
+  }
+
+  // Price
+  const priceEl = document.getElementById('auction-price-input');
+  if (priceEl) priceEl.value = player.basePrice;
+
+  // Team grid
+  fillAuctionAssignGrid();
+
+  // Clear error
+  hideBidError();
+}
+
+function clearBiddingPanel() {
+  const zone = document.getElementById('auction-bidding-zone');
+  if (zone) zone.classList.add('hidden');
+  STATE.auction.currentPlayerId = null;
+
+  // Reset flip card
+  const stage = document.getElementById('auction-stage-1');
+  const inner = document.getElementById('lot-card-inner');
+  const idle  = document.getElementById('auction-idle-hint');
+  if (stage) stage.classList.add('hidden');
+  if (inner) inner.classList.remove('flipped');
+  if (idle)  idle.style.display = '';
+}
+
+function showBidError(msg) {
+  const el = document.getElementById('bidding-error');
+  if (!el) { showToast(msg, 'error'); return; }
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+function hideBidError() {
+  const el = document.getElementById('bidding-error');
+  if (el) el.classList.add('hidden');
+}
+
+/* ── FILL ASSIGN GRID ────────────────────────────────── */
+function fillAuctionAssignGrid() {
+  const grid = document.getElementById('auction-team-assign-grid');
+  if (!grid) return;
+  if (!STATE.teams.length) {
+    grid.innerHTML = '<p style="color:var(--red);font-size:12px">⚠ No teams configured. Set up teams in Setup first.</p>';
+    return;
+  }
+  grid.innerHTML = STATE.teams.map(t => `
+    <button class="team-assign-btn" data-team-id="${t.id}"
+            onclick="selectAuctionTeam(this,'${t.id}')">
+      <span class="budget-pip" style="background:${t.color}"></span>
+      <span style="flex:1;text-align:left">${escHtml(t.shortName || t.name)}</span>
+      <span class="team-assign-budget">₹${t.budget.toFixed(1)}Cr</span>
+    </button>`).join('');
+}
+
+function selectAuctionTeam(btn, teamId) {
+  // Clear all selections
+  document.querySelectorAll('#auction-team-assign-grid .team-assign-btn')
+    .forEach(b => b.classList.remove('selected'));
+  // Select this one
+  btn.classList.add('selected');
+  hideBidError();
+}
+
+/* ── CONFIRM ASSIGNMENT ──────────────────────────────── */
+function confirmAssign() {
+  ensureAuctionFields();
+
+  const pid = STATE.auction.currentPlayerId;
+  if (!pid) { showBidError('Draw a player first.'); return; }
+
+  const player = getPlayer(pid);
+  if (!player) { showBidError('Player data missing — redraw.'); STATE.auction.currentPlayerId = null; return; }
+
+  const selBtn = document.querySelector('#auction-team-assign-grid .team-assign-btn.selected');
+  if (!selBtn) { showBidError('Select a team first.'); return; }
+
+  const teamId = selBtn.dataset.teamId;
+  const team   = getTeam(teamId);
+  if (!team) { showBidError('Team not found. Try again.'); return; }
+
+  const priceInput = parseFloat(document.getElementById('auction-price-input')?.value);
+  const price = isNaN(priceInput) || priceInput <= 0 ? player.basePrice : priceInput;
+
+  if (price > team.budget) {
+    showBidError(`${team.name} only has ₹${team.budget.toFixed(2)}Cr — enter a lower price.`);
+    return;
+  }
+  if (price < player.basePrice) {
+    showBidError(`Price cannot be below base price ₹${player.basePrice}Cr.`);
+    return;
+  }
+
+  // ── Execute assignment ──
+  player.teamId = teamId;
+  player.price  = price;
+
+  // Add to team
+  if (!team.players.includes(pid)) team.players.push(pid);
+  team.budget = parseFloat((team.budget - price).toFixed(2));
+  team.spent  = parseFloat(((team.spent || 0) + price).toFixed(2));
+
+  // Remove from active pool
+  STATE.auction.pool = STATE.auction.pool.filter(id => id !== pid);
+
+  // Add to log
+  STATE.auction.log.push({
+    playerId: pid,
+    teamId, price,
+    lot:   STATE.auction.currentLot,
+    round: STATE.auction.round,
+  });
+
+  // Clear current player
+  STATE.auction.currentPlayerId = null;
+
+  saveState();
+  clearBiddingPanel();
+  renderAuction();
+  showToast(`${player.name} → ${team.name} for ₹${price}Cr`, 'success');
+}
+
+/* ── MARK UNSOLD ─────────────────────────────────────── */
+function markUnsold() {
+  ensureAuctionFields();
+  const pid = STATE.auction.currentPlayerId;
+  if (!pid) { showBidError('Draw a player first.'); return; }
+
+  const player = getPlayer(pid);
+  const name   = player ? player.name : pid;
+
+  // Move from pool to unsold (not back into pool)
+  STATE.auction.pool   = STATE.auction.pool.filter(id => id !== pid);
+  if (!STATE.auction.unsold.includes(pid)) STATE.auction.unsold.push(pid);
+  STATE.auction.currentPlayerId = null;
+
+  saveState();
+  clearBiddingPanel();
+  renderAuction();
+  showToast(`${name} marked unsold.`, 'info');
+}
+
+/* Alias for old skipLot calls in HTML */
+function skipLot() { markUnsold(); }
+
+/* ── RE-AUCTION (Round 2+) ───────────────────────────── */
+function startReAuction() {
+  ensureAuctionFields();
+  if (!STATE.auction.unsold.length) {
+    showToast('No unsold players to re-auction.', 'warn');
+    return;
+  }
+
+  STATE.auction.round++;
+  STATE.auction.drawnThisRound = 0;
+
+  // Move all unsold back into active pool
+  STATE.auction.pool   = [...STATE.auction.unsold];
+  STATE.auction.unsold = [];
+  STATE.auction.currentPlayerId = null;
+
+  saveState();
+  renderAuction();
+  showToast(`Re-auction Round ${STATE.auction.round} started — ${STATE.auction.pool.length} players.`, 'success');
+}
+
+/* ── RENDER POOL (v2) ────────────────────────────────── */
+function renderAuctionPoolV2() {
+  ensureAuctionFields();
+  const pool   = STATE.auction.pool;
+  const unsold = STATE.auction.unsold;
+  const countEl = document.getElementById('auction-pool-count');
+  const listEl  = document.getElementById('auction-pool-list');
+  const unsoldCard  = document.getElementById('auction-unsold-card');
+  const unsoldBadge = document.getElementById('auction-unsold-count-badge');
+  const unsoldList  = document.getElementById('auction-unsold-list');
+
+  if (countEl) countEl.textContent = pool.length;
+  if (listEl) {
+    const current = STATE.auction.currentPlayerId;
+    listEl.innerHTML = pool.map(pid => {
+      const p = getPlayer(pid);
+      if (!p) return '';
+      const isActive = pid === current;
+      return `<div class="pool-player-row" style="${isActive ? 'background:var(--ipl-dim);border-left:2px solid var(--ipl2)' : ''}">
+        <span class="squad-player-role-badge ${p.role}">${p.role}</span>
+        ${escHtml(p.name)}${isActive ? ' <span style="color:var(--ipl2);font-size:9px">▶ Bidding</span>' : ''}
+        <span style="margin-left:auto;font-family:var(--fm);font-size:10px;color:var(--text3)">₹${p.basePrice}Cr</span>
+      </div>`;
+    }).join('') || '<div class="list-empty">Pool empty.</div>';
+  }
+
+  // Unsold section
+  if (unsoldCard) unsoldCard.classList.toggle('hidden', unsold.length === 0);
+  if (unsoldBadge) unsoldBadge.textContent = unsold.length;
+  if (unsoldList) {
+    unsoldList.innerHTML = unsold.map(pid => {
+      const p = getPlayer(pid);
+      if (!p) return '';
+      return `<div class="pool-player-row" style="opacity:0.65">
+        <span class="squad-player-role-badge ${p.role}">${p.role}</span>
+        ${escHtml(p.name)}
+        <span style="margin-left:auto;font-family:var(--fm);font-size:10px;color:var(--text3)">₹${p.basePrice}Cr</span>
+      </div>`;
+    }).join('') || '<div class="list-empty">None.</div>';
+  }
+}
+
+/* ── RENDER LOG (v2) ─────────────────────────────────── */
+function renderAuctionLogV2() {
+  const el    = document.getElementById('auction-log-list');
+  const badge = document.getElementById('auction-log-count');
+  const log   = STATE.auction.log || [];
+  if (badge) badge.textContent = `${log.length} assigned`;
+  if (!el) return;
+  if (!log.length) { el.innerHTML = '<div class="list-empty">No players assigned yet.</div>'; return; }
+  el.innerHTML = [...log].reverse().map(e => {
+    const p = getPlayer(e.playerId), t = getTeam(e.teamId);
+    return `<div class="auction-log-entry">
+      <span class="log-player">${p ? escHtml(p.name) : '?'}</span>
+      <span class="log-team" style="color:${t?.color || 'var(--text2)'}">${t ? escHtml(t.shortName || t.name) : '—'}</span>
+      <span class="log-price">₹${e.price}Cr</span>
+      ${e.round > 1 ? `<span style="font-family:var(--fm);font-size:9px;color:var(--text3)">R${e.round}</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+/* ── FINALISE ────────────────────────────────────────── */
+function finaliseAuction() {
+  ensureAuctionFields();
+  const unsoldCount = STATE.auction.unsold.length + STATE.auction.pool.length;
+  if (unsoldCount > 0) {
+    if (!confirm(`${unsoldCount} players unassigned. Finalise auction anyway?`)) return;
+  }
+  // Players still in pool/unsold remain unowned
+  STATE.season.status  = 'league';
+  STATE.season.currentMD = 1;
+  STATE.auction.currentPlayerId = null;
+  saveState();
+  showToast('Auction finalised! Season begins.', 'success');
+  navTo('matchday');
+}
+
+/* ── KEEP renderAuctionBudgets working ───────────────── */
+function renderAuctionBudgets() {
+  const el = document.getElementById('auction-budget-list');
+  if (!el) return;
+  el.innerHTML = STATE.teams.map(t => {
+    const pct  = Math.min(100, t.budget / STATE.config.auctionBudget * 100);
+    const crit = pct < 10, low = pct < 30;
+    return `<div class="budget-row">
+      <span class="budget-pip" style="background:${t.color}"></span>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="budget-team-name">${escHtml(t.shortName || t.name)}</span>
+          <span class="budget-amount" style="color:${crit ? 'var(--red)' : low ? 'var(--gold)' : 'var(--gold)'}">₹${t.budget.toFixed(1)}Cr</span>
+        </div>
+        <div class="budget-track" style="margin-top:4px">
+          <div class="budget-fill ${crit ? 'danger' : low ? 'low' : ''}" style="width:${pct}%"></div>
+        </div>
+        <div style="font-family:var(--fm);font-size:9px;color:var(--text3);margin-top:2px">${t.players.length} players</div>
+      </div>
+    </div>`;
+  }).join('') || '<div class="list-empty">No teams set up.</div>';
+}
+
+/* ── Patch migrateState to include new auction fields ── */
+const _origMigrateState = migrateState;
+function migrateState(s) {
+  const out = _origMigrateState(s);
+  if (!Array.isArray(out.auction.unsold))        out.auction.unsold = [];
+  if (!out.auction.round)                        out.auction.round = 1;
+  if (!out.auction.drawnThisRound)               out.auction.drawnThisRound = 0;
+  if (out.auction.currentPlayerId === undefined) out.auction.currentPlayerId = null;
+  return out;
+}
+
+/* ══════════════════════════════════════════════════════
+   CONTINUATION PATCH — critical fixes + playoffs +
+   toss/super-over integration + MD flow improvements
+   ══════════════════════════════════════════════════════ */
+
+/* ── FIX: simulateInnings aggression delta bug ───────── */
+function simulateInnings(battingTeam, bowlingTeam, batters, bowlers, venue, target) {
+  const pm  = getPitchMods(venue?.pitchType || 'balanced');
+  // FIXED: operator precedence — was (aggression||60-60)/100 = wrong
+  const adB   = ((battingTeam.aggression  || 60) - 60) / 100;
+  const adBow = ((bowlingTeam.aggression  || 60) - 60) / 100;
+  const homeBonus = battingTeam.venueId === venue?.id ? 3 : 0;
+
+  let runs = 0, wickets = 0, balls = 0, ppRuns = 0, ppWickets = 0;
+  const pStats = {}, bStats = {}, fow = [], ballLog = [];
+
+  batters.forEach(pid => pStats[pid] = { runs:0, balls:0, fours:0, sixes:0, out:false, dismissal:'' });
+  bowlers.forEach(pid => bStats[pid] = { runs:0, balls:0, wickets:0, maidens:0 });
+
+  // Sort bowlers by bowling rating (best first)
+  const bq = [...bowlers].sort((a,b) => (getPlayer(b)?.bowling||50) - (getPlayer(a)?.bowling||50));
+  let bRot = 0;
+  let bat1 = batters[0] || null, bat2 = batters[1] || null, bIdx = 2;
+
+  for (let over = 0; over < 20; over++) {
+    const isPP = over < 6;
+    const bowlerId = bq[bRot % bq.length]; bRot++;
+    let overRuns = 0;
+
+    for (let ball = 0; ball < 6; ball++) {
+      if (wickets >= 10 || (target && runs >= target)) break;
+      balls++;
+
+      const o = simulateBall({
+        isPP, pm, adB, adBow, homeBonus,
+        batter: bat1 ? getPlayer(bat1) : null,
+        bowler: bowlerId ? getPlayer(bowlerId) : null,
+        wickets,
+        runsNeeded: target ? target - runs : null,
+        ballsLeft: 120 - balls,
+      });
+
+      runs += o.runs; overRuns += o.runs;
+
+      if (!o.extra) {
+        if (bat1 && pStats[bat1]) {
+          pStats[bat1].balls++;
+          pStats[bat1].runs += o.runs;
+          if (o.runs === 4) pStats[bat1].fours++;
+          if (o.runs === 6) pStats[bat1].sixes++;
+        }
+        if (bowlerId && bStats[bowlerId]) {
+          bStats[bowlerId].balls++;
+          bStats[bowlerId].runs += o.runs;
+        }
+      }
+
+      if (isPP) ppRuns += o.runs;
+
+      if (o.wicket) {
+        wickets++;
+        if (isPP) ppWickets++;
+        if (bat1 && pStats[bat1]) { pStats[bat1].out = true; pStats[bat1].dismissal = o.dismissal || 'out'; }
+        if (bowlerId && bStats[bowlerId]) bStats[bowlerId].wickets++;
+        fow.push({ wicket: wickets, runs, over: over + 1, ball: ball + 1 });
+        if (bIdx < batters.length) bat1 = batters[bIdx++];
+      }
+
+      if (o.runs % 2 === 1) { const tmp = bat1; bat1 = bat2; bat2 = tmp; }
+      ballLog.push({ over, ball, runs: o.runs, wicket: !!o.wicket, wide: !!o.wide, noBall: !!o.noBall });
+    }
+
+    if (overRuns === 0 && bStats[bowlerId]) bStats[bowlerId].maidens++;
+    { const tmp = bat1; bat1 = bat2; bat2 = tmp; } // rotate strike end of over
+    if (target && runs >= target) break;
+  }
+
+  const overs = parseFloat((Math.floor(balls/6) + (balls%6) * 0.1).toFixed(1));
+  return { teamId: battingTeam.id, total: runs, wickets, overs, ballLog, fow,
+           ppRuns, ppWickets, playerStats: pStats, bowlerStats: bStats,
+           extras: Math.floor(balls * 0.04) };
+}
+
+/* ── FIX: getPlayingXI skips injured players even if XI set ── */
+function getPlayingXI(team) {
+  if (team.xi && team.xi.length === 11) {
+    // Filter out newly-injured/suspended players
+    const available = team.xi.filter(pid => {
+      const p = getPlayer(pid);
+      return p && !p.injured && !p.suspended;
+    });
+    if (available.length === 11) return available;
+    // Fill gaps with next-best available players
+    const inSquad = STATE.players
+      .filter(p => p.teamId === team.id && !p.injured && !p.suspended && !available.includes(p.id))
+      .sort((a,b) => (b.batting + b.bowling + b.fielding) - (a.batting + a.bowling + a.fielding));
+    while (available.length < 11 && inSquad.length) available.push(inSquad.shift().id);
+    return available;
+  }
+  // Auto-select best 11
+  return STATE.players
+    .filter(p => p.teamId === team.id && !p.injured && !p.suspended)
+    .sort((a,b) => (b.batting + b.bowling + b.fielding) - (a.batting + a.bowling + a.fielding))
+    .slice(0, 11).map(p => p.id);
+}
+
+/* ── FIX: NRR — use running average not accumulation ─── */
+function updateNRR(result) {
+  const i1 = result.innings1, i2 = result.innings2;
+  const tA = getTeam(result.teamA), tB = getTeam(result.teamB);
+  const oA = Math.max(i1.teamId === result.teamA ? i1.overs : i2.overs, 0.1);
+  const oB = Math.max(i1.teamId === result.teamA ? i2.overs : i1.overs, 0.1);
+  const runsA = i1.teamId === result.teamA ? i1.total : i2.total;
+  const runsB = i1.teamId === result.teamA ? i2.total : i1.total;
+  const nrrDiff = parseFloat((runsA/oA - runsB/oB).toFixed(3));
+
+  // Recalculate NRR from all matches (proper method)
+  recalcAllNRR();
+}
+
+function recalcAllNRR() {
+  // Reset NRR for all teams
+  STATE.teams.forEach(t => { t._nrrRunsFor = 0; t._nrrOversFor = 0; t._nrrRunsAgainst = 0; t._nrrOversAgainst = 0; });
+  STATE.matches.forEach(m => {
+    const i1 = m.innings1, i2 = m.innings2;
+    const tBat = getTeam(i1.teamId), tBowl = getTeam(i2.teamId);
+    if (tBat) { tBat._nrrRunsFor += i1.total; tBat._nrrOversFor += Math.max(i1.overs, 0.1); tBat._nrrRunsAgainst += i2.total; tBat._nrrOversAgainst += Math.max(i2.overs, 0.1); }
+    if (tBowl) { tBowl._nrrRunsFor += i2.total; tBowl._nrrOversFor += Math.max(i2.overs, 0.1); tBowl._nrrRunsAgainst += i1.total; tBowl._nrrOversAgainst += Math.max(i1.overs, 0.1); }
+  });
+  STATE.teams.forEach(t => {
+    if (!t._nrrOversFor) { t.nrr = 0; return; }
+    t.nrr = parseFloat((t._nrrRunsFor/t._nrrOversFor - t._nrrRunsAgainst/t._nrrOversAgainst).toFixed(3));
+    delete t._nrrRunsFor; delete t._nrrOversFor; delete t._nrrRunsAgainst; delete t._nrrOversAgainst;
+  });
+}
+
+/* ── IMPROVED: simulateSingleMatch with overlays ─────── */
+function simulateSingleMatch(fixId) {
+  const sched = getCurrentSchedule();
+  const fix   = sched?.fixtures.find(f => f.id === fixId);
+  if (!fix || fix.result) return;
+
+  const result = runMatchSimulation(fix);
+  fix.result   = result;
+  STATE.matches.push(result);
+  updatePointsFromResult(result);
+  recalcAllNRR();
+  updateStatsFromMatch(result);
+
+  saveState();
+  renderMatchday();
+  renderLive();
+  renderSidebar();
+
+  const winner = getTeam(result.winnerId);
+  showToast(`${winner?.name || '?'} won — ${result.winDesc}${result.superOver ? ' (Super Over!)' : ''}`, 'success');
+
+  // Show super over overlay if applicable
+  if (result.superOver) {
+    const tA = getTeam(result.teamA), tB = getTeam(result.teamB);
+    setTimeout(() => showSuperOverOverlay(tA, tB), 400);
+  }
+
+  // Check for milestones
+  checkAndShowMilestones(result);
+}
+
+function checkAndShowMilestones(result) {
+  const milestones = STATE.stats.milestones || [];
+  // Show the most recent significant milestone
+  const recent = milestones.filter(m => m.matchId === result.id);
+  if (!recent.length) return;
+  const best = recent.find(m => m.type === 'century') ||
+               recent.find(m => m.type === 'fiveWickets') ||
+               recent.find(m => m.type === 'fifty');
+  if (!best) return;
+  const player = getPlayer(best.playerId);
+  if (!player) return;
+  const typeMap = { century: 'century', fifty: 'fifty', fiveWickets: 'fiveWkt' };
+  setTimeout(() => showMilestone(typeMap[best.type] || 'fifty', player, best.value), 800);
+}
+
+/* ── IMPROVED: advanceMatchday resets locks + handles MD end ── */
+function advanceMatchday() {
+  const nextMD = STATE.season.currentMD + 1;
+
+  // Reset all teams' aggression locks (delegates re-submit each MD)
+  STATE.teams.forEach(t => {
+    t.aggressionLocked = false;
+    // Carry XI forward (delegates can still edit it — unlock it)
+    // They don't have to redo it from scratch
+  });
+
+  if (nextMD > STATE.season.totalMDs) {
+    // League stage complete — set up playoffs
+    STATE.season.status  = 'playoffs';
+    STATE.season.currentMD = STATE.season.totalMDs; // keep at max for display
+    setupPlayoffs();
+    saveState();
+    document.getElementById('matchday-postmd-card').classList.add('hidden');
+    showToast('League stage complete! Setting up playoffs…', 'success');
+    navTo('admin');
+    return;
+  }
+
+  STATE.season.currentMD = nextMD;
+  document.getElementById('matchday-postmd-card').classList.add('hidden');
+
+  // Trade window notification
+  const isTradeWindow = (nextMD > 1) && (nextMD % STATE.season.tradeWindowEvery === 1);
+  if (isTradeWindow) showToast(`MD ${nextMD}: Trade window is OPEN! Visit Admin → Trade Desk.`, 'info', 5000);
+
+  if (STATE.liveSession.autoPush) pushState();
+  saveState();
+  renderMatchday();
+  renderHeaderMD();
+  showToast(`Matchday ${nextMD} is live! Teams should set their strategies.`, 'success');
+}
+
+/* ══════════════════════════════════════════════════════
+   PLAYOFFS — full bracket simulation
+   ══════════════════════════════════════════════════════ */
+
+function setupPlayoffs() {
+  const top4 = getSortedStandings().slice(0, 4);
+  if (top4.length < 4) {
+    showToast('Need at least 4 teams for playoffs.', 'warn'); return;
+  }
+  STATE.playoffs = {
+    q1:    { teamA: top4[0].id, teamB: top4[1].id, result: null, label: 'Qualifier 1' },
+    elim:  { teamA: top4[2].id, teamB: top4[3].id, result: null, label: 'Eliminator' },
+    q2:    { teamA: null,       teamB: null,        result: null, label: 'Qualifier 2' },
+    final: { teamA: null,       teamB: null,        result: null, label: 'Final'       },
+    stage: 'q1',   // q1 → elim → q2 → final → complete
+    champion: null,
+  };
+  saveState();
+}
+
+function simulatePlayoffMatch() {
+  if (!STATE.playoffs) { setupPlayoffs(); }
+  const p   = STATE.playoffs;
+  const stg = p.stage;
+  const fix = p[stg];
+  if (!fix) { showToast('Playoffs complete.', 'info'); return; }
+  if (!fix.teamA || !fix.teamB) { showToast('Bracket not complete yet.', 'warn'); return; }
+
+  // Build a synthetic fixture object
+  const fixture = {
+    id:      `playoff_${stg}`,
+    teamA:   fix.teamA,
+    teamB:   fix.teamB,
+    venueId: STATE.venues[Math.floor(Math.random() * STATE.venues.length)]?.id,
+    result:  null,
+  };
+
+  const result = runMatchSimulation(fixture);
+  fix.result   = result;
+  STATE.matches.push(result);
+  updateStatsFromMatch(result);
+
+  const winner = getTeam(result.winnerId);
+  const loser  = getTeam(result.winnerId === fix.teamA ? fix.teamB : fix.teamA);
+
+  // Advance bracket
+  if (stg === 'q1') {
+    p.elim;               // Eliminator runs in parallel, set next stage to elim
+    p.stage = 'elim';
+  } else if (stg === 'elim') {
+    // Q2: Q1 loser vs Elim winner
+    const q1loser = p.q1.result
+      ? getTeam(p.q1.result.winnerId === p.q1.teamA ? p.q1.teamB : p.q1.teamA).id
+      : null;
+    p.q2.teamA = q1loser;
+    p.q2.teamB = result.winnerId;
+    p.stage    = 'q2';
+  } else if (stg === 'q2') {
+    // Final: Q1 winner vs Q2 winner
+    const q1winner = p.q1.result?.winnerId;
+    p.final.teamA  = q1winner;
+    p.final.teamB  = result.winnerId;
+    p.stage        = 'final';
+  } else if (stg === 'final') {
+    p.champion = result.winnerId;
+    p.stage    = 'complete';
+    STATE.season.status = 'complete';
+    // Trigger champion reveal after a short delay
+    setTimeout(() => triggerChampionReveal(), 1200);
+  }
+
+  saveState();
+  renderAdmin();
+  showToast(`${winner.name} beat ${loser?.name} — ${result.winDesc}`, 'success');
+}
+
+function triggerChampionReveal() {
+  const sorted  = getSortedStandings();
+  const champId = STATE.playoffs?.champion || sorted[0]?.id;
+  const winner  = getTeam(champId);
+  const runnerUp = sorted.find(t => t.id !== champId) || sorted[1];
+  if (!winner) return;
+  showChampionReveal(winner, runnerUp || winner, sorted);
+}
+
+/* ── IMPROVED: renderAdmin with full playoffs bracket ── */
+function renderAdmin() {
+  renderTeamCodes(); renderTradeDesk(); renderTradeLog(); renderPlayoffsBracketV2();
+  document.getElementById('admin-session-id').textContent = STATE.liveSession.blobId || '—';
+  document.getElementById('admin-autopush').checked       = STATE.liveSession.autoPush;
+  const md     = STATE.season.currentMD;
+  const isOpen = md > 1 && md % STATE.season.tradeWindowEvery === 1;
+  const badge  = document.getElementById('admin-trade-window-status');
+  if (badge) { badge.textContent = isOpen ? 'Open' : 'Closed'; badge.style.color = isOpen ? 'var(--green)' : 'var(--text2)'; }
+}
+
+function renderPlayoffsBracketV2() {
+  const statusEl  = document.getElementById('admin-playoffs-status');
+  const actionsEl = document.getElementById('playoffs-sim-actions');
+  const isPlayoffs = ['playoffs','complete'].includes(STATE.season.status);
+
+  if (statusEl) { statusEl.textContent = isPlayoffs ? (STATE.season.status === 'complete' ? 'Complete' : 'Active') : 'League stage'; statusEl.style.color = isPlayoffs ? (STATE.season.status === 'complete' ? 'var(--gold)' : 'var(--green)') : 'var(--text2)'; }
+  if (actionsEl) actionsEl.classList.toggle('hidden', !isPlayoffs || STATE.season.status === 'complete');
+
+  const p = STATE.playoffs;
+
+  function teamName(id) {
+    if (!id) return '?';
+    const t = getTeam(id);
+    return t ? `<span style="color:${t.color}">${escHtml(t.shortName || t.name)}</span>` : '?';
+  }
+  function stageLabel(fix, id) {
+    if (!fix || !fix.teamA) return '<em style="color:var(--text3)">TBD</em>';
+    const res = fix.result;
+    const win = res ? `<span style="color:var(--green);font-weight:700"> → ${teamName(res.winnerId)}</span>` : '';
+    return `${teamName(fix.teamA)} <span style="color:var(--text3)">vs</span> ${teamName(fix.teamB)}${win}`;
+  }
+
+  const q1El    = document.getElementById('bracket-q1');
+  const elimEl  = document.getElementById('bracket-elim');
+  const q2El    = document.getElementById('bracket-q2');
+  const finalEl = document.getElementById('bracket-final');
+
+  if (q1El    && p) q1El.innerHTML    = stageLabel(p.q1,   'q1');
+  if (elimEl  && p) elimEl.innerHTML  = stageLabel(p.elim, 'elim');
+  if (q2El    && p) q2El.innerHTML    = stageLabel(p.q2,   'q2');
+  if (finalEl && p) finalEl.innerHTML = stageLabel(p.final,'final');
+
+  // Populate bracket from top-4 if not yet set up
+  if (isPlayoffs && !p && STATE.season.status !== 'complete') {
+    const sorted = getSortedStandings();
+    if (q1El && sorted[0] && sorted[1])
+      q1El.innerHTML = `${teamName(sorted[0].id)} vs ${teamName(sorted[1].id)}`;
+    if (elimEl && sorted[2] && sorted[3])
+      elimEl.innerHTML = `${teamName(sorted[2].id)} vs ${teamName(sorted[3].id)}`;
+  }
+
+  // Button text reflects current stage
+  const btn = actionsEl?.querySelector('button');
+  if (btn && p) {
+    const labels = { q1:'Simulate Qualifier 1', elim:'Simulate Eliminator', q2:'Simulate Qualifier 2', final:'Simulate Final ⚡', complete:'Season Complete' };
+    btn.textContent = labels[p.stage] || 'Simulate Next Playoff';
+    btn.disabled    = p.stage === 'complete';
+  }
+}
+
+/* ── IMPROVED: renderMatchday with toss integration ──── */
+function simulateAllMatches() {
+  const sched = getCurrentSchedule(); if (!sched) return;
+  const pending = sched.fixtures.filter(f => !f.result);
+  if (!pending.length) { checkMatchdayComplete(); return; }
+
+  // Show toss for first match, then simulate all
+  const firstFix = pending[0];
+  const tA = getTeam(firstFix.teamA), tB = getTeam(firstFix.teamB);
+  if (tA && tB) {
+    showTossOverlay(tA, tB, () => {
+      pending.forEach(fix => simulateSingleMatch(fix.id));
+      checkMatchdayComplete();
+    });
+  } else {
+    pending.forEach(fix => simulateSingleMatch(fix.id));
+    checkMatchdayComplete();
+  }
+}
+
+function simulateNextMatch() {
+  const sched = getCurrentSchedule(); if (!sched) return;
+  const fix = sched.fixtures.find(f => !f.result);
+  if (!fix) { showToast('All matches done!', 'info'); checkMatchdayComplete(); return; }
+
+  const tA = getTeam(fix.teamA), tB = getTeam(fix.teamB);
+  if (tA && tB) {
+    showTossOverlay(tA, tB, () => simulateSingleMatch(fix.id));
+  } else {
+    simulateSingleMatch(fix.id);
+  }
+}
+
+/* ── IMPROVED: Phase strip management ───────────────── */
+function updateMatchdayPhase(phase) {
+  // phases: strategy → xi → toss → simulate → results
+  const order = ['strategy','xi','toss','simulate','results'];
+  document.querySelectorAll('.phase-step').forEach(el => {
+    const p = el.dataset.phase;
+    const idx = order.indexOf(p), cur = order.indexOf(phase);
+    el.classList.toggle('active', p === phase);
+    el.classList.toggle('done', idx < cur);
+  });
+}
+
+/* ── IMPROVED: renderMatchday with phase awareness ───── */
+function renderMatchday() {
+  const md = STATE.season.currentMD;
+  if (!md) return;
+  document.getElementById('matchday-badge').textContent  = `MD ${md} / ${STATE.season.totalMDs}`;
+  document.getElementById('live-md-label').textContent   = `Matchday ${md}`;
+  document.getElementById('points-md-label').textContent = `After MD ${md-1}`;
+
+  // Check current phase
+  const sched = getCurrentSchedule();
+  const allDone = sched?.fixtures.every(f => f.result);
+  const anyDone = sched?.fixtures.some(f => f.result);
+  const allLocked = STATE.teams.every(t => t.aggressionLocked);
+  const allXI = STATE.teams.every(t => t.xi && t.xi.length === 11);
+
+  if (allDone) updateMatchdayPhase('results');
+  else if (anyDone) updateMatchdayPhase('simulate');
+  else if (allLocked && allXI) updateMatchdayPhase('toss');
+  else if (allXI) updateMatchdayPhase('xi');
+  else updateMatchdayPhase('strategy');
+
+  renderMatchdayVenues();
+  renderMatchdayStrategyGrid();
+  renderMatchdayXIGrid();
+  renderMatchdayInjuries();
+  renderSimFixtures();
+
+  // Show/hide post-MD card
+  document.getElementById('matchday-postmd-card').classList.toggle('hidden', !allDone);
+
+  // Playoffs mode — show different content
+  if (STATE.season.status === 'playoffs') {
+    document.getElementById('matchday-badge').textContent = '🏆 Playoffs';
+    document.getElementById('matchday-sim-card').innerHTML = `
+      <div class="card-header"><h2 class="card-title">⚡ Playoffs Simulation</h2></div>
+      <div class="card-body">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Manage playoff matches from the Admin → Playoffs Bracket.</p>
+        <button class="btn btn-primary btn-large" onclick="navTo('admin')">Go to Playoffs Bracket →</button>
+      </div>`;
+  }
+}
+
+/* ── IMPROVED: lockAllStrategies also marks delegate submit ── */
+function lockAllStrategies() {
+  STATE.teams.forEach(t => t.aggressionLocked = true);
+  saveState();
+  renderMatchdayStrategyGrid();
+  renderStrategy();
+  showToast('All strategies locked. Ready to simulate!', 'success');
+  updateMatchdayPhase('toss');
+}
+
+/* ── IMPROVED: Points page — show playoff results too ── */
+function renderPoints() {
+  const tbody  = document.getElementById('points-table-body');
+  const sorted = getSortedStandings();
+  if (!sorted.length) {
+    tbody.innerHTML = '<tr class="table-empty-row"><td colspan="9">Season not started.</td></tr>';
+    renderScheduleList(); return;
+  }
+  const n = sorted.length;
+  tbody.innerHTML = sorted.map((t, i) => {
+    const pos = i + 1, qualify = pos <= 4, danger = pos > n - 2, own = t.id === SESSION.teamId;
+    const nrrStr = t.nrr >= 0 ? `+${t.nrr.toFixed(3)}` : t.nrr.toFixed(3);
+    const form   = (t.form || []).slice(-5);
+    const dots   = Array.from({length:5}, (_, j) => form[j] || 'na')
+      .map(f => `<div class="form-dot ${f==='W'?'W':f==='L'?'L':f==='T'?'T':'na'}"></div>`).join('');
+    const rowCls = [qualify?'qualify-zone':'', danger?'danger-zone':'', own?'own-team':''].filter(Boolean).join(' ');
+    return `<tr class="${rowCls}">
+      <td><span class="pt-pos">${pos}</span></td>
+      <td><div class="pt-team-cell">
+        <span class="pt-team-pip" style="background:${t.color}"></span>
+        <span class="pt-team-name">${escHtml(t.name)}</span>
+        ${own ? '<span class="pt-team-code">◀ you</span>' : ''}
+      </div></td>
+      <td class="col-num">${t.played}</td>
+      <td class="col-num">${t.wins}</td>
+      <td class="col-num">${t.losses}</td>
+      <td class="col-num">${t.ties||0}</td>
+      <td class="col-num pt-pts" style="color:var(--ipl2)">${t.points}</td>
+      <td class="col-nrr"><span class="pt-nrr ${t.nrr>=0?'positive':'negative'}">${nrrStr}</span></td>
+      <td><div class="form-strip">${dots}</div></td>
+    </tr>`;
+  }).join('');
+  renderScheduleList();
+  document.getElementById('points-md-label').textContent = `After MD ${STATE.season.currentMD}`;
+}
+
+/* ── FIX: updateStatsFromMatch — deduplicate milestones ── */
+function updateStatsFromMatch(result) {
+  const matchMilestones = new Set(); // track within this match only
+  [result.innings1, result.innings2].forEach(inn => {
+    Object.entries(inn.playerStats || {}).forEach(([pid, s]) => {
+      const bs = STATE.stats.batting[pid];
+      if (!bs) return;
+      bs.matches++; bs.runs += s.runs; bs.balls += s.balls;
+      bs.fours += s.fours; bs.sixes += s.sixes;
+      if (s.runs > bs.highScore) bs.highScore = s.runs;
+      if (s.runs >= 100) bs.hundreds++;
+      else if (s.runs >= 50) bs.fifties++;
+      if (s.out) bs.dismissals++;
+      // Milestones (once per match per player)
+      const mKey = `${pid}_${s.runs >= 100 ? 'c' : 'f'}_${result.id}`;
+      if (s.runs >= 50 && !matchMilestones.has(mKey)) {
+        matchMilestones.add(mKey);
+        STATE.stats.milestones.push({ type: s.runs >= 100 ? 'century' : 'fifty', playerId: pid, matchId: result.id, value: `${s.runs}(${s.balls})`, md: result.md });
+      }
+    });
+    Object.entries(inn.bowlerStats || {}).forEach(([pid, s]) => {
+      const bw = STATE.stats.bowling[pid];
+      if (!bw) return;
+      bw.matches++; bw.wickets += s.wickets; bw.runs += s.runs;
+      bw.overs   = parseFloat((bw.overs + s.balls / 6).toFixed(1));
+      bw.maidens += s.maidens;
+      const wKey = `${pid}_5w_${result.id}`;
+      if (s.wickets >= 5 && !matchMilestones.has(wKey)) {
+        matchMilestones.add(wKey);
+        bw.fiveWickets++;
+        STATE.stats.milestones.push({ type: 'fiveWickets', playerId: pid, matchId: result.id, value: `${s.wickets}/${s.runs}`, md: result.md });
+      }
+      const nb = parseInt(bw.best || '0'), nr = parseInt((bw.best || '0/99').split('/')[1] || '99');
+      if (s.wickets > nb || (s.wickets === nb && s.runs < nr)) bw.best = `${s.wickets}/${s.runs}`;
+    });
+  });
+}
+
+/* ── IMPROVED: Toss overlay shows match context ─────── */
+function showTossOverlay(teamA, teamB, onDone) {
+  document.getElementById('toss-team-a').textContent = teamA.name;
+  document.getElementById('toss-team-b').textContent = teamB.name;
+  document.getElementById('toss-result').classList.add('hidden');
+  document.getElementById('btn-toss-continue').style.display = 'none';
+  document.getElementById('overlay-toss').classList.remove('hidden');
+
+  const coin = document.getElementById('toss-coin');
+  coin.classList.remove('flipping'); void coin.offsetWidth; coin.classList.add('flipping');
+
+  const winner = Math.random() < 0.5 ? teamA : teamB;
+  const dec    = Math.random() < 0.5 ? 'bat first' : 'field first';
+  setTimeout(() => {
+    document.getElementById('toss-winner-name').textContent = winner.name;
+    document.getElementById('toss-winner-name').style.color = winner.color || 'var(--ipl2)';
+    document.getElementById('toss-decision').textContent    = `elected to ${dec}`;
+    document.getElementById('toss-result').classList.remove('hidden');
+    document.getElementById('btn-toss-continue').style.display = 'inline-flex';
+    window._tossCb = onDone;
+  }, 1800);
+}
+
+function closeToss() {
+  document.getElementById('overlay-toss').classList.add('hidden');
+  if (window._tossCb) { const cb = window._tossCb; window._tossCb = null; cb(); }
+}
+
+/* ── IMPROVED: Live Page — completed matches show results clearly ── */
+function renderLive() {
+  const sched  = getCurrentSchedule();
+  const liveEl = document.getElementById('live-matches-grid');
+  const idleEl = document.getElementById('live-idle-state');
+  const ownEl  = document.getElementById('live-own-match');
+
+  if (!sched) {
+    liveEl.innerHTML = '';
+    const idleMsg = document.getElementById('live-idle-msg');
+    idleEl.classList.remove('hidden');
+    if (STATE.season.status === 'setup' || STATE.season.status === 'auction') {
+      if (idleMsg) idleMsg.textContent = 'Season is in setup/auction phase.';
+    } else if (STATE.season.status === 'playoffs') {
+      if (idleMsg) idleMsg.textContent = 'Playoffs are in progress — see Admin for results.';
+    } else {
+      if (idleMsg) idleMsg.textContent = 'Waiting for the next matchday.';
+    }
+    ownEl.classList.add('hidden'); return;
+  }
+
+  idleEl.classList.add('hidden');
+  document.getElementById('live-md-label').textContent = `Matchday ${STATE.season.currentMD}`;
+
+  liveEl.innerHTML = sched.fixtures.map(f => buildLMC(f)).join('') ||
+    '<div class="list-empty">Waiting for simulation to begin.</div>';
+
+  // Live badge
+  const hasLive = sched.fixtures.some(f => !f.result);
+  document.getElementById('nav-live-badge')?.classList.toggle('hidden', !hasLive);
+
+  // Delegate: pin own match
+  if (SESSION.teamId) {
+    const own = sched.fixtures.find(f => f.teamA === SESSION.teamId || f.teamB === SESSION.teamId);
+    if (own) {
+      ownEl.classList.remove('hidden');
+      // Replace the content of the own match card div
+      document.getElementById('live-own-match-card').outerHTML =
+        `<div id="live-own-match-card" class="live-match-card featured">${buildLMC(own, true)}</div>`;
+    } else { ownEl.classList.add('hidden'); }
+  } else { ownEl.classList.add('hidden'); }
+}
+
+/* ── FIX: buildLMC — don't wrap in extra div ─────────── */
+function buildLMC(fix, featured = false) {
+  const tA = getTeam(fix.teamA), tB = getTeam(fix.teamB);
+  const r  = fix.result;
+  const cls = `live-match-card${featured ? ' featured' : ''}${r ? ' complete' : ''}`;
+
+  if (!r) {
+    return `<div class="${cls}">
+      <div class="lmc-header">
+        <div class="lmc-teams" style="color:var(--text2)">${escHtml(tA?.shortName||tA?.name||'?')} vs ${escHtml(tB?.shortName||tB?.name||'?')}</div>
+        <span class="lmc-over" style="color:var(--text3)">Not started</span>
+      </div>
+      <div class="lmc-body" style="color:var(--text3);font-size:12px;padding:16px">Waiting for simulation…</div>
+    </div>`;
+  }
+
+  const i1 = r.innings1, i2 = r.innings2;
+  const bf = getTeam(i1.teamId);
+  const bs = getTeam(i2.teamId); // batting second
+  const recentBalls = (i2.ballLog || []).slice(-6).map(b => {
+    let c = 'd0', l = '0';
+    if (b.wide) { c='dWd'; l='Wd'; }
+    else if (b.noBall) { c='dNb'; l='Nb'; }
+    else if (b.wicket) { c='dW';  l='W'; }
+    else if (b.runs===6) { c='d6'; l='6'; }
+    else if (b.runs===4) { c='d4'; l='4'; }
+    else if (b.runs===2) { c='d2'; l='2'; }
+    else if (b.runs===1) { c='d1'; l='1'; }
+    return `<div class="ball-dot ${c}">${l}</div>`;
+  }).join('');
+
+  const win = getTeam(r.winnerId);
+  return `<div class="${cls}">
+    <div class="lmc-header">
+      <div class="lmc-teams">${escHtml(tA?.shortName||tA?.name||'?')} vs ${escHtml(tB?.shortName||tB?.name||'?')}</div>
+      <span class="lmc-over">${overStr(i2.overs)} ov</span>
+    </div>
+    <div class="lmc-body">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:3px">
+        <span style="color:${bf?.color||'var(--text)'}">${escHtml(bf?.shortName||bf?.name||'?')}</span>: ${i1.total}/${i1.wickets} (${overStr(i1.overs)})
+      </div>
+      <div class="lmc-score-row">
+        <div class="lmc-score-batting">
+          <span style="color:${bs?.color||'var(--text)'}">${i2.total}</span>/<span class="wickets">${i2.wickets}</span>
+        </div>
+        <div class="lmc-target">Chase: ${i1.total+1}</div>
+      </div>
+      <div class="lmc-ball-log">
+        <span class="over-label">Last 6:</span>
+        ${recentBalls || '<span style="color:var(--text3);font-size:11px">—</span>'}
+      </div>
+    </div>
+    <div class="lmc-result" style="color:${win?.color||'var(--gold)'}">
+      ${escHtml(win?.name||'?')} ${escHtml(r.winDesc)}${r.superOver?' <span style="color:var(--gold)">(SO)</span>':''}
+    </div>
+  </div>`;
+}
+
+/* ── IMPROVED: Scorecards — show all innings clearly ─── */
+function renderScorecards() {
+  const tabs = document.getElementById('scorecard-match-tabs');
+  if (!STATE.matches.length) {
+    tabs.innerHTML = '<div class="selector-empty">No completed matches yet.</div>';
+    document.getElementById('scorecard-content').classList.add('hidden');
+    return;
+  }
+  // Sort matches: most recent first
+  const sorted = [...STATE.matches].sort((a,b) => b.timestamp - a.timestamp);
+  tabs.innerHTML = sorted.map((m, i) => {
+    const tA = getTeam(m.teamA), tB = getTeam(m.teamB);
+    const own = SESSION.teamId && (m.teamA === SESSION.teamId || m.teamB === SESSION.teamId);
+    return `<button class="sc-match-tab${own?' own-team':''}${i===0?' active':''}"
+                    onclick="showScorecard('${m.id}',this)">
+      MD${m.md}: ${escHtml(tA?.shortName||'?')} v ${escHtml(tB?.shortName||'?')}
+    </button>`;
+  }).join('');
+  showScorecard(sorted[0].id, tabs.firstElementChild);
+}
+
+/* ── IMPROVED: Strategy page — show next match info ──── */
+function renderDelegateStrategy() {
+  const team = getTeam(SESSION.teamId); if (!team) return;
+  const sched = getCurrentSchedule();
+  const fix = sched?.fixtures.find(f => f.teamA === team.id || f.teamB === team.id);
+  const oppId = fix ? (fix.teamA === team.id ? fix.teamB : fix.teamA) : null;
+  const opp   = oppId ? getTeam(oppId) : null;
+  const venue = fix ? getVenue(fix.venueId) : null;
+  const locked = team.aggressionLocked;
+
+  document.getElementById('strategy-md-info').innerHTML = `
+    <div class="md-info-item">Matchday: <strong>MD ${STATE.season.currentMD}</strong></div>
+    <div class="md-info-item">vs: <strong style="color:${opp?.color||'var(--text)'}">${opp ? escHtml(opp.name) : 'TBD'}</strong></div>
+    <div class="md-info-item">Venue: <strong>${venue ? escHtml(venue.name) : 'TBD'}</strong></div>
+    <div class="md-info-item">Pitch: <span class="pitch-badge ${venue?.pitchType||'balanced'}">${pitchLabel(venue?.pitchType||'balanced')}</span></div>
+    ${locked ? '<div class="md-info-item" style="color:var(--green)">🔒 Strategy locked</div>' : ''}`;
+
+  renderXISelector(team);
+
+  const slider = document.getElementById('aggression-slider');
+  if (slider) { slider.value = team.aggression; slider.disabled = locked; }
+  const val = document.getElementById('aggression-value');
+  if (val) val.textContent = team.aggression;
+  updateAggressionDisplay(team.aggression);
+  document.getElementById('aggression-submitted')?.classList.toggle('hidden', !locked);
+
+  // XI confirmed state
+  const xiConfirmed = document.getElementById('xi-confirmed-state');
+  if (xiConfirmed) xiConfirmed.classList.toggle('hidden', team.xi.length !== 11);
+}
+
+/* ── FIX: submitAggression also sets lock ────────────── */
+function submitAggression() {
+  const team = getTeam(SESSION.teamId); if (!team) return;
+  if (team.aggressionLocked) { showToast('Strategy is locked for this matchday.', 'warn'); return; }
+  const val = parseInt(document.getElementById('aggression-slider')?.value || 60);
+  team.aggression        = val;
+  team.aggressionLocked  = true;
+  saveState();
+  document.getElementById('aggression-submitted')?.classList.remove('hidden');
+  const slider = document.getElementById('aggression-slider');
+  if (slider) slider.disabled = true;
+  showToast('Strategy locked!', 'success');
+}
+
+/* ── IMPROVED: Stats — show season totals properly ───── */
+function renderStats() {
+  renderCaps();
+  // Default to batting tab but preserve current tab if active
+  const active = document.querySelector('.stat-tab.active');
+  switchStatTab(active?.dataset.stat || 'batting');
+}
+
+/* ── NEW: Projector mode ─────────────────────────────── */
+function toggleProjectorView() {
+  const isProjector = document.body.classList.toggle('projector-mode');
+  if (isProjector) {
+    // Hide header clutter, maximise main content
+    document.getElementById('main-header').style.display = 'none';
+    document.getElementById('sidebar').classList.add('hidden');
+    document.querySelector('.main-content').style.padding = '0';
+    showToast('Projector mode ON — press P to exit or reload', 'info', 8000);
+    document.addEventListener('keydown', exitProjector);
+  }
+  function exitProjector(e) {
+    if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+      document.body.classList.remove('projector-mode');
+      document.getElementById('main-header').style.display = '';
+      document.getElementById('sidebar').classList.remove('hidden');
+      document.querySelector('.main-content').style.padding = '';
+      document.removeEventListener('keydown', exitProjector);
+    }
+  }
+}
+
+/* ── FIX: migrateState — include playoffs field ─────── */
+const _migV2 = migrateState;
+function migrateState(s) {
+  const out = _migV2(s);
+  if (!out.playoffs) out.playoffs = null;
+  return out;
+}
+
+/* ── Boot: keyboard shortcut for projector ──────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('keydown', e => {
+    if (e.key === 'p' && e.ctrlKey) { e.preventDefault(); toggleProjectorView(); }
+  });
+});
