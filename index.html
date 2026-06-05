@@ -3,233 +3,126 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IPL MUN — Season Manager v3.0</title>
+  <title>IPL MUN — Season Manager v3.2</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="ipl.css">
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════
-     TOAST NOTIFICATION CONTAINER
-═══════════════════════════════════════════════════════ -->
 <div id="toast-container" role="status" aria-live="polite"></div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SCREEN: LOGIN
-═══════════════════════════════════════════════════════ -->
+<!-- ═══ SCREEN: LOGIN ═══ -->
 <div id="screen-login" class="screen active">
   <div class="login-bg">
     <div class="login-bg-orb orb-1"></div>
     <div class="login-bg-orb orb-2"></div>
     <div class="login-bg-grid"></div>
   </div>
-
   <div class="login-wrap">
-
-    <!-- Branding -->
     <div class="login-brand">
-      <div class="login-logo">
-        <span class="logo-ipl">IPL</span>
-        <span class="logo-mun">MUN</span>
-      </div>
-      <div class="login-tagline">Season Manager <span class="version-tag">v3.0</span></div>
+      <div class="login-logo"><span class="logo-ipl">IPL</span><span class="logo-mun">MUN</span></div>
+      <div class="login-tagline">Season Manager <span class="version-tag">v3.2</span></div>
     </div>
-
-    <!-- Tab toggle: Admin / Delegate -->
-    <div class="login-toggle" role="tablist" aria-label="Login type">
-      <button class="login-tab active" role="tab" aria-selected="true"
-              data-tab="admin" onclick="loginSwitchTab('admin')">
-        🔐 Chair / Admin
-      </button>
-      <button class="login-tab" role="tab" aria-selected="false"
-              data-tab="delegate" onclick="loginSwitchTab('delegate')">
-        🎽 Delegate
-      </button>
+    <div class="login-toggle" role="tablist">
+      <button class="login-tab active" role="tab" data-tab="admin" onclick="loginSwitchTab('admin')">🔐 Chair / Admin</button>
+      <button class="login-tab" role="tab" data-tab="delegate" onclick="loginSwitchTab('delegate')">🎽 Delegate (View)</button>
     </div>
-
-    <!-- Admin Login Panel -->
-    <div id="login-panel-admin" class="login-panel" role="tabpanel" aria-label="Admin login">
+    <!-- Admin Panel -->
+    <div id="login-panel-admin" class="login-panel" role="tabpanel">
       <div class="login-field">
         <label class="login-label" for="admin-password">Chair Password</label>
-        <input id="admin-password" class="login-input" type="password"
-               placeholder="Enter password" autocomplete="current-password"
+        <input id="admin-password" class="login-input" type="password" placeholder="Enter password"
                onkeydown="if(event.key==='Enter') loginAsAdmin()">
       </div>
-      <button class="btn btn-primary btn-login" onclick="loginAsAdmin()">
-        Enter as Chair
-      </button>
+      <button class="btn btn-primary btn-login" onclick="loginAsAdmin()">Enter as Chair</button>
       <div id="admin-login-error" class="login-error hidden"></div>
     </div>
-
-    <!-- Delegate Login Panel -->
-    <div id="login-panel-delegate" class="login-panel hidden" role="tabpanel" aria-label="Delegate login">
-      <!-- Option A: Join existing session -->
-      <div class="login-section-label">Join a Live Session</div>
-      <div class="login-field">
-        <label class="login-label" for="delegate-session-id">Session ID <span class="login-hint">(from chair)</span></label>
-        <input id="delegate-session-id" class="login-input" type="text"
-               placeholder="e.g. abc123" autocomplete="off" maxlength="20">
-      </div>
+    <!-- Delegate Panel -->
+    <div id="login-panel-delegate" class="login-panel hidden" role="tabpanel">
       <div class="login-field">
         <label class="login-label" for="delegate-team-select">Your Team</label>
         <select id="delegate-team-select" class="login-select">
           <option value="">— Select team —</option>
-          <!-- Populated by JS after state loads -->
         </select>
       </div>
       <div class="login-field">
-        <label class="login-label" for="delegate-team-code">Team Code <span class="login-hint">(4 characters)</span></label>
-        <input id="delegate-team-code" class="login-input" type="text"
-               placeholder="e.g. M7KQ" autocomplete="off" maxlength="4"
-               style="text-transform:uppercase"
+        <label class="login-label" for="delegate-team-code">Team Code <span class="login-hint">(4 chars from chair)</span></label>
+        <input id="delegate-team-code" class="login-input" type="text" placeholder="e.g. M7KQ"
+               maxlength="4" style="text-transform:uppercase"
                onkeydown="if(event.key==='Enter') loginAsDelegate()">
       </div>
-      <button class="btn btn-primary btn-login" onclick="loginAsDelegate()">
-        Join as Delegate
-      </button>
-
-      <div class="login-divider"><span>or</span></div>
-
-      <!-- Option B: Load from URL state -->
-      <div class="login-section-label">Load from Share Link</div>
-      <p class="login-hint-text">If the chair shared a link, it auto-loads state. Then just pick your team and code above.</p>
-
+      <button class="btn btn-primary btn-login" onclick="loginAsDelegate()">Join as Delegate</button>
       <div id="delegate-login-error" class="login-error hidden"></div>
+      <p class="login-hint-text" style="margin-top:4px">Delegates get view-only access. Strategy is set by the chair.</p>
     </div>
-
-    <!-- State loaded indicator (shown after URL import) -->
     <div id="login-state-loaded" class="login-state-notice hidden">
-      <span class="state-dot"></span>
-      Session state loaded from link
+      <span class="state-dot"></span> Session state loaded from link
     </div>
-
   </div>
-</div><!-- /screen-login -->
+</div>
 
-
-<!-- ═══════════════════════════════════════════════════════
-     MAIN APP SHELL (hidden until login)
-═══════════════════════════════════════════════════════ -->
+<!-- ═══ APP SHELL ═══ -->
 <div id="app" class="app hidden" data-role="" data-team-id="">
 
-  <!-- ── Top Navigation Bar ── -->
   <header id="main-header" class="main-header">
     <div class="header-left">
-      <div class="header-logo">
-        <span class="logo-ipl">IPL</span>
-        <span class="logo-mun">MUN</span>
-      </div>
+      <div class="header-logo"><span class="logo-ipl">IPL</span><span class="logo-mun">MUN</span></div>
       <div id="header-season-name" class="header-season"></div>
     </div>
-
-    <nav id="main-nav" class="main-nav" role="navigation" aria-label="Main navigation">
-      <!-- Admin-only tabs -->
-      <button class="nav-tab admin-only hidden" data-page="setup" onclick="navTo('setup')">
-        <span class="nav-icon">⚙️</span> Setup
-      </button>
-      <button class="nav-tab admin-only hidden" data-page="auction" onclick="navTo('auction')">
-        <span class="nav-icon">🎰</span> Auction
-      </button>
-      <button class="nav-tab admin-only hidden" data-page="matchday" onclick="navTo('matchday')">
-        <span class="nav-icon">🏏</span> Matchday
-      </button>
-
-      <!-- All-roles tabs -->
-      <button class="nav-tab" data-page="live" onclick="navTo('live')">
-        <span class="nav-icon">📺</span> Live
-        <span id="nav-live-badge" class="nav-badge hidden">LIVE</span>
-      </button>
-      <button class="nav-tab" data-page="strategy" onclick="navTo('strategy')">
-        <span class="nav-icon">🎚️</span> Strategy
-      </button>
-      <button class="nav-tab" data-page="points" onclick="navTo('points')">
-        <span class="nav-icon">📊</span> Points
-      </button>
-      <button class="nav-tab" data-page="scorecards" onclick="navTo('scorecards')">
-        <span class="nav-icon">📋</span> Scorecards
-      </button>
-      <button class="nav-tab" data-page="stats" onclick="navTo('stats')">
-        <span class="nav-icon">📈</span> Stats
-      </button>
-
-      <!-- Admin-only admin panel -->
-      <button class="nav-tab admin-only hidden" data-page="admin" onclick="navTo('admin')">
-        <span class="nav-icon">🛡️</span> Admin
-      </button>
-
-      <!-- Guide (all) -->
-      <button class="nav-tab" data-page="guide" onclick="navTo('guide')">
-        <span class="nav-icon">📖</span> Guide
-      </button>
+    <nav id="main-nav" class="main-nav">
+      <button class="nav-tab admin-only hidden" data-page="setup"     onclick="navTo('setup')"><span class="nav-icon">⚙️</span> Setup</button>
+      <button class="nav-tab admin-only hidden" data-page="auction"   onclick="navTo('auction')"><span class="nav-icon">🎰</span> Auction</button>
+      <button class="nav-tab admin-only hidden" data-page="matchday"  onclick="navTo('matchday')"><span class="nav-icon">🏏</span> Matchday</button>
+      <button class="nav-tab" data-page="live"       onclick="navTo('live')"><span class="nav-icon">📺</span> Live<span id="nav-live-badge" class="nav-badge hidden">LIVE</span></button>
+      <button class="nav-tab admin-only hidden" data-page="strategy"  onclick="navTo('strategy')"><span class="nav-icon">🎚️</span> Strategy</button>
+      <button class="nav-tab" data-page="points"     onclick="navTo('points')"><span class="nav-icon">📊</span> Points</button>
+      <button class="nav-tab" data-page="scorecards" onclick="navTo('scorecards')"><span class="nav-icon">📋</span> Scorecards</button>
+      <button class="nav-tab" data-page="stats"      onclick="navTo('stats')"><span class="nav-icon">📈</span> Stats</button>
+      <button class="nav-tab" data-page="reports"    onclick="navTo('reports')"><span class="nav-icon">📥</span> Reports</button>
+      <button class="nav-tab admin-only hidden" data-page="admin"     onclick="navTo('admin')"><span class="nav-icon">🛡️</span> Admin</button>
+      <button class="nav-tab" data-page="guide"      onclick="navTo('guide')"><span class="nav-icon">📖</span> Guide</button>
     </nav>
-
     <div class="header-right">
-      <!-- Matchday indicator -->
-      <div id="header-md-indicator" class="md-indicator hidden">
-        MD <span id="header-md-num">1</span>/<span id="header-md-total">10</span>
-      </div>
-      <!-- Delegate: team pill -->
+      <div id="header-md-indicator" class="md-indicator hidden">MD <span id="header-md-num">1</span>/<span id="header-md-total">10</span></div>
       <div id="header-team-pill" class="team-pill hidden">
         <span id="header-team-color" class="team-pip"></span>
         <span id="header-team-name">Team</span>
       </div>
-      <!-- Session sync status -->
-      <div id="header-sync" class="sync-dot hidden" title="Session sync status">
-        <span class="sync-icon">●</span>
-      </div>
-      <!-- Logout -->
-      <button class="btn-icon" onclick="logout()" title="Logout" aria-label="Logout">
-        <span>⏻</span>
-      </button>
+      <div id="header-sync" class="sync-dot hidden" title="Sync status"><span class="sync-icon">●</span></div>
+      <button class="btn-icon" onclick="logout()" title="Logout">⏻</button>
     </div>
   </header>
 
-  <!-- ── App Body: Sidebar + Main Content ── -->
   <div class="app-body">
-
-    <!-- Sidebar: Live Standings Widget -->
-    <aside id="sidebar" class="sidebar" aria-label="Live standings">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
       <div class="sidebar-header">
         <span class="sidebar-title">Standings</span>
-        <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">‹</button>
+        <button class="sidebar-toggle" onclick="toggleSidebar()">‹</button>
       </div>
       <div id="sidebar-standings" class="sidebar-standings">
-        <!-- JS renders rows: position, team name, points, NRR -->
         <div class="sidebar-empty">Season not started</div>
       </div>
       <div class="sidebar-footer">
-        <div id="sidebar-caps" class="sidebar-caps">
-          <!-- Orange Cap / Purple Cap current holders -->
-        </div>
+        <div id="sidebar-caps" class="sidebar-caps"></div>
       </div>
     </aside>
 
-    <!-- ── PAGES ── -->
-    <main id="main-content" class="main-content" role="main">
+    <main id="main-content" class="main-content">
 
-      <!-- ─────────────────────────────────────────
-           PAGE: SETUP  (Admin only)
-      ───────────────────────────────────────── -->
-      <section id="page-setup" class="page admin-only hidden" aria-labelledby="setup-title">
+      <!-- ─── PAGE: SETUP ─── -->
+      <section id="page-setup" class="page admin-only hidden">
         <div class="page-header">
-          <h1 id="setup-title" class="page-title">Season Setup</h1>
-          <p class="page-sub">Configure season, create teams, and import players before the auction begins.</p>
+          <h1 class="page-title">Season Setup</h1>
+          <p class="page-sub">Configure season, create teams, import players.</p>
         </div>
-
-        <!-- Season config card -->
-        <div class="card" id="setup-season-card">
-          <div class="card-header">
-            <h2 class="card-title">🏏 Season Configuration</h2>
-          </div>
+        <div class="card">
+          <div class="card-header"><h2 class="card-title">🏏 Season Configuration</h2></div>
           <div class="card-body">
             <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label" for="cfg-season-name">Season Name</label>
-                <input id="cfg-season-name" class="form-input" type="text" placeholder="IPL MUN 2025">
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="cfg-num-teams">Number of Teams</label>
+              <div class="form-group"><label class="form-label">Season Name</label><input id="cfg-season-name" class="form-input" type="text" placeholder="IPL MUN 2025"></div>
+              <div class="form-group"><label class="form-label">Number of Teams</label>
                 <select id="cfg-num-teams" class="form-select">
                   <option value="4">4 teams — 6 matchdays</option>
                   <option value="6">6 teams — 10 matchdays</option>
@@ -237,373 +130,122 @@
                   <option value="10">10 teams — 18 matchdays</option>
                 </select>
               </div>
-              <div class="form-group">
-                <label class="form-label" for="cfg-admin-password">Chair Password</label>
-                <input id="cfg-admin-password" class="form-input" type="password" placeholder="Set a password">
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="cfg-auction-budget">Auction Budget per Team <span class="form-unit">₹ Cr</span></label>
-                <input id="cfg-auction-budget" class="form-input" type="number" value="90" min="50" max="200">
-              </div>
+              <div class="form-group"><label class="form-label">Chair Password</label><input id="cfg-admin-password" class="form-input" type="password" placeholder="Set password"></div>
+              <div class="form-group"><label class="form-label">Auction Budget per Team <span class="form-unit">₹ Cr</span></label><input id="cfg-auction-budget" class="form-input" type="number" value="90" min="50" max="200"></div>
             </div>
           </div>
         </div>
-
-        <!-- Team builder -->
-        <div class="card" id="setup-teams-card">
-          <div class="card-header">
-            <h2 class="card-title">🎽 Team Builder</h2>
-            <button class="btn btn-secondary btn-sm" onclick="addTeamRow()">+ Add Team</button>
-          </div>
-          <div class="card-body">
-            <div id="team-builder-list" class="team-builder-list">
-              <!-- JS renders team rows dynamically -->
-              <div class="team-builder-empty">
-                No teams yet — click "Add Team" to begin.
-              </div>
-            </div>
-          </div>
+        <div class="card">
+          <div class="card-header"><h2 class="card-title">🎽 Team Builder</h2><button class="btn btn-secondary btn-sm" onclick="addTeamRow()">+ Add Team</button></div>
+          <div class="card-body"><div id="team-builder-list" class="team-builder-list"><div class="team-builder-empty">No teams yet — click "Add Team".</div></div></div>
         </div>
-
-        <!-- Venue configuration -->
-        <div class="card" id="setup-venues-card">
-          <div class="card-header">
-            <h2 class="card-title">🏟️ Venues &amp; Pitch Types</h2>
-          </div>
-          <div class="card-body">
-            <div id="venue-list" class="venue-list">
-              <!-- JS renders venue rows from default list -->
-            </div>
-          </div>
+        <div class="card">
+          <div class="card-header"><h2 class="card-title">🏟️ Venues &amp; Pitch Types</h2></div>
+          <div class="card-body"><div id="venue-list" class="venue-list"></div></div>
         </div>
-
-        <!-- Player import -->
-        <div class="card" id="setup-players-card">
-          <div class="card-header">
-            <h2 class="card-title">👤 Player Pool Import</h2>
-          </div>
+        <div class="card">
+          <div class="card-header"><h2 class="card-title">👤 Player Pool Import</h2></div>
           <div class="card-body">
-            <p class="form-hint">
-              Paste CSV with columns: <code>Name, Role, Batting, Bowling, Fielding, Keeping, Base Price</code>
-              — or import from Google Sheets (make it "Anyone with link can view", paste URL below).
-            </p>
+            <p class="form-hint">Paste CSV: <code>Name, Role, Batting, Bowling, Fielding, Keeping, Base Price</code></p>
             <div class="import-tabs">
               <button class="import-tab active" data-import="csv" onclick="switchImport('csv')">CSV Paste</button>
               <button class="import-tab" data-import="sheets" onclick="switchImport('sheets')">Google Sheets</button>
             </div>
             <div id="import-csv" class="import-panel">
-              <textarea id="player-csv" class="form-textarea" rows="8"
-                        placeholder="Player Name,Role,Bat,Bowl,Field,Keep,BasePrice&#10;Virat Kohli,BAT,95,20,80,0,2.0&#10;..."></textarea>
+              <textarea id="player-csv" class="form-textarea" rows="8" placeholder="Player Name,Role,Bat,Bowl,Field,Keep,BasePrice&#10;Virat Kohli,BAT,95,20,80,0,2.0&#10;MS Dhoni,WK,75,20,85,92,2.0"></textarea>
             </div>
             <div id="import-sheets" class="import-panel hidden">
               <div class="form-group">
-                <label class="form-label" for="sheets-url">Google Sheets URL</label>
+                <label class="form-label">Google Sheets URL</label>
                 <input id="sheets-url" class="form-input" type="url" placeholder="https://docs.google.com/spreadsheets/d/...">
               </div>
               <button class="btn btn-secondary" onclick="fetchSheets()">Fetch Players</button>
             </div>
             <div class="card-actions">
               <button class="btn btn-secondary" onclick="parsePlayerImport()">Preview Import</button>
-              <button class="btn btn-primary" onclick="confirmPlayerImport()">Confirm &amp; Lock Pool</button>
+              <button class="btn btn-primary"   onclick="confirmPlayerImport()">Confirm &amp; Lock Pool</button>
             </div>
-            <div id="import-preview" class="import-preview hidden">
-              <!-- Preview table rendered by JS -->
-            </div>
+            <div id="import-preview" class="import-preview hidden"></div>
           </div>
         </div>
-
-        <!-- Actions -->
         <div class="page-actions">
-          <button class="btn btn-large btn-primary" onclick="finaliseSetup()">
-            Save Setup &amp; Proceed to Auction →
-          </button>
+          <button class="btn btn-large btn-primary" onclick="finaliseSetup()">Save Setup &amp; Proceed to Auction →</button>
         </div>
       </section>
 
-
-      <!-- ─────────────────────────────────────────
-           PAGE: AUCTION  (Admin only)
-      ───────────────────────────────────────── -->
-      <section id="page-auction" class="page admin-only hidden" aria-labelledby="auction-title">
-        <div class="page-header">
-          <h1 id="auction-title" class="page-title">Auction</h1>
-          <p class="page-sub">Draw lots, reveal players, assign to teams.</p>
-        </div>
-
-        <div class="auction-layout">
-
-          <!-- Left: Draw stage -->
-          <div class="auction-main">
-
-            <!-- Lot draw card -->
-            <div class="card" id="auction-draw-card">
-              <div class="card-header">
-                <h2 class="card-title">🎰 Draw Lot</h2>
-                <div class="auction-lot-counter">
-                  Lot <span id="auction-lot-current">0</span> / <span id="auction-lot-total">0</span>
-                </div>
-              </div>
-              <div class="card-body">
-                <!-- Animated reveal stage -->
-                <div id="auction-reveal-stage" class="auction-reveal-stage">
-                  <div class="auction-reveal-idle">
-                    <div class="auction-reveal-icon">🎰</div>
-                    <p>Press "Draw Next Lot" to reveal a player</p>
-                  </div>
-
-                  <!-- Stage 1: Lot card (hidden until draw) -->
-                  <div id="auction-stage-1" class="auction-stage hidden">
-                    <div class="auction-lot-card">
-                      <div class="lot-card-inner">
-                        <div class="lot-card-front">
-                          <span class="lot-number">LOT <span id="auction-lot-num">?</span></span>
-                        </div>
-                        <div class="lot-card-back">
-                          <!-- Stage 2: Player identity -->
-                          <div id="auction-player-reveal" class="auction-player-reveal">
-                            <div class="player-reveal-role" id="reveal-role-badge"></div>
-                            <div class="player-reveal-name" id="reveal-player-name">Player Name</div>
-                            <div class="player-reveal-stats" id="reveal-player-stats">
-                              <!-- Bars filled by JS -->
-                            </div>
-                            <div class="player-reveal-base">
-                              Base: ₹<span id="reveal-base-price">0</span> Cr
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Draw controls -->
-                <div class="auction-controls">
-                  <button class="btn btn-large btn-primary" id="btn-draw-lot" onclick="drawNextLot()">
-                    Draw Next Lot
-                  </button>
-                  <button class="btn btn-secondary" id="btn-skip-lot" onclick="skipLot()">
-                    Skip (Unsold)
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Assignment panel (visible after each draw) -->
-            <div id="auction-assign-card" class="card hidden">
-              <div class="card-header">
-                <h2 class="card-title">📌 Assign to Team</h2>
-              </div>
-              <div class="card-body">
-                <div id="auction-team-assign-grid" class="auction-team-assign-grid">
-                  <!-- JS renders team assign buttons with budget remaining -->
-                </div>
-                <div class="form-group" style="margin-top:16px">
-                  <label class="form-label" for="auction-price-input">Final Price <span class="form-unit">₹ Cr</span></label>
-                  <input id="auction-price-input" class="form-input" type="number" step="0.25" min="0">
-                </div>
-                <div class="card-actions">
-                  <button class="btn btn-primary" onclick="confirmAssign()">Confirm Assignment</button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Auction log -->
-            <div class="card" id="auction-log-card">
-              <div class="card-header">
-                <h2 class="card-title">📝 Auction Log</h2>
-              </div>
-              <div class="card-body" style="padding:0">
-                <div id="auction-log-list" class="auction-log-list">
-                  <div class="list-empty">No players assigned yet.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Right: Team budget dials -->
-          <div class="auction-sidebar">
-            <div class="card" id="auction-budgets-card">
-              <div class="card-header">
-                <h2 class="card-title">💰 Budgets</h2>
-              </div>
-              <div class="card-body" style="padding:0">
-                <div id="auction-budget-list" class="auction-budget-list">
-                  <!-- JS renders team budget dials -->
-                </div>
-              </div>
-            </div>
-
-            <div class="card" id="auction-pool-card">
-              <div class="card-header">
-                <h2 class="card-title">👤 Pool Remaining</h2>
-                <span id="auction-pool-count" class="card-badge">0</span>
-              </div>
-              <div class="card-body" style="padding:0">
-                <div id="auction-pool-list" class="auction-pool-list">
-                  <!-- Unassigned players list -->
-                </div>
-              </div>
-            </div>
-
-            <button class="btn btn-primary btn-block" onclick="finaliseAuction()">
-              Finalise Auction →
-            </button>
-          </div>
-
-        </div>
+      <!-- ─── PAGE: AUCTION ─── -->
+      <section id="page-auction" class="page admin-only hidden">
+        <!-- rebuilt by buildAuctionUI() -->
       </section>
 
-
-      <!-- ─────────────────────────────────────────
-           PAGE: MATCHDAY  (Admin only)
-      ───────────────────────────────────────── -->
-      <section id="page-matchday" class="page admin-only hidden" aria-labelledby="matchday-title">
+      <!-- ─── PAGE: MATCHDAY ─── -->
+      <section id="page-matchday" class="page admin-only hidden">
         <div class="page-header">
-          <h1 id="matchday-title" class="page-title">
-            Matchday Control
-            <span id="matchday-badge" class="md-badge"></span>
-          </h1>
-          <p class="page-sub">Run the matchday simulation. Set strategy, confirm XIs, simulate matches.</p>
+          <h1 class="page-title">Matchday Control <span id="matchday-badge" class="md-badge"></span></h1>
+          <p class="page-sub">Set XI, lock strategies, simulate matches.</p>
         </div>
-
-        <!-- Phase indicator strip -->
         <div id="matchday-phase-strip" class="phase-strip">
-          <div class="phase-step active" data-phase="strategy">
-            <span class="phase-num">1</span> Strategy Lock
-          </div>
-          <div class="phase-step" data-phase="xi">
-            <span class="phase-num">2</span> XI Confirm
-          </div>
-          <div class="phase-step" data-phase="toss">
-            <span class="phase-num">3</span> Toss
-          </div>
-          <div class="phase-step" data-phase="simulate">
-            <span class="phase-num">4</span> Simulate
-          </div>
-          <div class="phase-step" data-phase="results">
-            <span class="phase-num">5</span> Results
-          </div>
+          <div class="phase-step active" data-phase="strategy"><span class="phase-num">1</span> Strategy Lock</div>
+          <div class="phase-step" data-phase="xi"><span class="phase-num">2</span> XI Confirm</div>
+          <div class="phase-step" data-phase="toss"><span class="phase-num">3</span> Toss</div>
+          <div class="phase-step" data-phase="simulate"><span class="phase-num">4</span> Simulate</div>
+          <div class="phase-step" data-phase="results"><span class="phase-num">5</span> Results</div>
         </div>
-
-        <!-- Venue / Pitch card -->
-        <div id="matchday-venues-row" class="matchday-venues-row">
-          <!-- JS renders venue+pitch cards for each fixture -->
+        <div id="matchday-venues-row" class="matchday-venues-row"></div>
+        <div class="card">
+          <div class="card-header"><h2 class="card-title">🎚️ Strategy Overview</h2><button class="btn btn-secondary btn-sm" onclick="lockAllStrategies()">Lock All</button></div>
+          <div class="card-body"><div id="matchday-strategy-grid" class="strategy-grid"></div></div>
         </div>
-
-        <!-- Strategy overview (all teams, admin sees all sliders) -->
-        <div class="card" id="matchday-strategy-card">
-          <div class="card-header">
-            <h2 class="card-title">🎚️ Strategy Overview</h2>
-            <button class="btn btn-secondary btn-sm" onclick="lockAllStrategies()">Lock All</button>
-          </div>
-          <div class="card-body">
-            <div id="matchday-strategy-grid" class="strategy-grid">
-              <!-- JS renders one strategy row per team -->
-            </div>
-          </div>
+        <div class="card">
+          <div class="card-header"><h2 class="card-title">👥 Playing XIs</h2><div id="matchday-xi-status" class="xi-status-bar"></div></div>
+          <div class="card-body"><div id="matchday-xi-grid" class="xi-confirm-grid"></div></div>
         </div>
-
-        <!-- XI confirmation grid (Admin) -->
-        <div class="card" id="matchday-xi-card">
-          <div class="card-header">
-            <h2 class="card-title">👥 Playing XIs</h2>
-            <div id="matchday-xi-status" class="xi-status-bar">
-              <!-- Shows which teams have confirmed XI -->
-            </div>
-          </div>
-          <div class="card-body">
-            <div id="matchday-xi-grid" class="xi-confirm-grid">
-              <!-- JS renders team XI confirm buttons -->
-            </div>
-          </div>
+        <div class="card">
+          <div class="card-header"><h2 class="card-title">🤕 Injury Report</h2></div>
+          <div class="card-body"><div id="matchday-injury-list" class="injury-list"><div class="list-empty">No injuries.</div></div></div>
         </div>
-
-        <!-- Injury report -->
-        <div class="card" id="matchday-injury-card">
-          <div class="card-header">
-            <h2 class="card-title">🤕 Injury Report</h2>
-          </div>
-          <div class="card-body">
-            <div id="matchday-injury-list" class="injury-list">
-              <div class="list-empty">No injuries this matchday.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Simulation control -->
         <div class="card card-sim" id="matchday-sim-card">
-          <div class="card-header">
-            <h2 class="card-title">⚡ Simulation</h2>
-          </div>
+          <div class="card-header"><h2 class="card-title">⚡ Simulation</h2></div>
           <div class="card-body">
-            <div class="sim-fixtures-list" id="sim-fixtures-list">
-              <!-- JS renders fixture rows with simulate buttons -->
-            </div>
+            <div id="sim-fixtures-list" class="sim-fixtures-list"></div>
             <div class="sim-actions">
-              <button class="btn btn-large btn-danger" id="btn-sim-all" onclick="simulateAllMatches()">
-                ⚡ Simulate All Matches
-              </button>
-              <button class="btn btn-secondary" id="btn-sim-next" onclick="simulateNextMatch()">
-                Simulate Next →
-              </button>
+              <button class="btn btn-large btn-danger" onclick="simulateAllMatches()">⚡ Simulate All Matches</button>
+              <button class="btn btn-secondary" onclick="simulateNextMatch()">Simulate Next →</button>
             </div>
           </div>
         </div>
-
-        <!-- Post-MD actions -->
         <div class="card hidden" id="matchday-postmd-card">
-          <div class="card-header">
-            <h2 class="card-title">✅ Matchday Complete</h2>
-          </div>
+          <div class="card-header"><h2 class="card-title">✅ Matchday Complete</h2></div>
           <div class="card-body">
-            <div id="postmd-injury-rolls" class="postmd-section">
+            <div class="postmd-section">
               <h3 class="section-sub-title">Post-MD Injury Rolls</h3>
               <div id="injury-roll-results"></div>
-              <button class="btn btn-secondary" onclick="rollInjuries()">Run Injury Rolls</button>
+              <button class="btn btn-secondary" style="margin-top:8px" onclick="rollInjuries()">Run Injury Rolls</button>
             </div>
             <div class="postmd-section">
               <h3 class="section-sub-title">Trade Window</h3>
-              <div id="trade-window-status" class="trade-status">
-                <!-- Shows if trade window is open this MD -->
-              </div>
+              <div id="trade-window-status" class="trade-status"></div>
             </div>
             <div class="postmd-actions">
-              <button class="btn btn-primary btn-large" onclick="advanceMatchday()">
-                Advance to Next Matchday →
-              </button>
+              <button class="btn btn-primary btn-large" onclick="advanceMatchday()">Advance to Next Matchday →</button>
             </div>
           </div>
         </div>
       </section>
 
-
-      <!-- ─────────────────────────────────────────
-           PAGE: LIVE  (All roles)
-      ───────────────────────────────────────── -->
-      <section id="page-live" class="page hidden" aria-labelledby="live-title">
+      <!-- ─── PAGE: LIVE ─── -->
+      <section id="page-live" class="page hidden">
         <div class="page-header">
-          <h1 id="live-title" class="page-title">
-            Live Matches
-            <span id="live-pp-badge" class="powerplay-badge hidden">⚡ POWERPLAY</span>
-          </h1>
+          <h1 class="page-title">Live Matches <span id="live-pp-badge" class="powerplay-badge hidden">⚡ POWERPLAY</span></h1>
           <div id="live-md-label" class="live-md-label"></div>
         </div>
-
-        <!-- Delegate: own match pinned at top -->
         <div id="live-own-match" class="live-own-match hidden">
           <div class="own-match-label">YOUR MATCH</div>
-          <div id="live-own-match-card" class="live-match-card featured">
-            <!-- JS renders own team's match card -->
-          </div>
+          <div id="live-own-match-card"></div>
         </div>
-
-        <!-- All match cards grid -->
         <div id="live-matches-grid" class="live-matches-grid">
-          <!-- JS renders all live match cards here -->
           <div class="list-empty">No live matches. Waiting for admin to start simulation.</div>
         </div>
-
-        <!-- No active matchday state -->
         <div id="live-idle-state" class="live-idle hidden">
           <div class="idle-icon">🏏</div>
           <div class="idle-title">Between Matchdays</div>
@@ -611,192 +253,38 @@
         </div>
       </section>
 
-
-      <!-- ─────────────────────────────────────────
-           PAGE: STRATEGY  (All roles)
-           Delegates: own team only + Playing XI
-           Admin: all teams grid
-      ───────────────────────────────────────── -->
-      <section id="page-strategy" class="page hidden" aria-labelledby="strategy-title">
+      <!-- ─── PAGE: STRATEGY (Admin only) ─── -->
+      <section id="page-strategy" class="page admin-only hidden">
         <div class="page-header">
-          <h1 id="strategy-title" class="page-title">Strategy</h1>
-          <p class="page-sub">Set your aggression and pick your Playing XI before the matchday locks.</p>
+          <h1 class="page-title">Strategy Control</h1>
+          <p class="page-sub">Set aggression and Playing XIs for all teams. Lock before simulating.</p>
         </div>
-
-        <!-- Lock status banner -->
         <div id="strategy-lock-banner" class="lock-banner hidden">
-          <span class="lock-icon">🔒</span>
-          Strategies are locked — matchday has started.
+          <span class="lock-icon">🔒</span> All strategies locked — ready to simulate.
         </div>
-
-        <!-- DELEGATE VIEW -->
-        <div id="strategy-delegate-view" class="delegate-view hidden">
-
-          <!-- Matchday info bar -->
-          <div id="strategy-md-info" class="strategy-md-info">
-            <!-- Next matchday, opponent, venue, pitch type -->
-          </div>
-
-          <!-- ── PLAYING XI SELECTOR (New feature) ── -->
-          <div class="card card-xi" id="strategy-xi-card">
-            <div class="card-header">
-              <h2 class="card-title">👥 Playing XI</h2>
-              <div class="xi-count-badge">
-                <span id="xi-selected-count">0</span>/11 selected
-              </div>
-            </div>
-            <div class="card-body">
-              <!-- XI composition guide -->
-              <div class="xi-composition-guide">
-                <span class="comp-pill" data-role="BAT">🟠 BAT</span>
-                <span class="comp-pill" data-role="WK">🟡 WK</span>
-                <span class="comp-pill" data-role="AR">🟢 AR</span>
-                <span class="comp-pill" data-role="PACE">🔵 PACE</span>
-                <span class="comp-pill" data-role="SPIN">🟣 SPIN</span>
-                <span class="xi-comp-hint">Pick exactly 11 players</span>
-              </div>
-
-              <!-- Selected XI strip -->
-              <div id="xi-selected-strip" class="xi-selected-strip">
-                <div class="xi-strip-label">Selected XI</div>
-                <div id="xi-slots" class="xi-slots">
-                  <!-- 11 slots rendered by JS, filled as player is selected -->
-                </div>
-              </div>
-
-              <!-- Full squad list -->
-              <div class="xi-squad-header">
-                <span class="xi-squad-label">Full Squad</span>
-                <div class="xi-filter-pills">
-                  <button class="filter-pill active" data-filter="all" onclick="filterSquad('all')">All</button>
-                  <button class="filter-pill" data-filter="BAT" onclick="filterSquad('BAT')">Batters</button>
-                  <button class="filter-pill" data-filter="WK" onclick="filterSquad('WK')">Keepers</button>
-                  <button class="filter-pill" data-filter="AR" onclick="filterSquad('AR')">All-rounders</button>
-                  <button class="filter-pill" data-filter="PACE" onclick="filterSquad('PACE')">Pacers</button>
-                  <button class="filter-pill" data-filter="SPIN" onclick="filterSquad('SPIN')">Spinners</button>
-                </div>
-              </div>
-              <div id="xi-squad-list" class="xi-squad-list">
-                <!-- JS renders player cards for own team's squad -->
-              </div>
-
-              <div class="xi-actions">
-                <button class="btn btn-secondary" onclick="clearXI()">Clear Selection</button>
-                <button class="btn btn-secondary" onclick="autoPickXI()">Auto-Pick Best 11</button>
-                <button class="btn btn-primary" id="btn-confirm-xi" onclick="confirmXI()" disabled>
-                  Confirm Playing XI ✓
-                </button>
-              </div>
-
-              <!-- XI submitted state -->
-              <div id="xi-confirmed-state" class="xi-confirmed hidden">
-                <span class="confirmed-tick">✓</span>
-                Playing XI confirmed! Admin can override before matchday starts.
-                <button class="btn-link" onclick="editXI()">Edit XI</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- ── AGGRESSION SLIDER ── -->
-          <div class="card card-aggression" id="strategy-aggression-card">
-            <div class="card-header">
-              <h2 class="card-title">🎚️ Aggression</h2>
-              <span id="aggression-level-label" class="aggression-label">Balanced</span>
-            </div>
-            <div class="card-body">
-              <div class="aggression-slider-wrap">
-                <span class="slider-end-label">Cautious</span>
-                <input type="range" id="aggression-slider" class="aggression-slider"
-                       min="20" max="100" step="5" value="60"
-                       oninput="onAggressionChange(this.value)">
-                <span class="slider-end-label">Ultra</span>
-              </div>
-              <div class="aggression-value-display">
-                <span id="aggression-value">60</span>
-              </div>
-              <div id="aggression-effect-hint" class="aggression-hint">
-                <!-- Dynamically updated hint text -->
-                Balanced play — equal chance of attack and control.
-              </div>
-              <div class="aggression-effect-breakdown" id="aggression-breakdown">
-                <!-- Effect labels: sixes, boundaries, wicket risk -->
-              </div>
-              <div class="card-actions">
-                <button class="btn btn-primary" onclick="submitAggression()">Submit Strategy</button>
-              </div>
-              <div id="aggression-submitted" class="submission-confirm hidden">
-                ✓ Strategy submitted
-              </div>
-            </div>
-          </div>
-
-          <!-- Next match info card -->
-          <div class="card" id="strategy-next-match-card">
-            <div class="card-header">
-              <h2 class="card-title">📅 Next Match</h2>
-            </div>
-            <div id="strategy-next-match-body" class="card-body">
-              <!-- JS renders opponent, venue, pitch type, toss info -->
-            </div>
-          </div>
-
-        </div><!-- /strategy-delegate-view -->
-
-        <!-- ADMIN VIEW: all teams in a grid -->
-        <div id="strategy-admin-view" class="admin-view hidden">
-          <div id="strategy-all-teams-grid" class="strategy-all-teams-grid">
-            <!-- JS renders a card per team with slider + XI status -->
-          </div>
-        </div>
-
+        <div id="strategy-content" class="strategy-all-teams-grid"></div>
       </section>
 
-
-      <!-- ─────────────────────────────────────────
-           PAGE: POINTS  (All roles)
-      ───────────────────────────────────────── -->
-      <section id="page-points" class="page hidden" aria-labelledby="points-title">
+      <!-- ─── PAGE: POINTS ─── -->
+      <section id="page-points" class="page hidden">
         <div class="page-header">
-          <h1 id="points-title" class="page-title">Points Table</h1>
+          <h1 class="page-title">Points Table</h1>
           <div id="points-md-label" class="live-md-label"></div>
         </div>
-
-        <!-- League table -->
-        <div class="card" id="points-table-card">
+        <div class="card">
           <div class="card-body" style="padding:0">
-            <table class="points-table" id="points-table" aria-label="League standings">
-              <thead>
-                <tr>
-                  <th class="col-pos">#</th>
-                  <th class="col-team">Team</th>
-                  <th class="col-num">P</th>
-                  <th class="col-num">W</th>
-                  <th class="col-num">L</th>
-                  <th class="col-num">T</th>
-                  <th class="col-num">Pts</th>
-                  <th class="col-nrr">NRR</th>
-                  <th class="col-form">Form</th>
-                </tr>
-              </thead>
-              <tbody id="points-table-body">
-                <!-- JS renders rows with animation -->
-                <tr class="table-empty-row">
-                  <td colspan="9">Season not started.</td>
-                </tr>
-              </tbody>
+            <table class="points-table" id="points-table">
+              <thead><tr><th class="col-pos">#</th><th class="col-team">Team</th><th class="col-num">P</th><th class="col-num">W</th><th class="col-num">L</th><th class="col-num">T</th><th class="col-num">Pts</th><th class="col-nrr">NRR</th><th class="col-form">Form</th></tr></thead>
+              <tbody id="points-table-body"><tr class="table-empty-row"><td colspan="9">Season not started.</td></tr></tbody>
             </table>
           </div>
         </div>
-
-        <!-- Qualification legend -->
         <div class="points-legend">
           <span class="legend-item legend-qualify">Qualify (Playoffs)</span>
           <span class="legend-item legend-danger">Elimination Zone</span>
           <span class="legend-item legend-delegate">Your Team</span>
         </div>
-
-        <!-- Schedule tab strip -->
-        <div class="card" id="points-schedule-card">
+        <div class="card">
           <div class="card-header">
             <h2 class="card-title">📅 Full Schedule</h2>
             <div class="schedule-view-toggle">
@@ -805,635 +293,270 @@
             </div>
           </div>
           <div class="card-body" style="padding:0">
-            <div id="schedule-list-view">
-              <!-- JS renders matchday groups -->
-            </div>
-            <div id="schedule-gantt-view" class="hidden">
-              <!-- JS renders Gantt chart -->
-            </div>
+            <div id="schedule-list-view"></div>
+            <div id="schedule-gantt-view" class="hidden"></div>
           </div>
         </div>
-
       </section>
 
-
-      <!-- ─────────────────────────────────────────
-           PAGE: SCORECARDS  (All roles)
-      ───────────────────────────────────────── -->
-      <section id="page-scorecards" class="page hidden" aria-labelledby="scorecards-title">
+      <!-- ─── PAGE: SCORECARDS ─── -->
+      <section id="page-scorecards" class="page hidden">
         <div class="page-header">
-          <h1 id="scorecards-title" class="page-title">Scorecards</h1>
-          <p class="page-sub">Full ball-by-ball results. Download as printable HTML.</p>
+          <h1 class="page-title">Scorecards</h1>
+          <p class="page-sub">Full match results and statistics.</p>
         </div>
-
-        <!-- Match selector -->
         <div class="scorecard-selector">
           <div class="selector-label">Select Match:</div>
-          <div id="scorecard-match-tabs" class="scorecard-match-tabs">
-            <!-- JS renders one tab per completed match -->
-            <div class="selector-empty">No completed matches yet.</div>
-          </div>
+          <div id="scorecard-match-tabs" class="scorecard-match-tabs"><div class="selector-empty">No completed matches yet.</div></div>
         </div>
-
-        <!-- Scorecard content -->
         <div id="scorecard-content" class="scorecard-content hidden">
-
-          <!-- Match header -->
-          <div id="sc-match-header" class="sc-match-header">
-            <!-- Result banner, toss, venue -->
+          <div id="sc-match-header" class="sc-match-header"></div>
+          <div class="innings-tabs">
+            <button class="innings-tab active" data-innings="1" onclick="switchInnings(1)">1st Innings</button>
+            <button class="innings-tab" data-innings="2" onclick="switchInnings(2)">2nd Innings</button>
+            <button id="sc-super-over-tab" class="innings-tab hidden" data-innings="so" onclick="switchInnings('so')">Super Over</button>
           </div>
-
-          <!-- Innings tabs -->
-          <div class="innings-tabs" role="tablist">
-            <button class="innings-tab active" role="tab" data-innings="1"
-                    onclick="switchInnings(1)">1st Innings</button>
-            <button class="innings-tab" role="tab" data-innings="2"
-                    onclick="switchInnings(2)">2nd Innings</button>
-            <button id="sc-super-over-tab" class="innings-tab hidden" role="tab" data-innings="so"
-                    onclick="switchInnings('so')">Super Over</button>
-          </div>
-
-          <!-- Batting scorecard -->
           <div class="card" id="sc-batting-card">
-            <div class="card-header">
-              <h2 class="card-title">🏏 Batting</h2>
-              <div id="sc-batting-team-name" class="card-subtitle"></div>
-            </div>
+            <div class="card-header"><h2 class="card-title">🏏 Batting</h2><div id="sc-batting-team-name" class="card-subtitle"></div></div>
             <div class="card-body" style="padding:0">
-              <table class="sc-table" id="sc-batting-table" aria-label="Batting scorecard">
-                <thead>
-                  <tr>
-                    <th class="sc-col-player">Batter</th>
-                    <th class="sc-col-dismissal">Dismissal</th>
-                    <th>R</th>
-                    <th>B</th>
-                    <th>4s</th>
-                    <th>6s</th>
-                    <th>SR</th>
-                  </tr>
-                </thead>
+              <table class="sc-table">
+                <thead><tr><th class="sc-col-player">Batter</th><th class="sc-col-dismissal">Dismissal</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead>
                 <tbody id="sc-batting-body"></tbody>
                 <tfoot id="sc-batting-extras"></tfoot>
               </table>
             </div>
           </div>
-
-          <!-- Bowling scorecard -->
           <div class="card" id="sc-bowling-card">
-            <div class="card-header">
-              <h2 class="card-title">🏐 Bowling</h2>
-              <div id="sc-bowling-team-name" class="card-subtitle"></div>
-            </div>
+            <div class="card-header"><h2 class="card-title">🏐 Bowling</h2><div id="sc-bowling-team-name" class="card-subtitle"></div></div>
             <div class="card-body" style="padding:0">
-              <table class="sc-table" id="sc-bowling-table" aria-label="Bowling scorecard">
-                <thead>
-                  <tr>
-                    <th class="sc-col-player">Bowler</th>
-                    <th>O</th>
-                    <th>M</th>
-                    <th>R</th>
-                    <th>W</th>
-                    <th>Econ</th>
-                    <th>WD</th>
-                    <th>NB</th>
-                  </tr>
-                </thead>
+              <table class="sc-table">
+                <thead><tr><th class="sc-col-player">Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>Econ</th><th>WD</th><th>NB</th></tr></thead>
                 <tbody id="sc-bowling-body"></tbody>
               </table>
             </div>
           </div>
-
-          <!-- Fall of wickets + PowerPlay summary -->
+          <!-- Phase breakdown panel -->
+          <div class="card">
+            <div class="card-header"><h2 class="card-title">📊 Phase Breakdown</h2></div>
+            <div class="card-body"><div id="sc-phase-breakdown"></div></div>
+          </div>
           <div class="sc-extras-row">
-            <div class="card sc-fow-card">
-              <div class="card-header"><h2 class="card-title">🎯 Fall of Wickets</h2></div>
-              <div class="card-body">
-                <div id="sc-fow"></div>
-              </div>
-            </div>
-            <div class="card sc-pp-card">
-              <div class="card-header"><h2 class="card-title">⚡ Powerplay</h2></div>
-              <div class="card-body">
-                <div id="sc-pp-summary"></div>
-              </div>
-            </div>
+            <div class="card sc-fow-card"><div class="card-header"><h2 class="card-title">🎯 Fall of Wickets</h2></div><div class="card-body"><div id="sc-fow"></div></div></div>
+            <div class="card sc-pp-card"><div class="card-header"><h2 class="card-title">⚡ Powerplay</h2></div><div class="card-body"><div id="sc-pp-summary"></div></div></div>
           </div>
-
-          <!-- Man of the Match -->
-          <div class="card" id="sc-mom-card">
-            <div class="card-header"><h2 class="card-title">⭐ Man of the Match</h2></div>
-            <div class="card-body">
-              <div id="sc-mom"></div>
-            </div>
-          </div>
-
-          <!-- Scorecard actions -->
+          <div class="card"><div class="card-header"><h2 class="card-title">⭐ Man of the Match</h2></div><div class="card-body"><div id="sc-mom"></div></div></div>
           <div class="scorecard-actions">
-            <button class="btn btn-secondary" onclick="downloadScorecard()">
-              📄 Download Scorecard
-            </button>
+            <button class="btn btn-secondary" onclick="downloadScorecard()">📄 Download Scorecard</button>
           </div>
-        </div><!-- /scorecard-content -->
-
+        </div>
       </section>
 
-
-      <!-- ─────────────────────────────────────────
-           PAGE: STATS  (All roles)
-      ───────────────────────────────────────── -->
-      <section id="page-stats" class="page hidden" aria-labelledby="stats-title">
-        <div class="page-header">
-          <h1 id="stats-title" class="page-title">Season Stats</h1>
-        </div>
-
-        <!-- Caps row -->
+      <!-- ─── PAGE: STATS ─── -->
+      <section id="page-stats" class="page hidden">
+        <div class="page-header"><h1 class="page-title">Season Stats</h1></div>
         <div class="caps-row">
-          <div class="cap-card cap-orange">
-            <div class="cap-icon">🟠</div>
-            <div class="cap-label">Orange Cap — Most Runs</div>
-            <div id="orange-cap-holder" class="cap-holder">—</div>
-            <div id="orange-cap-stat" class="cap-stat"></div>
-          </div>
-          <div class="cap-card cap-purple">
-            <div class="cap-icon">🟣</div>
-            <div class="cap-label">Purple Cap — Most Wickets</div>
-            <div id="purple-cap-holder" class="cap-holder">—</div>
-            <div id="purple-cap-stat" class="cap-stat"></div>
-          </div>
+          <div class="cap-card cap-orange"><div class="cap-icon">🟠</div><div class="cap-label">Orange Cap — Most Runs</div><div id="orange-cap-holder" class="cap-holder">—</div><div id="orange-cap-stat" class="cap-stat"></div></div>
+          <div class="cap-card cap-purple"><div class="cap-icon">🟣</div><div class="cap-label">Purple Cap — Most Wickets</div><div id="purple-cap-holder" class="cap-holder">—</div><div id="purple-cap-stat" class="cap-stat"></div></div>
         </div>
-
-        <!-- Stat category tabs -->
-        <div class="stat-tabs" role="tablist">
-          <button class="stat-tab active" role="tab" data-stat="batting"
-                  onclick="switchStatTab('batting')">Batting</button>
-          <button class="stat-tab" role="tab" data-stat="bowling"
-                  onclick="switchStatTab('bowling')">Bowling</button>
-          <button class="stat-tab" role="tab" data-stat="fielding"
-                  onclick="switchStatTab('fielding')">Fielding</button>
-          <button class="stat-tab" role="tab" data-stat="sixes"
-                  onclick="switchStatTab('sixes')">Most Sixes</button>
-          <button class="stat-tab" role="tab" data-stat="milestones"
-                  onclick="switchStatTab('milestones')">Milestones</button>
-        </div>
-
-        <!-- Stat panels -->
-        <div id="stats-batting-panel" class="stat-panel">
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">🏏 Batting Leaderboard</h2>
-              <button class="btn btn-secondary btn-sm" onclick="exportStatsCsv('batting')">Export CSV</button>
-            </div>
-            <div class="card-body" style="padding:0">
-              <table class="stat-table" id="stat-batting-table" aria-label="Batting stats">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Player</th>
-                    <th>Team</th>
-                    <th>M</th>
-                    <th>Runs</th>
-                    <th>HS</th>
-                    <th>Avg</th>
-                    <th>SR</th>
-                    <th>50s</th>
-                    <th>100s</th>
-                    <th>6s</th>
-                    <th>4s</th>
-                  </tr>
-                </thead>
-                <tbody id="stat-batting-body"></tbody>
-              </table>
-            </div>
+        <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div class="stat-tabs">
+            <button class="stat-tab active" data-stat="batting"    onclick="switchStatTab('batting')">Batting</button>
+            <button class="stat-tab" data-stat="bowling"   onclick="switchStatTab('bowling')">Bowling</button>
+            <button class="stat-tab" data-stat="fielding"  onclick="switchStatTab('fielding')">Fielding</button>
+            <button class="stat-tab" data-stat="sixes"     onclick="switchStatTab('sixes')">Most Sixes</button>
+            <button class="stat-tab" data-stat="milestones" onclick="switchStatTab('milestones')">Milestones</button>
           </div>
+          <input id="stat-search" class="form-input" type="text" placeholder="🔍 Search player…" oninput="filterCurrentStats(this.value)" style="max-width:220px;margin-left:auto">
         </div>
-
+        <div id="stats-batting-panel" class="stat-panel active">
+          <div class="card"><div class="card-header"><h2 class="card-title">🏏 Batting Leaderboard</h2><button class="btn btn-secondary btn-sm" onclick="exportStatsCsv('batting')">Export CSV</button></div>
+          <div class="card-body" style="padding:0"><table class="stat-table" id="stat-batting-table"><thead><tr><th>#</th><th>Player</th><th>Team</th><th>M</th><th>Runs</th><th>HS</th><th>Avg</th><th>SR</th><th>50s</th><th>100s</th><th>6s</th><th>4s</th></tr></thead><tbody id="stat-batting-body"></tbody></table></div></div>
+        </div>
         <div id="stats-bowling-panel" class="stat-panel hidden">
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">🏐 Bowling Leaderboard</h2>
-              <button class="btn btn-secondary btn-sm" onclick="exportStatsCsv('bowling')">Export CSV</button>
-            </div>
-            <div class="card-body" style="padding:0">
-              <table class="stat-table" id="stat-bowling-table" aria-label="Bowling stats">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Player</th>
-                    <th>Team</th>
-                    <th>M</th>
-                    <th>Wkts</th>
-                    <th>Runs</th>
-                    <th>Overs</th>
-                    <th>Avg</th>
-                    <th>Econ</th>
-                    <th>Best</th>
-                    <th>5W</th>
-                  </tr>
-                </thead>
-                <tbody id="stat-bowling-body"></tbody>
-              </table>
-            </div>
-          </div>
+          <div class="card"><div class="card-header"><h2 class="card-title">🏐 Bowling Leaderboard</h2><button class="btn btn-secondary btn-sm" onclick="exportStatsCsv('bowling')">Export CSV</button></div>
+          <div class="card-body" style="padding:0"><table class="stat-table" id="stat-bowling-table"><thead><tr><th>#</th><th>Player</th><th>Team</th><th>M</th><th>Wkts</th><th>Runs</th><th>Overs</th><th>Avg</th><th>Econ</th><th>Best</th><th>5W</th></tr></thead><tbody id="stat-bowling-body"></tbody></table></div></div>
         </div>
-
         <div id="stats-fielding-panel" class="stat-panel hidden">
-          <div class="card">
-            <div class="card-header"><h2 class="card-title">🧤 Fielding Stats</h2></div>
-            <div class="card-body" style="padding:0">
-              <table class="stat-table" id="stat-fielding-table" aria-label="Fielding stats">
-                <thead>
-                  <tr>
-                    <th>#</th><th>Player</th><th>Team</th>
-                    <th>Catches</th><th>Stumpings</th><th>Run Outs</th>
-                  </tr>
-                </thead>
-                <tbody id="stat-fielding-body"></tbody>
-              </table>
-            </div>
-          </div>
+          <div class="card"><div class="card-header"><h2 class="card-title">🧤 Fielding Stats</h2></div>
+          <div class="card-body" style="padding:0"><table class="stat-table" id="stat-fielding-table"><thead><tr><th>#</th><th>Player</th><th>Team</th><th>Catches</th><th>Stumpings</th><th>Run Outs</th></tr></thead><tbody id="stat-fielding-body"></tbody></table></div></div>
         </div>
-
         <div id="stats-sixes-panel" class="stat-panel hidden">
-          <div class="card">
-            <div class="card-header"><h2 class="card-title">💥 Most Sixes</h2></div>
-            <div class="card-body" style="padding:0">
-              <table class="stat-table" id="stat-sixes-table" aria-label="Sixes leaderboard">
-                <thead>
-                  <tr>
-                    <th>#</th><th>Player</th><th>Team</th><th>Sixes</th><th>Fours</th>
-                  </tr>
-                </thead>
-                <tbody id="stat-sixes-body"></tbody>
-              </table>
-            </div>
-          </div>
+          <div class="card"><div class="card-header"><h2 class="card-title">💥 Most Sixes</h2></div>
+          <div class="card-body" style="padding:0"><table class="stat-table" id="stat-sixes-table"><thead><tr><th>#</th><th>Player</th><th>Team</th><th>Sixes</th><th>Fours</th></tr></thead><tbody id="stat-sixes-body"></tbody></table></div></div>
         </div>
-
         <div id="stats-milestones-panel" class="stat-panel hidden">
-          <div class="card">
-            <div class="card-header"><h2 class="card-title">🌟 Milestones</h2></div>
-            <div class="card-body">
-              <div id="milestones-list" class="milestones-list">
-                <!-- Fifties, centuries, 5-wicket hauls, fastest fifty, etc. -->
-              </div>
-            </div>
-          </div>
+          <div class="card"><div class="card-header"><h2 class="card-title">🌟 Milestones</h2></div><div class="card-body"><div id="milestones-list" class="milestones-list"></div></div></div>
         </div>
-
       </section>
 
-
-      <!-- ─────────────────────────────────────────
-           PAGE: ADMIN PANEL  (Admin only)
-      ───────────────────────────────────────── -->
-      <section id="page-admin" class="page admin-only hidden" aria-labelledby="admin-title">
+      <!-- ─── PAGE: REPORTS ─── -->
+      <section id="page-reports" class="page hidden">
         <div class="page-header">
-          <h1 id="admin-title" class="page-title">Admin Panel</h1>
+          <h1 class="page-title">Analytics &amp; Reports</h1>
+          <p class="page-sub">Download comprehensive team and player analytics for strategy sessions. Share with delegates before matchday.</p>
         </div>
-
-        <div class="admin-grid">
-
-          <!-- Team codes -->
-          <div class="card" id="admin-codes-card">
-            <div class="card-header">
-              <h2 class="card-title">🔑 Team Codes</h2>
-              <button class="btn btn-secondary btn-sm" onclick="generateAllCodes()">Regenerate All</button>
-            </div>
-            <div class="card-body">
-              <div id="admin-codes-list" class="admin-codes-list">
-                <!-- JS renders team + code + copy button rows -->
-              </div>
+        <div class="reports-grid">
+          <div class="card">
+            <div class="card-header"><h2 class="card-title">📊 Season Snapshot</h2></div>
+            <div class="card-body" id="reports-overview">
+              <div class="list-empty">Season not started yet.</div>
             </div>
           </div>
-
-          <!-- Live session / sync -->
-          <div class="card" id="admin-sync-card">
-            <div class="card-header">
-              <h2 class="card-title">📡 Live Session</h2>
+          <div class="card">
+            <div class="card-header"><h2 class="card-title">⬇️ Download Reports</h2></div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <button class="btn btn-primary btn-large" onclick="downloadAnalytics()">📥 Full Analytics Report (HTML)</button>
+                <button class="btn btn-secondary" onclick="exportStatsCsv('batting')">🏏 Batting Stats CSV</button>
+                <button class="btn btn-secondary" onclick="exportStatsCsv('bowling')">🎯 Bowling Stats CSV</button>
+              </div>
+              <p class="form-hint" style="margin-top:12px">The Analytics Report is a printable HTML file with team rosters, ratings, pitch guide, and all stats. Share it with delegates before strategy sessions so they can make informed XI and aggression decisions.</p>
             </div>
+          </div>
+          <div class="card admin-full-width">
+            <div class="card-header">
+              <h2 class="card-title">👥 Team Rosters at a Glance</h2>
+              <div id="reports-team-filter" class="xi-filter-pills"></div>
+            </div>
+            <div class="card-body" id="reports-rosters"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── PAGE: ADMIN ─── -->
+      <section id="page-admin" class="page admin-only hidden">
+        <div class="page-header"><h1 class="page-title">Admin Panel</h1></div>
+        <div class="admin-grid">
+          <div class="card">
+            <div class="card-header"><h2 class="card-title">🔑 Team Codes</h2><button class="btn btn-secondary btn-sm" onclick="generateAllCodes()">Regenerate All</button></div>
+            <div class="card-body"><div id="admin-codes-list" class="admin-codes-list"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h2 class="card-title">📡 Live Session</h2></div>
             <div class="card-body">
               <div class="sync-controls">
+                <div class="sync-row"><span class="sync-label">Session ID:</span><code id="admin-session-id" class="code-pill">—</code><button class="btn-icon" onclick="copySessionId()" title="Copy">📋</button></div>
+                <div class="sync-row"><span class="sync-label">Auto-push after MD:</span><label class="toggle-switch"><input type="checkbox" id="admin-autopush" onchange="toggleAutoPush(this.checked)"><span class="toggle-slider"></span></label></div>
                 <div class="sync-row">
-                  <span class="sync-label">Session ID:</span>
-                  <code id="admin-session-id" class="code-pill">—</code>
-                  <button class="btn-icon" onclick="copySessionId()" title="Copy">📋</button>
-                </div>
-                <div class="sync-row">
-                  <span class="sync-label">Auto-push after MD:</span>
-                  <label class="toggle-switch">
-                    <input type="checkbox" id="admin-autopush" onchange="toggleAutoPush(this.checked)">
-                    <span class="toggle-slider"></span>
-                  </label>
-                </div>
-                <div class="sync-row">
-                  <button class="btn btn-secondary" onclick="createSession()">Create New Session</button>
-                  <button class="btn btn-secondary" onclick="pushState()">Push State Now</button>
+                  <button class="btn btn-secondary" onclick="createSession()">Create Session</button>
+                  <button class="btn btn-secondary" onclick="pushState()">Push State</button>
                 </div>
               </div>
             </div>
           </div>
-
-          <!-- URL Share + QR -->
-          <div class="card" id="admin-share-card">
-            <div class="card-header">
-              <h2 class="card-title">🔗 Share Link</h2>
-            </div>
+          <div class="card">
+            <div class="card-header"><h2 class="card-title">🔗 Share Link</h2></div>
             <div class="card-body">
               <button class="btn btn-primary" onclick="generateShareLink()">Generate Share Link</button>
               <div id="admin-share-url" class="share-url-box hidden">
                 <input id="share-url-input" class="form-input" type="text" readonly>
                 <button class="btn btn-secondary btn-sm" onclick="copyShareUrl()">Copy</button>
               </div>
-              <div id="admin-qr" class="qr-box hidden">
-                <img id="admin-qr-img" src="" alt="QR Code for share link">
-                <div class="qr-label">Scan to join</div>
-              </div>
+              <div id="admin-qr" class="qr-box hidden"><img id="admin-qr-img" src="" alt="QR Code"><div class="qr-label">Scan to join</div></div>
             </div>
           </div>
-
-          <!-- Trade Desk (admin-only execute) -->
-          <div class="card" id="admin-trade-card">
-            <div class="card-header">
-              <h2 class="card-title">🔄 Trade Desk</h2>
-              <span id="admin-trade-window-status" class="card-badge">Closed</span>
-            </div>
+          <div class="card">
+            <div class="card-header"><h2 class="card-title">🔄 Trade Desk</h2><span id="admin-trade-window-status" class="card-badge">Closed</span></div>
             <div class="card-body">
               <div id="admin-trade-form" class="trade-form">
                 <div class="form-row">
-                  <div class="form-group">
-                    <label class="form-label">Team A</label>
-                    <select id="trade-team-a" class="form-select"></select>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Offers Player</label>
-                    <select id="trade-player-a" class="form-select"></select>
-                  </div>
+                  <div class="form-group"><label class="form-label">Team A</label><select id="trade-team-a" class="form-select"></select></div>
+                  <div class="form-group"><label class="form-label">Offers Player</label><select id="trade-player-a" class="form-select"></select></div>
                 </div>
                 <div class="trade-swap-icon">⇄</div>
                 <div class="form-row">
-                  <div class="form-group">
-                    <label class="form-label">Team B</label>
-                    <select id="trade-team-b" class="form-select"></select>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Offers Player</label>
-                    <select id="trade-player-b" class="form-select"></select>
-                  </div>
+                  <div class="form-group"><label class="form-label">Team B</label><select id="trade-team-b" class="form-select"></select></div>
+                  <div class="form-group"><label class="form-label">Offers Player</label><select id="trade-player-b" class="form-select"></select></div>
                 </div>
                 <button class="btn btn-primary" onclick="executeTrade()">Execute Trade</button>
               </div>
-              <div id="trade-log" class="trade-log">
-                <div class="list-empty">No trades this season.</div>
-              </div>
+              <div id="trade-log" class="trade-log"><div class="list-empty">No trades this season.</div></div>
             </div>
           </div>
-
-          <!-- Password change -->
-          <div class="card" id="admin-password-card">
-            <div class="card-header">
-              <h2 class="card-title">🔐 Change Password</h2>
-            </div>
+          <div class="card">
+            <div class="card-header"><h2 class="card-title">🔐 Change Password</h2></div>
             <div class="card-body">
-              <div class="form-group">
-                <label class="form-label" for="new-password">New Password</label>
-                <input id="new-password" class="form-input" type="password">
-              </div>
-              <button class="btn btn-secondary" onclick="changePassword()">Update Password</button>
+              <div class="form-group"><label class="form-label">New Password</label><input id="new-password" class="form-input" type="password"></div>
+              <button class="btn btn-secondary" onclick="changePassword()">Update</button>
             </div>
           </div>
-
-          <!-- Data management -->
-          <div class="card" id="admin-data-card">
-            <div class="card-header">
-              <h2 class="card-title">💾 Data</h2>
-            </div>
+          <div class="card">
+            <div class="card-header"><h2 class="card-title">💾 Data</h2></div>
             <div class="card-body">
               <div class="data-actions">
                 <button class="btn btn-secondary" onclick="exportState()">Export Season Package</button>
                 <button class="btn btn-secondary" onclick="importState()">Import Package</button>
                 <button class="btn btn-secondary" onclick="toggleProjectorView()">📽️ Projector View</button>
-                <button class="btn btn-danger" onclick="confirmReset()">⚠️ Hard Reset Season</button>
+                <button class="btn btn-danger" onclick="confirmReset()">⚠️ Hard Reset</button>
               </div>
               <div class="form-group" style="margin-top:12px">
-                <label class="form-label" for="import-file">Import file</label>
+                <label class="form-label">Import file</label>
                 <input id="import-file" class="form-input" type="file" accept=".json,.ipl">
               </div>
             </div>
           </div>
-
-          <!-- Playoffs bracket (unlocked at end of league stage) -->
-          <div class="card admin-full-width" id="admin-playoffs-card">
-            <div class="card-header">
-              <h2 class="card-title">🏆 Playoffs Bracket</h2>
-              <span id="admin-playoffs-status" class="card-badge">League stage</span>
-            </div>
+          <div class="card admin-full-width">
+            <div class="card-header"><h2 class="card-title">🏆 Playoffs Bracket</h2><span id="admin-playoffs-status" class="card-badge">League stage</span></div>
             <div class="card-body">
               <div id="playoffs-bracket" class="playoffs-bracket">
-                <div class="bracket-stage">
-                  <div class="bracket-label">Qualifier 1</div>
-                  <div class="bracket-match" id="bracket-q1">1st vs 2nd</div>
-                </div>
-                <div class="bracket-stage">
-                  <div class="bracket-label">Eliminator</div>
-                  <div class="bracket-match" id="bracket-elim">3rd vs 4th</div>
-                </div>
-                <div class="bracket-stage">
-                  <div class="bracket-label">Qualifier 2</div>
-                  <div class="bracket-match" id="bracket-q2">Q1 Loser vs Elim Winner</div>
-                </div>
-                <div class="bracket-stage bracket-final">
-                  <div class="bracket-label">Final</div>
-                  <div class="bracket-match" id="bracket-final">Q1 Winner vs Q2 Winner</div>
-                </div>
+                <div class="bracket-stage"><div class="bracket-label">Qualifier 1</div><div class="bracket-match" id="bracket-q1">1st vs 2nd</div></div>
+                <div class="bracket-stage"><div class="bracket-label">Eliminator</div><div class="bracket-match" id="bracket-elim">3rd vs 4th</div></div>
+                <div class="bracket-stage"><div class="bracket-label">Qualifier 2</div><div class="bracket-match" id="bracket-q2">Q1 Loser vs Elim Winner</div></div>
+                <div class="bracket-stage bracket-final"><div class="bracket-label">Final</div><div class="bracket-match" id="bracket-final">Q1 Winner vs Q2 Winner</div></div>
               </div>
               <div class="playoffs-actions hidden" id="playoffs-sim-actions">
                 <button class="btn btn-primary" onclick="simulatePlayoffMatch()">Simulate Next Playoff Match</button>
               </div>
             </div>
           </div>
-
-        </div><!-- /admin-grid -->
-      </section>
-
-
-      <!-- ─────────────────────────────────────────
-           PAGE: GUIDE  (All roles)
-      ───────────────────────────────────────── -->
-      <section id="page-guide" class="page hidden" aria-labelledby="guide-title">
-        <div class="page-header">
-          <h1 id="guide-title" class="page-title">How It Works</h1>
-          <p class="page-sub">Everything delegates and chair need to know about the simulation.</p>
         </div>
-
-        <div class="guide-grid">
-
-          <div class="card guide-card">
-            <div class="card-header"><h2 class="card-title">🔄 Season Flow</h2></div>
-            <div class="card-body">
-              <ol class="guide-steps">
-                <li>Admin sets up teams and imports players</li>
-                <li>Auction: lots drawn, players assigned, budgets tracked</li>
-                <li>Each matchday: delegates set XI + aggression → Admin simulates → Results show</li>
-                <li>Trade windows open every 2 matchdays</li>
-                <li>Top 4 enter Playoffs → Qualifier 1, Eliminator, Qualifier 2, Final</li>
-                <li>Season champion revealed with ceremony animation</li>
-              </ol>
-            </div>
-          </div>
-
-          <div class="card guide-card">
-            <div class="card-header"><h2 class="card-title">👥 Playing XI Rules</h2></div>
-            <div class="card-body">
-              <ul class="guide-list">
-                <li>Each delegate selects exactly 11 players from their squad before the matchday locks.</li>
-                <li>Injured players are greyed out and cannot be selected.</li>
-                <li>Use Auto-Pick for the best available 11 by combined rating.</li>
-                <li>Admin can override any team's XI before simulation starts.</li>
-                <li>Batting order follows the order you selected players in.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="card guide-card">
-            <div class="card-header"><h2 class="card-title">🎚️ Aggression System</h2></div>
-            <div class="card-body">
-              <ul class="guide-list">
-                <li><strong>20–39 (Cautious):</strong> Safer batting, fewer wickets but slower scoring.</li>
-                <li><strong>40–59 (Calculated):</strong> Slightly conservative. Good for tricky pitches.</li>
-                <li><strong>60 (Balanced):</strong> Default. No modifiers applied.</li>
-                <li><strong>61–79 (Attacking):</strong> More boundaries, some extra wicket risk.</li>
-                <li><strong>80–100 (Ultra):</strong> High six probability, high wicket probability — high risk, high reward.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="card guide-card">
-            <div class="card-header"><h2 class="card-title">🌱 Pitch Types</h2></div>
-            <div class="card-body">
-              <ul class="guide-list">
-                <li><strong class="pitch-bat">Batting Paradise:</strong> Wankhede, Chinnaswamy, Eden Gardens — high boundary probability, fewer wickets.</li>
-                <li><strong class="pitch-spin">Spin Friendly:</strong> Chepauk, Rajiv Gandhi, Sawai — spinners get bonus wickets, slightly lower run rate.</li>
-                <li><strong class="pitch-pace">Pace Heaven:</strong> Mohali, Dharamsala, Ekana — pacers get swing bonus, early boundaries.</li>
-                <li><strong class="pitch-balanced">Balanced:</strong> Narendra Modi, Arun Jaitley — standard probabilities.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="card guide-card">
-            <div class="card-header"><h2 class="card-title">⚡ Powerplay (Overs 1–6)</h2></div>
-            <div class="card-body">
-              <ul class="guide-list">
-                <li>Boundary probability ×1.20 during overs 1–6.</li>
-                <li>Singles probability ×0.75 — batters go for it early.</li>
-                <li>Live card shows an orange <strong>POWERPLAY</strong> badge during these overs.</li>
-                <li>PP stats shown separately in each scorecard.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="card guide-card">
-            <div class="card-header"><h2 class="card-title">🤕 Injuries</h2></div>
-            <div class="card-body">
-              <ul class="guide-list">
-                <li><strong>Standard:</strong> 6% chance per active player after each matchday. Miss 1 MD.</li>
-                <li><strong>Crisis Event:</strong> At matchday ¾ of the season, the top team's best player is season-ended. Triggers a dramatic red animation.</li>
-                <li>Injured players are auto-flagged in the XI selector — pick a substitute!</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="card guide-card">
-            <div class="card-header"><h2 class="card-title">⚡🏏 Super Over</h2></div>
-            <div class="card-body">
-              <ul class="guide-list">
-                <li>If both teams finish on the same score, a Super Over is triggered automatically.</li>
-                <li>Top 2 batters + 1 bowler per side. 1 over each.</li>
-                <li>If still tied: team with more sixes in the Super Over wins.</li>
-                <li>Full Super Over scorecard available after the match.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="card guide-card">
-            <div class="card-header"><h2 class="card-title">🔄 Trade Desk</h2></div>
-            <div class="card-body">
-              <ul class="guide-list">
-                <li>Trade windows open every 2 matchdays.</li>
-                <li>Only the admin/chair can execute trades — negotiate in the room!</li>
-                <li>All trades are logged and visible in Scorecards and Stats.</li>
-              </ul>
-            </div>
-          </div>
-
-        </div><!-- /guide-grid -->
       </section>
 
-    </main><!-- /main-content -->
-  </div><!-- /app-body -->
-</div><!-- /app -->
+      <!-- ─── PAGE: GUIDE ─── -->
+      <section id="page-guide" class="page hidden">
+        <div class="page-header"><h1 class="page-title">How It Works</h1><p class="page-sub">Everything you need to know about the simulation.</p></div>
+        <div class="guide-grid">
+          <div class="card guide-card"><div class="card-header"><h2 class="card-title">🔄 Season Flow</h2></div><div class="card-body"><ol class="guide-steps"><li>Admin sets up teams and imports players</li><li>Auction: lots drawn, players assigned, budgets tracked</li><li>Each matchday: Admin sets XI + aggression for all teams → simulate → results</li><li>Delegates review analytics PDF to advise the chair on strategy</li><li>Trade windows open every 2 matchdays</li><li>Top 4 enter Playoffs → Champion revealed</li></ol></div></div>
+          <div class="card guide-card"><div class="card-header"><h2 class="card-title">🎚️ Aggression System</h2></div><div class="card-body"><ul class="guide-list"><li><strong>20–39 Cautious:</strong> Safer batting, fewer wickets but slower scoring.</li><li><strong>40–59 Calculated:</strong> Slightly conservative. Good for tricky pitches.</li><li><strong>60 Balanced:</strong> Default. No modifiers.</li><li><strong>61–79 Attacking:</strong> More boundaries, some wicket risk.</li><li><strong>80–100 Ultra:</strong> Max sixes, max wickets — go big or go home.</li></ul></div></div>
+          <div class="card guide-card"><div class="card-header"><h2 class="card-title">🌱 Pitch Types</h2></div><div class="card-body"><ul class="guide-list"><li><strong class="pitch-bat">Batting Paradise:</strong> High boundaries, bat first.</li><li><strong class="pitch-spin">Spin Friendly:</strong> Spinners get bonus wickets — pick 2+.</li><li><strong class="pitch-pace">Pace Heaven:</strong> Pacers get swing bonus early.</li><li><strong class="pitch-balanced">Balanced:</strong> No strong advantage.</li></ul></div></div>
+          <div class="card guide-card"><div class="card-header"><h2 class="card-title">🤕 Injuries</h2></div><div class="card-body"><ul class="guide-list"><li>1-2 injuries every 3-4 matchdays across all teams.</li><li>Each team has 1 injury-prone player (marked ⚠️ in reports).</li><li>Season Crisis at 3/4 mark: a random player is season-ended.</li><li>Injured players are shown in Matchday → Injury Report.</li></ul></div></div>
+          <div class="card guide-card"><div class="card-header"><h2 class="card-title">📥 Analytics &amp; Reports</h2></div><div class="card-body"><ul class="guide-list"><li>Go to Reports tab to download the full analytics HTML file.</li><li>Print or share it with delegates before strategy sessions.</li><li>It includes all squad ratings, injury status, pitch guide, and season stats.</li><li>Delegates advise the chair verbally — chair enters XI and aggression.</li></ul></div></div>
+          <div class="card guide-card"><div class="card-header"><h2 class="card-title">⚡ Super Over</h2></div><div class="card-body"><ul class="guide-list"><li>Triggered automatically when scores are tied.</li><li>Top 2 batters + 1 bowler per side. 1 over each.</li><li>If still tied: team with more sixes in Super Over wins.</li></ul></div></div>
+        </div>
+      </section>
 
+    </main>
+  </div>
+</div>
 
-<!-- ═══════════════════════════════════════════════════════
-     MODALS
-═══════════════════════════════════════════════════════ -->
-
-<!-- Modal backdrop -->
+<!-- ═══ MODALS ═══ -->
 <div id="modal-backdrop" class="modal-backdrop hidden" onclick="closeModal(event)"></div>
 
-<!-- Player Detail Modal -->
-<div id="modal-player" class="modal hidden" role="dialog" aria-labelledby="modal-player-title" aria-modal="true">
+<div id="modal-player" class="modal hidden" role="dialog">
   <div class="modal-header">
-    <div class="modal-title-row">
-      <div id="modal-player-role-badge" class="role-badge"></div>
-      <h2 id="modal-player-title" class="modal-title">Player Name</h2>
-    </div>
-    <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+    <div class="modal-title-row"><div id="modal-player-role-badge" class="role-badge"></div><h2 id="modal-player-title" class="modal-title">Player</h2></div>
+    <button class="modal-close" onclick="closeModal()">✕</button>
   </div>
   <div class="modal-body">
     <div id="modal-player-team" class="modal-player-team"></div>
     <div id="modal-player-price" class="modal-player-price"></div>
-
-    <div class="rating-bars" id="modal-player-ratings">
-      <!-- Batting, Bowling, Fielding, Keeping bars rendered by JS -->
-    </div>
-
-    <div id="modal-player-form" class="player-form-strip">
-      <!-- Last 5 match form dots -->
-    </div>
-
-    <div id="modal-player-season-stats" class="modal-season-stats">
-      <!-- Season aggregate stats table -->
-    </div>
-
-    <div id="modal-player-injury" class="injury-notice hidden">
-      🤕 Injured — unavailable for <span id="modal-injury-mds">1</span> matchday(s)
-    </div>
+    <div class="rating-bars" id="modal-player-ratings"></div>
+    <div id="modal-player-injury" class="injury-notice hidden">🤕 Injured — out for <span id="modal-injury-mds">1</span> matchday(s)</div>
   </div>
 </div>
 
-
-<!-- Admin XI Override Modal (Admin: select XI for any team) -->
-<div id="modal-xi-admin" class="modal modal-wide hidden" role="dialog" aria-labelledby="modal-xi-admin-title" aria-modal="true">
+<div id="modal-xi-admin" class="modal modal-wide hidden" role="dialog">
   <div class="modal-header">
-    <h2 id="modal-xi-admin-title" class="modal-title">
-      Set Playing XI — <span id="modal-xi-admin-team-name"></span>
-    </h2>
-    <button class="modal-close" onclick="closeXIAdminModal()" aria-label="Close">✕</button>
+    <h2 class="modal-title">Set Playing XI — <span id="modal-xi-admin-team-name"></span></h2>
+    <button class="modal-close" onclick="closeXIAdminModal()">✕</button>
   </div>
   <div class="modal-body">
-    <div class="xi-count-badge modal-xi-count">
-      <span id="modal-xi-admin-count">0</span>/11 selected
-    </div>
-
-    <!-- Composition guide -->
+    <div class="xi-count-badge modal-xi-count" id="modal-xi-count-badge"><span id="modal-xi-admin-count">0</span>/11 selected</div>
     <div class="xi-composition-guide">
-      <span class="comp-pill" data-role="BAT">🟠 BAT</span>
-      <span class="comp-pill" data-role="WK">🟡 WK</span>
-      <span class="comp-pill" data-role="AR">🟢 AR</span>
-      <span class="comp-pill" data-role="PACE">🔵 PACE</span>
+      <span class="comp-pill" data-role="BAT">🟠 BAT</span><span class="comp-pill" data-role="WK">🟡 WK</span>
+      <span class="comp-pill" data-role="AR">🟢 AR</span><span class="comp-pill" data-role="PACE">🔵 PACE</span>
       <span class="comp-pill" data-role="SPIN">🟣 SPIN</span>
     </div>
-
     <div class="xi-squad-header">
       <div class="xi-filter-pills">
         <button class="filter-pill active" data-filter="all" onclick="filterAdminSquad('all')">All</button>
@@ -1444,32 +567,19 @@
         <button class="filter-pill" data-filter="SPIN" onclick="filterAdminSquad('SPIN')">Spin</button>
       </div>
     </div>
-
-    <div id="modal-xi-admin-squad" class="xi-squad-list modal-squad-list">
-      <!-- Rendered by JS -->
-    </div>
+    <div id="modal-xi-admin-squad" class="xi-squad-list modal-squad-list"></div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="autoPickAdminXI()">Auto-Pick Best 11</button>
     <button class="btn btn-secondary" onclick="clearAdminXI()">Clear</button>
-    <button class="btn btn-primary" id="btn-confirm-xi-admin" onclick="confirmXIAdmin()" disabled>
-      Confirm XI ✓
-    </button>
+    <button class="btn btn-primary" id="btn-confirm-xi-admin" onclick="confirmXIAdmin()" disabled>Confirm XI ✓</button>
   </div>
 </div>
 
-
-<!-- Confirm Reset Modal -->
-<div id="modal-reset" class="modal modal-sm hidden" role="dialog" aria-labelledby="modal-reset-title" aria-modal="true">
-  <div class="modal-header">
-    <h2 id="modal-reset-title" class="modal-title">⚠️ Hard Reset Season</h2>
-    <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
-  </div>
+<div id="modal-reset" class="modal modal-sm hidden" role="dialog">
+  <div class="modal-header"><h2 class="modal-title">⚠️ Hard Reset Season</h2><button class="modal-close" onclick="closeModal()">✕</button></div>
   <div class="modal-body">
-    <p class="modal-warning-text">
-      This will permanently delete all season data including teams, players, results, and stats.
-      This cannot be undone.
-    </p>
+    <p class="modal-warning-text">This will permanently delete ALL season data. Cannot be undone.</p>
     <p class="modal-warning-text">Type <strong>RESET</strong> to confirm:</p>
     <input id="reset-confirm-input" class="form-input" type="text" placeholder="RESET">
   </div>
@@ -1479,13 +589,8 @@
   </div>
 </div>
 
-
-<!-- ═══════════════════════════════════════════════════════
-     ANIMATION OVERLAYS
-═══════════════════════════════════════════════════════ -->
-
-<!-- TOSS Animation Overlay -->
-<div id="overlay-toss" class="overlay overlay-toss hidden" aria-live="assertive" role="status">
+<!-- ═══ OVERLAYS ═══ -->
+<div id="overlay-toss" class="overlay overlay-toss hidden">
   <div class="toss-content">
     <div class="toss-label">TOSS</div>
     <div id="toss-teams-display" class="toss-teams">
@@ -1493,25 +598,17 @@
       <span class="toss-vs">vs</span>
       <span id="toss-team-b" class="toss-team-name"></span>
     </div>
-    <div class="coin-wrap">
-      <div id="toss-coin" class="toss-coin">
-        <div class="coin-face coin-heads">H</div>
-        <div class="coin-face coin-tails">T</div>
-      </div>
-    </div>
+    <div class="coin-wrap"><div id="toss-coin" class="toss-coin"><div class="coin-face coin-heads">H</div><div class="coin-face coin-tails">T</div></div></div>
     <div id="toss-result" class="toss-result hidden">
       <div class="toss-winner-label">Toss won by</div>
       <div id="toss-winner-name" class="toss-winner-name"></div>
       <div id="toss-decision" class="toss-decision"></div>
     </div>
-    <button class="btn btn-primary" id="btn-toss-continue"
-            onclick="closeToss()" style="display:none">Continue →</button>
+    <button class="btn btn-primary" id="btn-toss-continue" onclick="closeToss()" style="display:none">Continue →</button>
   </div>
 </div>
 
-
-<!-- MILESTONE Overlay (50 / 100 / 5-wicket haul) -->
-<div id="overlay-milestone" class="overlay overlay-milestone hidden" role="status" aria-live="assertive">
+<div id="overlay-milestone" class="overlay overlay-milestone hidden">
   <div class="milestone-content">
     <div id="milestone-icon" class="milestone-icon">🌟</div>
     <div id="milestone-title" class="milestone-title">FIFTY!</div>
@@ -1521,109 +618,48 @@
   <div id="milestone-confetti" class="milestone-confetti"></div>
 </div>
 
-
-<!-- SUPER OVER Overlay -->
-<div id="overlay-super-over" class="overlay overlay-super-over hidden" role="alertdialog" aria-labelledby="so-title">
+<div id="overlay-super-over" class="overlay overlay-super-over hidden">
   <div class="so-content">
     <div class="so-flash-text">⚡</div>
-    <div id="so-title" class="so-title">SUPER OVER</div>
+    <div class="so-title">SUPER OVER</div>
     <div class="so-sub">Both teams scored equally — it goes to a Super Over!</div>
     <div id="so-teams" class="so-teams">
-      <div class="so-team-card" id="so-team-a">
-        <div class="so-team-name"></div>
-        <div class="so-batters">Top batters ready</div>
-      </div>
+      <div class="so-team-card" id="so-team-a"><div class="so-team-name"></div></div>
       <div class="so-divider">⚡</div>
-      <div class="so-team-card" id="so-team-b">
-        <div class="so-team-name"></div>
-        <div class="so-batters">Top batters ready</div>
-      </div>
+      <div class="so-team-card" id="so-team-b"><div class="so-team-name"></div></div>
     </div>
-    <button class="btn btn-primary btn-large" onclick="startSuperOver()">
-      Start Super Over →
-    </button>
+    <button class="btn btn-primary btn-large" onclick="startSuperOver()">Start Super Over →</button>
   </div>
 </div>
 
-
-<!-- CRISIS EVENT Overlay -->
-<div id="overlay-crisis" class="overlay overlay-crisis hidden" role="alertdialog" aria-labelledby="crisis-title">
+<div id="overlay-crisis" class="overlay overlay-crisis hidden">
   <div class="crisis-bg-flash"></div>
   <div class="crisis-content">
     <div class="crisis-warning-icon">⚠</div>
-    <div id="crisis-title" class="crisis-title">SEASON CRISIS</div>
+    <div class="crisis-title">SEASON CRISIS</div>
     <div class="crisis-sub">Season-Ending Injury</div>
     <div id="crisis-player-reveal" class="crisis-player-reveal">
       <div id="crisis-player-name" class="crisis-player-name"></div>
       <div id="crisis-team-name" class="crisis-team-name"></div>
-      <div class="crisis-injury-type">
-        <span class="injury-cross">✕</span> Out for the Season
-      </div>
+      <div class="crisis-injury-type"><span class="injury-cross">✕</span> Out for the Season</div>
     </div>
-    <div class="crisis-crosses" id="crisis-crosses">
-      <!-- Falling red crosses rendered by JS -->
-    </div>
-    <button class="btn btn-primary" onclick="dismissCrisis()">
-      Acknowledge &amp; Continue
-    </button>
+    <div class="crisis-crosses" id="crisis-crosses"></div>
+    <button class="btn btn-primary" onclick="dismissCrisis()">Acknowledge &amp; Continue</button>
   </div>
 </div>
 
-
-<!-- CHAMPION REVEAL Overlay (7-stage) -->
-<div id="overlay-champion" class="overlay overlay-champion hidden" role="alertdialog" aria-labelledby="champ-title">
-  <!-- Stage 0: Stumps wipe transition -->
-  <div id="champ-stage-0" class="champ-stage champ-wipe active">
-    <div class="stumps-wipe-bar"></div>
-  </div>
-
-  <!-- Stage 1: Title -->
-  <div id="champ-stage-1" class="champ-stage hidden">
-    <div id="champ-title" class="champ-title">IPL MUN Season Champion</div>
-  </div>
-
-  <!-- Stage 2: Runner-up -->
-  <div id="champ-stage-2" class="champ-stage hidden">
-    <div class="champ-runner-up-label">Runner-Up</div>
-    <div id="champ-runner-up-name" class="champ-runner-up-name"></div>
-    <div id="champ-runner-up-pts" class="champ-runner-up-pts"></div>
-  </div>
-
-  <!-- Stage 3: Tension dots -->
-  <div id="champ-stage-3" class="champ-stage hidden">
-    <div class="tension-dots">
-      <span class="tension-dot"></span>
-      <span class="tension-dot"></span>
-      <span class="tension-dot"></span>
-    </div>
-  </div>
-
-  <!-- Stage 4: Champion burst -->
-  <div id="champ-stage-4" class="champ-stage hidden">
-    <div class="champ-gold-flash"></div>
-    <div id="champ-winner-name" class="champ-winner-name"></div>
-    <div class="champ-trophy">🏆</div>
-    <div id="champ-confetti" class="champ-confetti"></div>
-  </div>
-
-  <!-- Stage 5: Final standings + dismiss -->
-  <div id="champ-stage-5" class="champ-stage hidden">
-    <div class="champ-final-title">Final Standings</div>
-    <div id="champ-final-standings" class="champ-final-standings"></div>
-    <button class="btn btn-primary btn-large" id="btn-champ-dismiss"
-            onclick="dismissChampion()" style="display:none">
-      View Awards Ceremony →
-    </button>
-  </div>
+<div id="overlay-champion" class="overlay overlay-champion hidden">
+  <div id="champ-stage-0" class="champ-stage champ-wipe active"><div class="stumps-wipe-bar"></div></div>
+  <div id="champ-stage-1" class="champ-stage hidden"><div class="champ-title">IPL MUN Season Champion</div></div>
+  <div id="champ-stage-2" class="champ-stage hidden"><div class="champ-runner-up-label">Runner-Up</div><div id="champ-runner-up-name" class="champ-runner-up-name"></div><div id="champ-runner-up-pts" class="champ-runner-up-pts"></div></div>
+  <div id="champ-stage-3" class="champ-stage hidden"><div class="tension-dots"><span class="tension-dot"></span><span class="tension-dot"></span><span class="tension-dot"></span></div></div>
+  <div id="champ-stage-4" class="champ-stage hidden"><div class="champ-gold-flash"></div><div id="champ-winner-name" class="champ-winner-name"></div><div class="champ-trophy">🏆</div><div id="champ-confetti" class="champ-confetti"></div></div>
+  <div id="champ-stage-5" class="champ-stage hidden"><div class="champ-final-title">Final Standings</div><div id="champ-final-standings" class="champ-final-standings"></div><button class="btn btn-primary btn-large" id="btn-champ-dismiss" onclick="dismissChampion()" style="display:none">View Awards Ceremony →</button></div>
 </div>
 
-
-<!-- AWARDS CEREMONY Overlay -->
-<div id="overlay-awards" class="overlay overlay-awards hidden" role="dialog" aria-labelledby="awards-title">
+<div id="overlay-awards" class="overlay overlay-awards hidden">
   <div class="awards-content">
-    <div id="awards-title" class="awards-title">Awards Ceremony</div>
-
-    <!-- Awards reveal stage (one at a time) -->
+    <div class="awards-title">Awards Ceremony</div>
     <div id="awards-reveal-stage" class="awards-reveal-stage">
       <div id="award-icon-display" class="award-icon-big"></div>
       <div id="award-name-display" class="award-name"></div>
@@ -1631,30 +667,16 @@
       <div id="award-stat-display" class="award-stat"></div>
       <div id="award-confetti" class="award-confetti"></div>
     </div>
-
     <div class="awards-nav">
-      <div id="awards-progress" class="awards-progress">
-        <!-- Dot indicators for each award -->
-      </div>
-      <button class="btn btn-primary" id="btn-next-award" onclick="nextAward()">
-        Next Award →
-      </button>
-      <button class="btn btn-secondary hidden" id="btn-close-awards" onclick="closeAwards()">
-        Close
-      </button>
+      <div id="awards-progress" class="awards-progress"></div>
+      <button class="btn btn-primary" id="btn-next-award" onclick="nextAward()">Next Award →</button>
+      <button class="btn btn-secondary hidden" id="btn-close-awards" onclick="closeAwards()">Close</button>
     </div>
   </div>
 </div>
 
-
-<!-- ═══════════════════════════════════════════════════════
-     EMBEDDED STATE MARKER (for single-file export)
-═══════════════════════════════════════════════════════ -->
 <!--EMBEDDED_STATE:null-->
-
-<!-- Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
 <script src="ipl.js"></script>
-
 </body>
 </html>
