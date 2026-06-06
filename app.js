@@ -3,12 +3,12 @@
    Data · State · UI Render · Actions · Boot
    ================================================================ */
 'use strict';
- 
+
 /* ─────────────────────────────────────────────
    CONSTANTS
 ───────────────────────────────────────────── */
 const APP   = { version: '5.0', key: 'iplmun_v5' };
- 
+
 const ROLE_META = {
   BAT:  { label: 'Batter',       short: 'BAT'  },
   WK:   { label: 'Wicket-Keeper',short: 'WK'   },
@@ -16,14 +16,14 @@ const ROLE_META = {
   PACE: { label: 'Pace Bowler',  short: 'PACE' },
   SPIN: { label: 'Spinner',      short: 'SPIN' },
 };
- 
+
 const PITCH_LABELS = {
   flat:     'Flat Belter',
   dry:      'Dry Turner',
   green:    'Green Top',
   balanced: 'Balanced',
 };
- 
+
 /* 12 Real IPL Grounds — pitch type is editable in Setup */
 const DEFAULT_VENUES = [
   { id: 'v01', city: 'Mumbai',      name: 'Wankhede Stadium',                 pitch: 'flat'     },
@@ -39,7 +39,7 @@ const DEFAULT_VENUES = [
   { id: 'v11', city: 'Navi Mumbai', name: 'Dr. DY Patil Sports Academy',       pitch: 'balanced' },
   { id: 'v12', city: 'Pune',        name: 'MCA Stadium, Gahunje',              pitch: 'balanced' },
 ];
- 
+
 /* 12 Default Teams */
 const DEFAULT_TEAMS = [
   { short: 'MUM', name: 'Mumbai Monarchs',     color: '#2563eb', venueId: 'v01', purse: 90 },
@@ -55,7 +55,7 @@ const DEFAULT_TEAMS = [
   { short: 'NMU', name: 'Navi Mumbai Nexus',   color: '#65a30d', venueId: 'v11', purse: 90 },
   { short: 'PUN', name: 'Pune Pioneers',       color: '#6d28d9', venueId: 'v12', purse: 90 },
 ];
- 
+
 /* Player name parts */
 const FIRST = ['Arjun','Rohan','Vikram','Kabir','Aditya','Ishaan','Dhruv','Veer','Aryan','Nikhil',
                'Sameer','Rahul','Karthik','Manish','Yuvraj','Tejas','Harsh','Ankit','Pranav',
@@ -69,7 +69,7 @@ const LAST  = ['Sharma','Verma','Patel','Reddy','Nair','Iyer','Menon','Singh','K
                'Hegde','Kaul','Bedi','Sidhu','Dhillon','Ahuja','Sethi','Bajwa','Saxena',
                'Chauhan','Rathore','Solanki','Pawar','Kulkarni','Deshpande','Bhatt','Varma',
                'Trivedi','Chandra','Akhtar','Hussain'];
- 
+
 /* ─────────────────────────────────────────────
    PLAYER GENERATION
    Each player gets:
@@ -80,12 +80,12 @@ const LAST  = ['Sharma','Verma','Patel','Reddy','Nair','Iyer','Menon','Singh','K
 ───────────────────────────────────────────── */
 function clampR(v)    { return Math.max(10, Math.min(99, Math.round(v))); }
 function randBetween(lo, hi, rnd) { return lo + rnd() * (hi - lo); }
- 
+
 function generateRatings(role, tier, rnd) {
   const base = { star: 82, good: 66, mid: 52, budget: 38 }[tier] || 52;
   const spread = { star: 10, good: 12, mid: 14, budget: 16 }[tier] || 14;
   const R = () => clampR(base + (rnd() - 0.5) * 2 * spread);
- 
+
   let bat, bowl;
   if (role === 'BAT' || role === 'WK') {
     bat  = R();
@@ -97,7 +97,7 @@ function generateRatings(role, tier, rnd) {
     bat  = clampR(base - 5 + (rnd() - 0.5) * spread);
     bowl = clampR(base - 5 + (rnd() - 0.5) * spread);
   }
- 
+
   return {
     bat,
     bowl,
@@ -105,7 +105,7 @@ function generateRatings(role, tier, rnd) {
     keep:  role === 'WK' ? clampR(randBetween(68, 98, rnd)) : 0,
   };
 }
- 
+
 function playerOverall(p) {
   const r = p.ratings;
   if (p.role === 'BAT')  return Math.round(r.bat * 0.85 + r.field * 0.15);
@@ -113,37 +113,37 @@ function playerOverall(p) {
   if (p.role === 'ALL')  return Math.round((r.bat + r.bowl) / 2 * 0.90 + r.field * 0.10);
   return Math.round(r.bowl * 0.85 + r.field * 0.15);
 }
- 
+
 function formLabel(form) {
   if (form >= 75) return { text: '🔥 Hot',     cls: 'form-hot'  };
   if (form >= 55) return { text: '✅ Good',    cls: 'form-good' };
   if (form >= 35) return { text: '😐 Average', cls: 'form-avg'  };
   return            { text: '📉 Cold',    cls: 'form-cold' };
 }
- 
+
 function injuryLabel(prone) {
   if (prone >= 70) return { text: 'High',   cls: 'prone-high' };
   if (prone >= 40) return { text: 'Medium', cls: 'prone-med'  };
   return             { text: 'Low',    cls: 'prone-low'  };
 }
- 
+
 /* Base price by tier */
 const TIER_PRICE = { star: 2.0, good: 1.5, mid: 1.0, budget: 0.5 };
- 
+
 /* Role distribution for pool generation */
 const ROLE_DIST = ['BAT','BAT','BAT','WK','WK','ALL','ALL','ALL','PACE','PACE','PACE','SPIN','SPIN'];
- 
+
 function generatePlayerPool(seed, count) {
   const rng  = makeRNG(seed >>> 0);
   const used = new Set();
   const players = [];
- 
+
   // Determine tier distribution
   const starCount = Math.round(count * 0.18);
   const goodCount = Math.round(count * 0.30);
   const midCount  = Math.round(count * 0.32);
   // rest are budget
- 
+
   for (let i = 0; i < count; i++) {
     let name, attempts = 0;
     do {
@@ -151,11 +151,11 @@ function generatePlayerPool(seed, count) {
       attempts++;
     } while (used.has(name) && attempts < 80);
     used.add(name);
- 
+
     const tier = i < starCount ? 'star' : i < starCount + goodCount ? 'good' : i < starCount + goodCount + midCount ? 'mid' : 'budget';
     const role = ROLE_DIST[Math.floor(rng() * ROLE_DIST.length)];
     const ratings = generateRatings(role, tier, rng);
- 
+
     /* Injury proneness:
        Stars tend to be better conditioned (lower proneness).
        Budget players are often less fit.
@@ -163,10 +163,10 @@ function generatePlayerPool(seed, count) {
     const baseProne  = { star: 22, good: 35, mid: 50, budget: 65 }[tier];
     const proneSpread = 28;
     const injuryProne = clampR(baseProne + (rng() - 0.5) * 2 * proneSpread);
- 
+
     /* Form: start randomly between 40-70 */
     const form = Math.round(40 + rng() * 30);
- 
+
     players.push({
       id:          'p_' + i + '_' + (seed >>> 16 & 0xffff).toString(36),
       name,
@@ -185,23 +185,121 @@ function generatePlayerPool(seed, count) {
   }
   return players;
 }
- 
+
 /* ─────────────────────────────────────────────
    AUCTION SET BUILDER
    Groups players into named sets by (tier × role)
    so the auction reveals them set by set.
 ───────────────────────────────────────────── */
+/* ─────────────────────────────────────────────
+   CSV PLAYER IMPORT
+   Accepts the IPL_MUN_Players.csv format:
+   set,name,role,basePrice,bat,bowl,field,keep,form,injuryProne,tier,country
+───────────────────────────────────────────── */
+function parsePlayerCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  if (!lines.length) return { ok: false, msg: 'Empty file' };
+
+  // Detect and skip header row
+  const first = lines[0].toLowerCase();
+  const hasHeader = first.includes('name') || first.includes('role') || first.includes('bat');
+  const dataLines = hasHeader ? lines.slice(1) : lines;
+
+  const players = [];
+  const errors  = [];
+
+  dataLines.forEach((raw, idx) => {
+    const line = raw.trim();
+    if (!line) return;
+
+    // Simple CSV split (handles quoted fields)
+    const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+    if (cols.length < 10) { errors.push('Row ' + (idx + 2) + ': too few columns'); return; }
+
+    const [setStr, name, role, basePriceStr, batStr, bowlStr, fieldStr, keepStr, formStr, injuryProneStr, tier, country] = cols;
+
+    const setNum     = parseInt(setStr, 10)   || 0;
+    const basePrice  = parseFloat(basePriceStr) || 0.5;
+    const bat        = Math.min(99, Math.max(1, parseInt(batStr, 10)        || 30));
+    const bowl       = Math.min(99, Math.max(0, parseInt(bowlStr, 10)       || 10));
+    const field      = Math.min(99, Math.max(1, parseInt(fieldStr, 10)      || 60));
+    const keep       = Math.min(99, Math.max(0, parseInt(keepStr, 10)       || 0));
+    const form       = Math.min(95, Math.max(5,  parseInt(formStr, 10)      || 50));
+    const injuryProne= Math.min(99, Math.max(1,  parseInt(injuryProneStr, 10) || 30));
+    const validRole  = ['BAT','WK','ALL','PACE','SPIN'].includes(role.toUpperCase()) ? role.toUpperCase() : 'BAT';
+    const validTier  = ['star','good','mid','budget'].includes((tier||'').toLowerCase()) ? tier.toLowerCase() : 'mid';
+
+    if (!name) { errors.push('Row ' + (idx + 2) + ': missing name'); return; }
+
+    players.push({
+      id:          'csv_' + idx + '_' + Math.random().toString(36).slice(2, 6),
+      name:        name,
+      role:        validRole,
+      tier:        validTier,
+      csvSet:      setNum,   // preserved for building named sets
+      country:     country || 'IND',
+      ratings:     { bat, bowl, field, keep },
+      form,
+      injuryProne,
+      basePrice,
+      teamId:      null,
+      price:       0,
+      injured:     false,
+      injuryGames: 0,
+      fitness:     100,
+    });
+  });
+
+  if (!players.length) return { ok: false, msg: 'No valid player rows found. ' + errors.slice(0,3).join('; ') };
+  return { ok: true, players, errors };
+}
+
+/* Build auction sets from csvSet numbers if available */
+function buildAuctionSetsFromCSV(players) {
+  // Group by csvSet number, preserving order
+  const setMap = {};
+  players.forEach(p => {
+    const key = p.csvSet || 0;
+    if (!setMap[key]) setMap[key] = [];
+    setMap[key].push(p.id);
+  });
+
+  const SET_NAMES = {
+    1:'Premium Batters (Set 1)',       2:'Premium All-Rounders (Set 2)',
+    3:'Premium Wicket-Keepers (Set 3)',4:'Premium Pacers (Set 4)',
+    5:'Premium Spinners (Set 5)',      6:'Standard Batters (Set 6)',
+    7:'Standard All-Rounders (Set 7)', 8:'Standard Wicket-Keepers (Set 8)',
+    9:'Standard Pacers (Set 9)',       10:'Standard Spinners (Set 10)',
+    11:'Value Batters (Set 11)',       12:'Value All-Rounders (Set 12)',
+    13:'Value Wicket-Keepers (Set 13)',14:'Value Pacers (Set 14)',
+    15:'Value Spinners (Set 15)',      16:'Budget Batters (Set 16)',
+    17:'Budget All-Rounders (Set 17)',18:'Budget Wicket-Keepers (Set 18)',
+    19:'Budget Pacers (Set 19)',       20:'Budget Spinners (Set 20)',
+  };
+
+  return Object.keys(setMap)
+    .map(k => parseInt(k, 10))
+    .sort((a, b) => a - b)
+    .map(k => ({
+      name:      SET_NAMES[k] || 'Set ' + k + ' (Base ₹' + (players.find(p => p.csvSet === k)?.basePrice || '?') + 'Cr)',
+      playerIds: setMap[k],
+    }));
+}
+
 function buildAuctionSets(players) {
+  // If players were loaded from CSV (have csvSet field), use named sets
+  if (players.length && players[0].csvSet != null) return buildAuctionSetsFromCSV(players);
+
   const sets = [];
- 
+
   function addSet(name, pids) {
     if (pids.length > 0) sets.push({ name, playerIds: pids });
   }
- 
+
   const tiers   = ['star', 'good', 'mid', 'budget'];
   const tierNames = { star: 'Premium', good: 'Standard', mid: 'Value', budget: 'Budget' };
   const roles   = ['BAT', 'WK', 'ALL', 'PACE', 'SPIN'];
- 
+
   tiers.forEach(tier => {
     roles.forEach(role => {
       const group = players.filter(p => p.tier === tier && p.role === role);
@@ -213,10 +311,10 @@ function buildAuctionSets(players) {
       }
     });
   });
- 
+
   return sets;
 }
- 
+
 /* ─────────────────────────────────────────────
    STATE
 ───────────────────────────────────────────── */
@@ -254,7 +352,7 @@ function freshState() {
     h2h:      {},    // head-to-head: h2h['t1_t2'] = {wins:{t1:n,t2:n}}
   };
 }
- 
+
 function makeTeamRecord(d) {
   return {
     id:         d.id || ('t_' + d.short),
@@ -271,7 +369,7 @@ function makeTeamRecord(d) {
     P: 0, W: 0, L: 0, pts: 0, nrr: 0, form: [],
   };
 }
- 
+
 /* ─────────────────────────────────────────────
    LIVE STATE
 ───────────────────────────────────────────── */
@@ -290,14 +388,14 @@ let ui      = {
   tradeA:      null,
   tradeB:      null,
 };
- 
+
 /* ─────────────────────────────────────────────
    PERSISTENCE
 ───────────────────────────────────────────── */
 function save() {
   try { localStorage.setItem(APP.key, JSON.stringify(state)); } catch (_) {}
 }
- 
+
 function load() {
   try {
     const raw = localStorage.getItem(APP.key);
@@ -306,7 +404,7 @@ function load() {
     return true;
   } catch (_) { return false; }
 }
- 
+
 function migrateState(s) {
   const d = freshState();
   const o = { ...d, ...s };
@@ -323,7 +421,7 @@ function migrateState(s) {
   }));
   return o;
 }
- 
+
 /* ─────────────────────────────────────────────
    LOOKUPS
 ───────────────────────────────────────────── */
@@ -351,7 +449,7 @@ const purpleCap = () => {
   }
   return best;
 };
- 
+
 /* ─────────────────────────────────────────────
    HELPERS
 ───────────────────────────────────────────── */
@@ -360,7 +458,7 @@ function esc(s) {
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   }[c]));
 }
- 
+
 function $(id)         { return document.getElementById(id); }
 function ovStr(balls)  { return Math.floor(balls / 6) + '.' + (balls % 6); }
 function isChair()     { return session.role === 'chair'; }
@@ -375,7 +473,7 @@ function logEv(msg) {
   state.log.push({ t: Date.now(), msg });
   if (state.log.length > 300) state.log.shift();
 }
- 
+
 function toast(msg, kind = 'info') {
   const el = document.createElement('div');
   el.className = 'toast ' + kind;
@@ -384,7 +482,7 @@ function toast(msg, kind = 'info') {
   requestAnimationFrame(() => el.classList.add('show'));
   setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 320); }, 3000);
 }
- 
+
 function pip(color, size = 9) {
   return `<span class="pip" style="background:${esc(color)};width:${size}px;height:${size}px"></span>`;
 }
@@ -401,7 +499,7 @@ function formBadge(form) {
 function aggLabel(v) {
   return v < 25 ? 'Anchor' : v < 45 ? 'Steady' : v < 60 ? 'Balanced' : v < 78 ? 'Attacking' : 'Ultra';
 }
- 
+
 /* Squad balance summary */
 function squadBalance(teamId) {
   const sq = squadOf(teamId);
@@ -409,7 +507,7 @@ function squadBalance(teamId) {
   sq.forEach(p => b[p.role]++);
   return b;
 }
- 
+
 /* ─────────────────────────────────────────────
    SEASON LOGIC
 ───────────────────────────────────────────── */
@@ -422,7 +520,7 @@ function initStats() {
     state.stats.motm[p.id]  = 0;
   });
 }
- 
+
 /* Double round-robin schedule */
 function generateSchedule() {
   const ids = state.teams.map(t => t.id);
@@ -439,7 +537,7 @@ function generateSchedule() {
     rounds.push(pairs);
     const fixed = list[0], rest = list.slice(1); rest.unshift(rest.pop()); list = [fixed, ...rest];
   }
- 
+
   const schedule = [];
   let rnum = 1;
   const legs = [rounds, rounds.map(r => r.map(([a, b]) => [b, a]))];
@@ -456,16 +554,16 @@ function generateSchedule() {
     schedule.push({ round: rnum, matches });
     rnum++;
   }));
- 
+
   state.schedule    = schedule;
   state.currentRound = 1;
 }
- 
+
 const totalRounds      = () => state.schedule.length;
 const roundData        = r  => state.schedule.find(x => x.round === r) || null;
 const currentRoundData = () => roundData(state.currentRound);
 const roundComplete    = r  => { const rd = roundData(r); return rd ? rd.matches.every(m => m.resultId) : false; };
- 
+
 function applyMatchStats(m) {
   [m.inn1, m.inn2].forEach(inn => {
     inn.batting.forEach(b => {
@@ -486,7 +584,7 @@ function applyMatchStats(m) {
   });
   if (m.motm && state.stats.motm[m.motm] != null) state.stats.motm[m.motm]++;
 }
- 
+
 function applyMatchTables(m) {
   const home = teamById(m.homeId), away = teamById(m.awayId);
   if (!home || !away) return;
@@ -495,46 +593,46 @@ function applyMatchTables(m) {
   const loser  = winner.id === home.id ? away : home;
   winner.W++; winner.pts += 2; winner.form = [...winner.form, 'W'].slice(-6);
   loser.L++;                   loser.form  = [...loser.form,  'L'].slice(-6);
- 
+
   // NRR
   const allRes = state.resultOrder.map(id => state.results[id]);
   home.nrr = computeNRR(home.id, allRes);
   away.nrr = computeNRR(away.id, allRes);
- 
+
   // Head-to-head
   const key = [m.homeId, m.awayId].sort().join('_');
   if (!state.h2h[key]) state.h2h[key] = { wins: {} };
   state.h2h[key].wins[winner.id] = (state.h2h[key].wins[winner.id] || 0) + 1;
 }
- 
+
 function playMatch(mr) {
   if (mr.resultId) return resultById(mr.resultId);
   const home  = teamById(mr.homeId);
   const away  = teamById(mr.awayId);
   const venue = venueById(mr.venueId);
   const seed  = hashSeed(mr.id + ':' + state.meta.createdAt);
- 
+
   const m = simulateMatch({
     home:  buildEngineTeam(home, state.players),
     away:  buildEngineTeam(away, state.players),
     venue: venue || { pitch: 'balanced' },
     seed,
   });
- 
+
   m.id    = mr.id;
   m.round = state.currentRound;
   m.playedAt = Date.now();
- 
+
   state.results[m.id] = m;
   state.resultOrder.push(m.id);
   mr.resultId = m.id;
- 
+
   applyMatchTables(m);
   applyMatchStats(m);
   logEv(`${home.short} v ${away.short}: ${teamById(m.result.winnerId).short} won`);
   return m;
 }
- 
+
 function playCurrentRound() {
   const rd = currentRoundData(); if (!rd) return [];
   const played = [];
@@ -542,7 +640,7 @@ function playCurrentRound() {
   save();
   return played;
 }
- 
+
 function advanceRound() {
   if (state.currentRound >= totalRounds()) {
     setupPlayoffs();
@@ -554,19 +652,19 @@ function advanceRound() {
   save();
   return { done: false, round: state.currentRound };
 }
- 
+
 /* Between-round processing */
 function processBetweenRounds(playedMatches) {
   // Update form
   const motmIds = new Set(playedMatches.map(m => m.motm).filter(Boolean));
   updatePlayerForms(state.players, motmIds);
- 
+
   // Process injuries
   const injLog = processRoundInjuries(state.players, state.currentRound);
- 
+
   return injLog;
 }
- 
+
 /* Crisis: at 75% through league, one star ruled out for rest of season */
 function maybeFireCrisis() {
   if (state.crisis.fired) return null;
@@ -579,13 +677,13 @@ function maybeFireCrisis() {
   state.crisis = { fired: true, atRound: state.currentRound };
   return v;
 }
- 
+
 function tradeWindowOpen() {
   return state.phase === 'season' &&
     state.currentRound > 1 &&
     (state.currentRound - 1) % state.config.tradeWindowEvery === 0;
 }
- 
+
 function executeTrade(aTid, aPid, bTid, bPid) {
   const pa = playerById(aPid), pb = playerById(bPid);
   const ta = teamById(aTid),   tb = teamById(bTid);
@@ -600,7 +698,7 @@ function executeTrade(aTid, aPid, bTid, bPid) {
   save();
   return { ok: true };
 }
- 
+
 /* ─────────────────────────────────────────────
    PLAYOFFS
 ───────────────────────────────────────────── */
@@ -615,7 +713,7 @@ function setupPlayoffs() {
     championId: null,
   };
 }
- 
+
 function nextPlayoffTie() {
   const po = state.playoffs; if (!po) return null;
   if (!po.q1.resultId)    return 'q1';
@@ -624,7 +722,7 @@ function nextPlayoffTie() {
   if (!po.final.resultId) { po.final.aId = po.q1.winnerId; po.final.bId = po.q2.winnerId;  return 'final'; }
   return null;
 }
- 
+
 function playPlayoffTie(key) {
   const po = state.playoffs, tie = po[key];
   if (!tie || tie.resultId) return null;
@@ -650,7 +748,7 @@ function playPlayoffTie(key) {
   save();
   return m;
 }
- 
+
 /* ─────────────────────────────────────────────
    AUCTION LOGIC
 ───────────────────────────────────────────── */
@@ -667,7 +765,7 @@ function startAuction() {
   state.phase = 'auction';
   save();
 }
- 
+
 function auctionAssign(playerId, teamId, price) {
   const p = playerById(playerId), t = teamById(teamId);
   if (!p || !t) return { ok: false, msg: 'Invalid player or team' };
@@ -683,12 +781,12 @@ function auctionAssign(playerId, teamId, price) {
   save();
   return { ok: true };
 }
- 
+
 function auctionMarkUnsold(playerId) {
   state.auction.unsold.push(playerId);
   save();
 }
- 
+
 function doFinalizeAuction() {
   // Auto-pick XIs for any team that doesn't have one
   state.teams.forEach(t => {
@@ -701,13 +799,13 @@ function doFinalizeAuction() {
   state.phase = 'season';
   save();
 }
- 
+
 /* ═══════════════════════════════════════════
    UI RENDER LAYER
    All functions return HTML strings.
    render() rebuilds the page from state.
 ═══════════════════════════════════════════ */
- 
+
 const NAV = [
   { id:'setup',      label:'Setup',        icon:'⚙'  },
   { id:'auction',    label:'Auction',       icon:'🔨'  },
@@ -722,7 +820,7 @@ const NAV = [
   { id:'admin',      label:'Admin',         icon:'🛡',  chair:true },
   { id:'guide',      label:'Guide',         icon:'❓'  },
 ];
- 
+
 function render() {
   if (!session.role) { document.getElementById('root').innerHTML = renderLogin(); return; }
   document.getElementById('root').innerHTML = renderShell();
@@ -740,7 +838,7 @@ function render() {
     s.style.setProperty('--fill', s.value + '%');
   });
 }
- 
+
 /* ── Login ── */
 function renderLogin() {
   const tab = ui.loginTab || 'chair';
@@ -785,14 +883,14 @@ function renderLogin() {
   </div>
 </div>`;
 }
- 
+
 /* ── Shell ── */
 function renderShell() {
   const myTeam = session.teamId ? teamById(session.teamId) : null;
   const phLabel = { setup:'Pre-Season', auction:'Auction',
     season:`Round ${state.currentRound}/${totalRounds()}`,
     playoffs:'Playoffs', complete:'Season Complete' }[state.phase] || state.phase;
- 
+
   return `<div id="app">
   <div class="topbar">
     <div class="mini-brand"><span class="bi">IPL</span><span class="bm">MUN</span></div>
@@ -820,7 +918,7 @@ function renderShell() {
   </div>
 </div>`;
 }
- 
+
 /* ── Standings rail ── */
 function renderRail() {
   if (!state.teams.length || state.phase === 'setup') return '';
@@ -849,7 +947,7 @@ function renderRail() {
   </div>
 </div>`;
 }
- 
+
 /* ── Page router ── */
 function renderPage() {
   const pages = {
@@ -861,9 +959,9 @@ function renderPage() {
   try { return (pages[ui.page] || renderSetup)(); }
   catch (e) { return `<div class="empty-state" style="padding:80px">Error: ${esc(String(e))}</div>`; }
 }
- 
+
 function locked() { return `<div class="empty-state" style="padding:80px">🔒 Chair access only.</div>`; }
- 
+
 function phd(eye, title, sub = '') {
   return `<div class="page-head">
     <div class="page-eyebrow">${esc(eye)}</div>
@@ -871,7 +969,7 @@ function phd(eye, title, sub = '') {
     ${sub ? `<div class="page-sub">${esc(sub)}</div>` : ''}
   </div>`;
 }
- 
+
 function stepper(active) {
   const steps = [['Setup','setup'],['Auction','auction'],['Strategy','strategy'],['Season','matchday'],['Playoffs','playoffs']];
   const ai = steps.findIndex(([,k]) => k === active);
@@ -881,16 +979,16 @@ function stepper(active) {
     </div>`).join('')}
   </div>`;
 }
- 
+
 /* ── SETUP ── */
 function renderSetup() {
   if (!isChair()) return locked();
   const t    = ui.setupTab || 'teams';
   const ready = state.teams.length >= 2 && state.players.length >= 11;
- 
+
   return `${stepper('setup')}
 ${phd('Step 1', 'League Setup', 'Configure your 12 teams, set individual budgets and home grounds, then generate the player pool.')}
- 
+
 ${state.phase !== 'setup' ? `<div class="panel"><div class="panel-body" style="display:flex;align-items:center;gap:14px">
   <span style="font-size:20px">✅</span>
   <div class="grow"><b>Setup complete.</b> <span class="dim">Season is underway.</span></div>
@@ -916,7 +1014,7 @@ ${state.phase !== 'setup' ? `<div class="panel"><div class="panel-body" style="d
   <button class="btn btn-primary btn-lg" data-act="beginAuction" ${ready ? '' : 'disabled'}>Lock In & Begin Auction →</button>
 </div>`}`;
 }
- 
+
 function renderSetupTeams() {
   return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
   <b>Teams <span class="dim">(${state.teams.length})</span></b>
@@ -941,7 +1039,7 @@ ${state.teams.length ? state.teams.map(t => `
   <button class="icon-btn" data-act="removeTeam" data-id="${t.id}" style="font-size:11px">✕</button>
 </div>`).join('') : `<div class="empty-state">No teams yet. Load the 12 defaults or add custom teams.</div>`}`;
 }
- 
+
 function renderSetupVenues() {
   return `<div style="margin-bottom:14px">
   <b>Ground Pitch Types</b>
@@ -960,33 +1058,38 @@ ${state.venues.map(v => `
   </select>
 </div>`).join('')}`;
 }
- 
+
 function renderSetupPlayers() {
   const rc = {}; state.players.forEach(p => rc[p.role] = (rc[p.role] || 0) + 1);
   const tc = {}; state.players.forEach(p => tc[p.tier] = (tc[p.tier] || 0) + 1);
   return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
   <b>Player Pool <span class="dim">(${state.players.length})</span></b>
-  <div style="display:flex;gap:8px">
-    <button class="btn btn-ghost btn-sm" data-act="genPool" data-id="120">120 Players</button>
-    <button class="btn btn-ghost btn-sm" data-act="genPool" data-id="156">156 Players</button>
-    <button class="btn btn-ghost btn-sm" data-act="genPool" data-id="200">200 Players</button>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn btn-primary btn-sm" data-act="triggerCSVImport">Import CSV</button>
+    <input type="file" id="csvPlayerFile" accept=".csv,text/csv" class="hidden">
+    <button class="btn btn-ghost btn-sm" data-act="genPool" data-id="120">120 Random</button>
+    <button class="btn btn-ghost btn-sm" data-act="genPool" data-id="156">156 Random</button>
     ${state.players.length ? `<button class="btn btn-outline btn-sm" data-act="clearPool">Clear</button>` : ''}
   </div>
+</div>
+<div class="hint" style="margin-bottom:14px">
+  Upload <b>IPL_MUN_Players.csv</b> to load real players. Format: <code>set,name,role,basePrice,bat,bowl,field,keep,form,injuryProne,tier,country</code>
 </div>
 ${state.players.length ? `
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
   ${Object.keys(ROLE_META).map(r => `<span class="rbadge role-${r}" style="font-size:11px;padding:4px 10px">${ROLE_META[r].label}: ${rc[r] || 0}</span>`).join('')}
 </div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-  <span class="rbadge" style="background:rgba(245,200,66,.14);color:var(--gold)">⭐ Stars: ${tc.star || 0}</span>
+  <span class="rbadge" style="background:rgba(245,200,66,.14);color:var(--gold)">Stars: ${tc.star || 0}</span>
   <span class="rbadge" style="background:rgba(56,189,248,.12);color:#38bdf8">Good: ${tc.good || 0}</span>
   <span class="rbadge" style="background:rgba(139,146,168,.12);color:var(--ink-dim)">Mid: ${tc.mid || 0}</span>
   <span class="rbadge" style="background:rgba(239,68,68,.1);color:var(--red)">Budget: ${tc.budget || 0}</span>
 </div>
-<div class="hint">Players carry <b>Form</b> (performance multiplier — hot players punch above their rating) and <b>Injury Proneness</b> ratings. Both update between rounds.</div>
-` : `<div class="empty-state">No players yet. Generate at least 156 for a 12-team league.</div>`}`;
+<div class="hint">Players carry <b>Form</b> (performance multiplier) and <b>Injury Proneness</b> ratings.</div>
+` : `<div class="empty-state">No players yet. Import a CSV or generate a random pool.</div>`}`;
 }
- 
+
+
 function renderSetupConfig() {
   const c = state.config;
   return `<div class="form-grid">
@@ -997,18 +1100,18 @@ function renderSetupConfig() {
 </div>
 <div class="hint">12 teams → 22-round double round-robin (132 matches), then top-4 playoffs. Each team's individual budget is set in the Teams tab.</div>`;
 }
- 
+
 /* ── AUCTION — set-by-set ── */
 function renderAuction() {
   if (state.phase === 'setup') return `<div class="empty-state" style="padding:80px">Complete setup first, then begin the auction.</div>`;
- 
+
   const a = state.auction;
   const currentSet = a.sets[ui.auctionSet];
   const isFinal = allSquadsOk();
- 
+
   return `${stepper('auction')}
 ${phd('Step 2', 'Player Auction', 'Players are revealed set by set. For each player, announce bids and enter the winning team and price.')}
- 
+
 <div class="auction-layout">
   <!-- Left: Set list -->
   <div class="auction-sets-panel">
@@ -1031,7 +1134,7 @@ ${phd('Step 2', 'Player Auction', 'Players are revealed set by set. For each pla
       ${isFinal ? '' : `<div class="hint" style="margin-top:6px">Every team needs 11+ players.</div>`}
     </div>` : ''}
   </div>
- 
+
   <!-- Middle: Current set players -->
   <div class="auction-main">
     ${currentSet ? `
@@ -1077,7 +1180,7 @@ ${phd('Step 2', 'Player Auction', 'Players are revealed set by set. For each pla
     </div>
     ` : `<div class="empty-state" style="padding:60px">Select a set from the left panel to begin auctioning.</div>`}
   </div>
- 
+
   <!-- Right: Budgets -->
   <div class="auction-budgets-panel">
     <div class="panel">
@@ -1116,19 +1219,19 @@ ${phd('Step 2', 'Player Auction', 'Players are revealed set by set. For each pla
   </div>
 </div>`;
 }
- 
+
 /* ── SQUAD ── */
 function renderSquad() {
   if (state.phase === 'setup') return `<div class="empty-state" style="padding:80px">Squads appear after the auction.</div>`;
   const tid  = ui.xiTeam || (session.teamId || state.teams[0]?.id);
   const team = teamById(tid);
   if (!team) return `<div class="empty-state">No teams found.</div>`;
- 
+
   const squad  = squadOf(tid).sort((a, b) => playerOverall(b) - playerOverall(a));
   const xiSet  = new Set(team.xi?.length === 11 ? team.xi : autoXI(squad));
   const canEdit = canManage(tid);
   const bal    = squadBalance(tid);
- 
+
   return `${phd('Rosters', 'Squads & Playing XI', canEdit ? 'Tap a player to add or remove from the XI. Players in form show 🔥.' : 'View-only.')}
 <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px">
   ${state.teams.map(t => `<button class="fpill${tid === t.id ? ' on' : ''}" data-act="selectSquad" data-id="${t.id}">
@@ -1180,7 +1283,7 @@ function renderSquad() {
   </div>
 </div>`;
 }
- 
+
 /* ── STRATEGY ── */
 function renderStrategy() {
   if (state.phase === 'setup' || !state.teams.length) return `<div class="empty-state" style="padding:80px">Strategy unlocks after the auction.</div>`;
@@ -1218,7 +1321,7 @@ ${isChair() ? `<div style="display:flex;justify-content:flex-end;margin-top:20px
   <button class="btn btn-primary btn-lg" data-act="nav" data-id="matchday">To Matchday →</button>
 </div>` : ''}`;
 }
- 
+
 /* ── MATCHDAY ── */
 function renderMatchday() {
   if (['setup','auction'].includes(state.phase)) return `<div class="empty-state" style="padding:80px">Matchday unlocks once the season starts.</div>`;
@@ -1227,20 +1330,20 @@ function renderMatchday() {
     <div class="grow"><b>League stage complete.</b> <span class="dim">Head to Playoffs.</span></div>
     <button class="btn btn-primary btn-sm" data-act="nav" data-id="playoffs">Go to Playoffs →</button>
   </div></div>`;
- 
+
   const rd   = currentRoundData();
   const done = roundComplete(state.currentRound);
   const tw   = tradeWindowOpen();
- 
+
   return `${stepper('matchday')}
 ${phd('Step 4', `Matchday — Round ${state.currentRound}`, 'Simulate the round. Injuries and form updates happen automatically between rounds.')}
- 
+
 ${tw && isChair() ? `<div class="panel" style="border-color:rgba(245,158,11,.28)"><div class="panel-body" style="display:flex;align-items:center;gap:12px">
   <span style="font-size:18px">🔄</span>
   <div class="grow"><b>Trade window open</b> <span class="dim">— swap players before this round.</span></div>
   <button class="btn btn-ghost btn-sm" data-act="nav" data-id="admin">Trade Desk →</button>
 </div></div>` : ''}
- 
+
 <div class="panel">
   <div class="panel-head">
     <div class="panel-title">🏟 Round ${state.currentRound} Fixtures</div>
@@ -1264,7 +1367,7 @@ ${tw && isChair() ? `<div class="panel" style="border-color:rgba(245,158,11,.28)
     }).join('')}
   </div>
 </div>
- 
+
 ${isChair() ? `<div class="panel"><div class="panel-body" style="text-align:center;padding:28px">
   ${!done ? `
   <button class="btn btn-live btn-lg" data-act="simRound">▶ Simulate Round ${state.currentRound}</button>
@@ -1282,7 +1385,7 @@ ${isChair() ? `<div class="panel"><div class="panel-body" style="text-align:cent
   ${done ? 'Round complete — waiting for Chair to advance.' : 'Waiting for the Chair to simulate this round.'}
 </div></div>`}`;
 }
- 
+
 /* ── MATCH CENTRE ── */
 function renderLive() {
   const played = state.resultOrder.map(id => state.results[id]).filter(Boolean);
@@ -1293,19 +1396,19 @@ function renderLive() {
   const rd   = currentRoundData();
   const show = (rd?.matches.filter(m => m.resultId).map(m => resultById(m.resultId)) || []).filter(Boolean);
   const display = show.length ? show : played.slice(-6);
- 
+
   return `${phd('Broadcast', 'Match Centre', 'Most recent round results. Click any card for the full scorecard.')}
 <div class="live-grid">
   ${display.map((m, i) => matchCard(m, i === 0)).join('')}
 </div>`;
 }
- 
+
 function matchCard(m, feat = false) {
   if (!m) return '';
   const h   = teamById(m.homeId), a = teamById(m.awayId), v = venueById(m.venueId);
   const w   = teamById(m.result.winnerId);
   const motm = m.motm ? playerById(m.motm) : null;
- 
+
   function innBlock(inn, team) {
     const top   = [...inn.batting].sort((x, y) => y.r - x.r)[0];
     const won   = team.id === w.id;
@@ -1329,7 +1432,7 @@ function matchCard(m, feat = false) {
       <div class="phaseseg ph-death"><div class="pl">DEATH</div><div class="pv">${inn.phases.death.r}/${inn.phases.death.w}</div></div>
     </div>`;
   }
- 
+
   const t1 = teamById(m.inn1.teamId), t2 = teamById(m.inn2.teamId);
   return `<div class="match-card${feat ? ' feat' : ''}" data-act="openScorecard" data-id="${m.id}">
   <div class="mc-header">
@@ -1351,7 +1454,7 @@ function matchCard(m, feat = false) {
   </div>
 </div>`;
 }
- 
+
 /* ── POINTS TABLE ── */
 function renderPoints() {
   if (!state.teams.length || state.phase === 'setup') return `<div class="empty-state" style="padding:80px">Points table fills in once the season starts.</div>`;
@@ -1379,7 +1482,7 @@ function renderPoints() {
   <span><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--cyan);margin-right:5px"></span>Your team</span>
 </div>`;
 }
- 
+
 /* ── SCORECARDS ── */
 function renderScorecards() {
   const played = state.resultOrder.map(id => state.results[id]).filter(Boolean);
@@ -1396,14 +1499,14 @@ function renderScorecards() {
 </div>
 ${scorecardDetail(m)}`;
 }
- 
+
 function scorecardDetail(m) {
   const h = teamById(m.homeId), a = teamById(m.awayId), v = venueById(m.venueId), w = teamById(m.result.winnerId);
   const motm = m.motm ? playerById(m.motm) : null;
   const tw   = teamById(m.toss.winnerId);
   const inn  = ui.scInn === '2' ? m.inn2 : m.inn1;
   const batT = teamById(inn.teamId);
- 
+
   return `<div class="sc-hero">
   <div style="font-family:var(--f-display);font-size:28px;letter-spacing:.4px">🏆 ${esc(w.name)} won ${m.result.super ? '(Super Over)' : `by ${m.result.margin} ${m.result.method}`}</div>
   <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--ink-dim)">
@@ -1467,7 +1570,7 @@ ${inn.fow.length ? `<div class="panel"><div class="panel-head"><div class="panel
     ${inn.fow.map(f => `<span>${f.wkt}-${f.runs} (${esc(f.batter)})</span>`).join(' · ')}
   </div></div></div>` : ''}`;
 }
- 
+
 function dismissText(b) { return b.how === 'run out' ? 'run out' : (b.how + (b.bowlerName ? ' b ' + b.bowlerName.split(' ').pop() : '')); }
 function motmLine(m, pid) {
   let bat = null, bowl = null;
@@ -1480,7 +1583,7 @@ function motmLine(m, pid) {
   if (bowl) pts.push(`${bowl.wkts}/${bowl.runs}`);
   return pts.join(' & ') || 'match-winning impact';
 }
- 
+
 /* ── STATS ── */
 function renderStats() {
   if (!Object.keys(state.stats.bat || {}).length) return `<div class="empty-state" style="padding:80px">Stats accumulate as matches are played.</div>`;
@@ -1504,7 +1607,7 @@ function renderStats() {
 </div>
 <div class="panel"><div class="panel-body flush">${statTable(tab)}</div></div>`;
 }
- 
+
 function statTable(tab) {
   const rows = [];
   if (tab === 'bat') {
@@ -1556,7 +1659,7 @@ function statTable(tab) {
   </tr>`; }).join('') || `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--ink-off);font-style:italic">No data</td></tr>`}
   </tbody></table>`;
 }
- 
+
 /* ── PLAYOFFS ── */
 function renderPlayoffs() {
   if (['setup','auction','season'].includes(state.phase)) {
@@ -1565,7 +1668,7 @@ function renderPlayoffs() {
   }
   const po = state.playoffs; if (!po) return `<div class="empty-state">Playoffs not set up.</div>`;
   const next = nextPlayoffTie();
- 
+
   function tieCard(tie, cls='') {
     const a=tie.aId?teamById(tie.aId):null, b=tie.bId?teamById(tie.bId):null;
     const res=tie.resultId?resultById(tie.resultId):null;
@@ -1577,7 +1680,7 @@ function renderPlayoffs() {
     </div>`;
   }
   function innSFor(res,tid){const i=[res.inn1,res.inn2].find(x=>x.teamId===tid);return i?i.runs+'/'+i.wickets:'';}
- 
+
   return `${stepper('playoffs')}
 ${phd('Knockouts','Playoffs','Q1 winner → Final. Loser plays Elim winner in Q2.')}
 <div class="panel"><div class="panel-body">
@@ -1600,7 +1703,7 @@ ${isChair() ? `<div class="panel"><div class="panel-body" style="text-align:cent
     : `<div class="dim">All ties complete.</div>`}
 </div></div>` : ''}`;
 }
- 
+
 /* ── ADMIN ── */
 function renderAdmin() {
   if (!isChair()) return locked();
@@ -1636,7 +1739,7 @@ function renderAdmin() {
   </div>
 </div>`;
 }
- 
+
 function renderTradeDesk() {
   if (state.phase !== 'season') return '<div class="empty-state">Trades open during the season.</div>';
   const aT = ui.tradeA ? teamById(ui.tradeA) : null, bT = ui.tradeB ? teamById(ui.tradeB) : null;
@@ -1655,7 +1758,7 @@ function renderTradeDesk() {
 ${!tradeWindowOpen() ? '<div class="hint" style="color:var(--amber);margin-top:6px">Trade window is closed this round.</div>' : ''}`;
 }
 function optTeams(sel) { return '<option value="">Select…</option>' + state.teams.map(t => `<option value="${t.id}"${sel === t.id ? ' selected' : ''}>${esc(t.name)}</option>`).join(''); }
- 
+
 /* ── GUIDE ── */
 function renderGuide() {
   return `${phd('How It Works','Guide')}
@@ -1672,7 +1775,7 @@ function renderGuide() {
           <span style="position:absolute;left:0;top:-2px;width:23px;height:23px;border-radius:7px;background:var(--glass3);color:var(--gold);font-family:var(--f-mono);font-size:11px;font-weight:700;display:grid;place-items:center">${i+1}</span>${s}</li>`).join('')}
     </ol>
   </div></div>
- 
+
   <div class="panel"><div class="panel-head"><div class="panel-title">📐 Form & Injuries</div></div><div class="panel-body">
     <ul style="display:flex;flex-direction:column;gap:9px">
       ${['<b>Form (0–100)</b>: A player in form (🔥 Hot, 75+) plays above their rating by up to 30%. Cold players (📉, below 35) perform well below par.',
@@ -1683,13 +1786,13 @@ function renderGuide() {
         .map(s=>`<li style="font-size:13px;color:var(--ink-dim);padding-left:18px;position:relative"><span style="position:absolute;left:0;color:var(--gold)">▸</span>${s}</li>`).join('')}
     </ul>
   </div></div>
- 
+
   <div class="panel"><div class="panel-head"><div class="panel-title">🏟 The 12 IPL Grounds</div></div><div class="panel-body">
     <ul style="display:flex;flex-direction:column;gap:7px">
       ${state.venues.map(v => `<li style="font-size:12.5px;color:var(--ink-dim);padding-left:18px;position:relative"><span style="position:absolute;left:0;color:var(--gold)">▸</span><b>${esc(v.city)}</b> — ${esc(v.name)} ${pitchBadge(v.pitch)}</li>`).join('')}
     </ul>
   </div></div>
- 
+
   <div class="panel"><div class="panel-head"><div class="panel-title">⚙ Pitch Types</div></div><div class="panel-body">
     <ul style="display:flex;flex-direction:column;gap:9px">
       ${[['flat','Flat Belter','Pace and spin both get hit. High scores guaranteed. Batting heaven.'],
@@ -1702,12 +1805,12 @@ function renderGuide() {
   </div></div>
 </div>`;
 }
- 
+
 /* ═══════════════════════════════════════════
    OVERLAYS
 ═══════════════════════════════════════════ */
 function clearOverlay() { document.getElementById('overlay-root').innerHTML = ''; }
- 
+
 function confetti(n=90) {
   const colors=['#f5c842','#ff2060','#22d3ee','#22c55e','#38bdf8','#fb923c','#a855f7'];
   let h='<div class="confetti">';
@@ -1716,7 +1819,7 @@ function confetti(n=90) {
   }
   return h+'</div>';
 }
- 
+
 function showToss(home, away, onDone) {
   document.getElementById('overlay-root').innerHTML = `<div class="overlay" id="ovToss">
     <div class="ov-inner">
@@ -1733,7 +1836,7 @@ function showToss(home, away, onDone) {
   setTimeout(() => { const c = document.getElementById('tc'); if (c) c.classList.add('spin'); }, 60);
   setTimeout(() => { clearOverlay(); if (onDone) onDone(); }, 2000);
 }
- 
+
 function showCrisis(player) {
   const t = teamById(player.teamId);
   document.getElementById('overlay-root').innerHTML = `<div class="overlay overlay-crisis" data-act="dismissOverlay">
@@ -1747,13 +1850,13 @@ function showCrisis(player) {
     </div>
   </div>`;
 }
- 
+
 function showChampion() {
   const po = state.playoffs; if (!po || !po.championId) return;
   const champ = teamById(po.championId);
   const finalRes = resultById(po.final.resultId);
   const runner = finalRes ? teamById(finalRes.result.winnerId === po.final.aId ? po.final.bId : po.final.aId) : null;
- 
+
   document.getElementById('overlay-root').innerHTML = `<div class="overlay overlay-champion" id="ovChamp">
     <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(245,200,66,.15),transparent 65%);animation:pulse 2.2s infinite"></div>
     ${confetti(130)}
@@ -1779,7 +1882,7 @@ function showChampion() {
   setTimeout(() => { const a = document.getElementById('cs0'); if(a) a.classList.add('on'); }, 100);
   setTimeout(() => { const a=document.getElementById('cs0'); if(a) a.classList.remove('on'); const b=document.getElementById('cs1'); if(b) b.classList.add('on'); }, 2200);
 }
- 
+
 function showAwards() {
   const o = orangeCap(), p = purpleCap();
   let motmId=null, motmC=-1;
@@ -1794,7 +1897,7 @@ function showAwards() {
   ui.awardIdx=0; window.__awards=awards;
   showAwardSlide(awards);
 }
- 
+
 function showAwardSlide(awards) {
   const i=ui.awardIdx||0, a=awards[i];
   document.getElementById('overlay-root').innerHTML=`<div class="overlay"><div class="ov-inner" style="max-width:500px;width:90%">
@@ -1809,7 +1912,7 @@ function showAwardSlide(awards) {
     <button class="btn btn-primary btn-lg" style="margin-top:24px" data-act="${i<awards.length-1?'nextAward':'dismissOverlay'}">${i<awards.length-1?'Next →':'Close 🎉'}</button>
   </div></div>`;
 }
- 
+
 /* Auction player assignment modal */
 function showAuctionModal(pid) {
   const p = playerById(pid);
@@ -1866,13 +1969,13 @@ function showAuctionModal(pid) {
     </div>
   </div>`;
 }
- 
+
 /* ═══════════════════════════════════════════
    ACTIONS
 ═══════════════════════════════════════════ */
 const ACT = {
   loginTab(el)    { ui.loginTab = el.dataset.id; render(); },
- 
+
   doChairLogin() {
     const passEl = document.getElementById('loginPass');
     const pass = (passEl?.value || '').trim();
@@ -1885,7 +1988,7 @@ const ACT = {
       if (e) e.innerHTML = '<div class="login-err-box">Incorrect password. Default: <b>chair</b></div>';
     }
   },
- 
+
   doDelegateLogin() {
     const codeEl = document.getElementById('loginCode');
     const code = (codeEl?.value || '').toUpperCase().trim();
@@ -1899,13 +2002,13 @@ const ACT = {
       if (e) e.innerHTML = '<div class="login-err-box">Invalid code. Ask your Chair.</div>';
     }
   },
- 
+
   logout() { session = { role: null, teamId: null }; render(); },
- 
+
   nav(el) { ui.page = el.dataset.id; render(); },
- 
+
   setupTab(el) { ui.setupTab = el.dataset.id; render(); },
- 
+
   quickStart() {
     state = freshState();
     state.teams   = DEFAULT_TEAMS.map(d => makeTeamRecord({ ...d }));
@@ -1913,29 +2016,31 @@ const ACT = {
     state.players = generatePlayerPool(Date.now(), poolSz);
     save(); render(); toast(`12-team league ready — ${poolSz} players, 12 real IPL grounds`, 'success');
   },
- 
+
   loadDefaultTeams() {
     state.teams = DEFAULT_TEAMS.map(d => makeTeamRecord({ ...d }));
     save(); render(); toast('12 default teams loaded', 'success');
   },
- 
+
   addTeam() {
     const n = state.teams.length + 1;
     const colors = ['#3b82f6','#ef4444','#8b5cf6','#22c55e','#f59e0b','#ec4899'];
     state.teams.push(makeTeamRecord({ name:'Team '+n, short:'T'+n, color:colors[n%colors.length]||'#6b7280', venueId:state.venues[0].id, purse:90 }));
     save(); render();
   },
- 
+
   removeTeam(el)  { state.teams = state.teams.filter(t => t.id !== el.dataset.id); save(); render(); },
- 
+
   genPool(el) {
     const n = +el.dataset.id;
     state.players = generatePlayerPool(Date.now(), n);
     save(); render(); toast(`${n} players generated with form & injury ratings`, 'success');
   },
- 
+
   clearPool() { state.players = []; save(); render(); },
- 
+
+  triggerCSVImport() { document.getElementById('csvPlayerFile')?.click(); },
+
   beginAuction() {
     if (state.teams.length < 2)       { toast('Add at least 2 teams', 'warn'); return; }
     if (state.players.length < 11)    { toast('Generate a player pool first', 'warn'); return; }
@@ -1943,11 +2048,11 @@ const ACT = {
     ui.page = 'auction'; ui.auctionSet = 0;
     render(); toast('Auction started — reveal players set by set', 'success');
   },
- 
+
   selectAuctionSet(el) { ui.auctionSet = +el.dataset.id; render(); },
- 
+
   openAuctionPlayer(el) { showAuctionModal(el.dataset.id); },
- 
+
   confirmAuctionAssign(el) {
     const pid = el.dataset.pid, tid = el.dataset.tid;
     const priceEl = document.getElementById('bidPrice');
@@ -1956,28 +2061,28 @@ const ACT = {
     if (r.ok) { clearOverlay(); render(); toast(`${playerById(pid)?.name} sold to ${teamById(tid)?.short} for ₹${price}Cr`, 'success'); }
     else toast(r.msg || 'Cannot assign', 'error');
   },
- 
+
   markUnsold(el) { auctionMarkUnsold(el.dataset.pid); clearOverlay(); render(); toast('Marked unsold', 'info'); },
- 
+
   finalizeAuction() {
     if (!allSquadsOk()) { toast('Every team needs 11+ players', 'warn'); return; }
     doFinalizeAuction();
     ui.page = 'strategy';
     render(); toast('Season generated! Set lineups and aggression.', 'success');
   },
- 
+
   editVenuePitch(el) {
     const v = state.venues.find(x => x.id === el.dataset.id);
     if (v) { v.pitch = el.value; save(); }
   },
- 
+
   selectSquad(el) { ui.xiTeam = el.dataset.id; render(); },
- 
+
   autoXI(el) {
     const t = teamById(el.dataset.id);
     if (t) { t.xi = autoXI(squadOf(t.id)); save(); render(); toast('XI auto-picked', 'success'); }
   },
- 
+
   toggleXI(el) {
     const pid = el.dataset.id, tid = el.dataset.team, t = teamById(tid);
     if (!t) return;
@@ -1986,7 +2091,7 @@ const ACT = {
     else { if (xi.length >= 11) { toast('XI is full — remove one first', 'warn'); return; } xi.push(pid); }
     t.xi = xi; save(); render();
   },
- 
+
   simRound() {
     const rd = currentRoundData(); if (!rd) { toast('No round data', 'warn'); return; }
     const home = teamById(rd.matches[0].homeId), away = teamById(rd.matches[0].awayId);
@@ -2004,7 +2109,7 @@ const ACT = {
       toast(`Round ${state.currentRound} simulated — ${played.length} matches`, 'success');
     });
   },
- 
+
   advanceRound() {
     const played = state.resultOrder.slice(-currentRoundData()?.matches.length).map(id => state.results[id]).filter(Boolean);
     const injLog = processBetweenRounds(played);
@@ -2018,11 +2123,11 @@ const ACT = {
     }
     render();
   },
- 
+
   openScorecard(el) { ui.scOpenId = el.dataset.id; ui.scInn = '1'; ui.page = 'scorecards'; render(); },
   scInn(el)         { ui.scInn = el.dataset.id; render(); },
   statTab(el)       { ui.statTab = el.dataset.id; render(); },
- 
+
   simPlayoff(el) {
     const key = el.dataset.id, po = state.playoffs;
     if (!po || !po[key]) return;
@@ -2036,7 +2141,7 @@ const ACT = {
       else toast(po[key].name + ' complete', 'success');
     });
   },
- 
+
   showChampion()  { showChampion(); },
   finishCeremony(){ showAwards(); },
   nextAward()     { ui.awardIdx = (ui.awardIdx || 0) + 1; showAwardSlide(window.__awards); },
@@ -2044,11 +2149,11 @@ const ACT = {
     if (e && !el.matches('[data-act=dismissOverlay].btn, .overlay-crisis.overlay')) return;
     clearOverlay();
   },
- 
+
   genCodes() { state.teams.forEach(t => state.codes[t.id] = genCode()); save(); render(); toast('Codes regenerated', 'success'); },
- 
+
   tradeSelTeam(el) { if (el.dataset.side === 'a') ui.tradeA = el.value||null; else ui.tradeB = el.value||null; render(); },
- 
+
   doTrade() {
     const aP = document.getElementById('tradePlayerA')?.value;
     const bP = document.getElementById('tradePlayerB')?.value;
@@ -2057,7 +2162,7 @@ const ACT = {
     if (r.ok) { ui.tradeA = null; ui.tradeB = null; toast('Trade complete', 'success'); render(); }
     else toast(r.msg || 'Trade failed', 'error');
   },
- 
+
   exportState() {
     const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
     const url  = URL.createObjectURL(blob), a = document.createElement('a');
@@ -2065,7 +2170,7 @@ const ACT = {
     URL.revokeObjectURL(url); toast('League exported', 'success');
   },
   triggerImport() { document.getElementById('importFile')?.click(); },
- 
+
   confirmReset() {
     document.getElementById('overlay-root').innerHTML = `<div class="backdrop"></div>
     <div class="modal"><div class="modal-head"><div class="modal-title">Reset Everything?</div></div>
@@ -2073,16 +2178,16 @@ const ACT = {
       <div class="modal-foot"><button class="btn btn-ghost" data-act="closeModal">Cancel</button><button class="btn btn-danger btn-lg" data-act="doReset">Yes, Reset</button></div>
     </div>`;
   },
- 
+
   doReset() {
     state = freshState(); session = { role:'chair', teamId:null };
     ui = { page:'setup', setupTab:'teams', scOpenId:null, scInn:'1', statTab:'bat', xiTeam:null, loginTab:'chair', awardIdx:0, auctionSet:0, tradeA:null, tradeB:null };
     save(); clearOverlay(); render(); toast('League reset', 'info');
   },
- 
+
   closeModal() { clearOverlay(); },
 };
- 
+
 function showMilestone(title, player, stat) {
   document.getElementById('overlay-root').innerHTML = `<div class="overlay" data-act="dismissOverlay">
     <div class="ov-inner">${confetti(50)}
@@ -2094,7 +2199,7 @@ function showMilestone(title, player, stat) {
   </div>`;
   setTimeout(() => clearOverlay(), 3000);
 }
- 
+
 /* ─── Field editors (input/change events) ─── */
 function handleFieldEdit(el) {
   const act = el.dataset.act;
@@ -2113,7 +2218,7 @@ function handleFieldEdit(el) {
     save();
   }
 }
- 
+
 /* ═══════════════════════════════════════════
    EVENT DELEGATION
 ═══════════════════════════════════════════ */
@@ -2123,16 +2228,30 @@ document.addEventListener('click', e => {
   if (act === 'editTeam' || act === 'editConfig') return;
   if (ACT[act]) { e.preventDefault(); ACT[act](el, e); }
 });
- 
+
 document.addEventListener('input', e => {
   const el = e.target.closest('[data-act]'); if (!el) return;
   const act = el.dataset.act;
   if (act === 'editTeam' || act === 'editConfig') handleFieldEdit(el);
   if (act === 'editVenuePitch') ACT.editVenuePitch(el);
 });
- 
+
 document.addEventListener('change', e => {
   const el = e.target;
+  if (el.id === 'csvPlayerFile' && el.files?.[0]) {
+    const fr = new FileReader();
+    fr.onload = () => {
+      const r = parsePlayerCSV(fr.result);
+      if (!r.ok) { toast(r.msg || 'CSV parse failed', 'error'); return; }
+      state.players = r.players;
+      save(); render();
+      const warn = r.errors.length ? ' (' + r.errors.length + ' rows skipped)' : '';
+      toast(r.players.length + ' players loaded from CSV' + warn, 'success');
+    };
+    fr.readAsText(el.files[0]);
+    el.value = ''; // allow re-import same file
+    return;
+  }
   if (el.id === 'importFile' && el.files?.[0]) {
     const fr = new FileReader();
     fr.onload = () => {
@@ -2144,14 +2263,14 @@ document.addEventListener('change', e => {
   if (el.dataset?.act === 'editTeam' || el.dataset?.act === 'editConfig') handleFieldEdit(el);
   if (el.dataset?.act === 'editVenuePitch') ACT.editVenuePitch(el);
 });
- 
+
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     const ov = document.getElementById('overlay-root');
     if (ov?.innerHTML.trim() && !ov.querySelector('.overlay-champion')) clearOverlay();
   }
 });
- 
+
 /* ═══════════════════════════════════════════
    BOOT
 ═══════════════════════════════════════════ */
