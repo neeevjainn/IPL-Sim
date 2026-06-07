@@ -396,7 +396,7 @@ function processRoundInjuries(players, currentRound) {
   players.forEach(p => {
     if (!p.teamId || p.injured) return;
     const prone  = clamp(p.injuryProne ?? 30, 0, 100);
-    const chance = (prone / 100) * 0.16; // 0% to 16%
+    const chance = (prone / 100) * 0.008; // minimal — ~10-12 injuries across a full season
     if (Math.random() < chance) {
       p.injured     = true;
       p.injuryGames = 1; // Fixed: 1 match

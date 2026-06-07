@@ -1230,7 +1230,7 @@ function renderSquad() {
   if (!team) return `<div class="empty-state">No teams found.</div>`;
 
   const squad  = squadOf(tid).sort((a, b) => playerOverall(b) - playerOverall(a));
-  const xiSet  = new Set(team.xi?.length === 11 ? team.xi : autoXI(squad));
+  const xiSet  = new Set(team.xi && team.xi.length ? team.xi : autoXI(squad));
   const canEdit = canManage(tid);
   const bal    = squadBalance(tid);
 
